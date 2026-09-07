@@ -1,0 +1,738 @@
+// BJT — schema đầy đủ.
+// Đơn vị trung tâm là QuestionGroup (大問), không phải Question.
+// Mọi câu hỏi đều thuộc một group, kể cả câu đứng một mình.
+
+// Prisma 7: generator `prisma-client-js` đã bị bỏ, thay bằng `prisma-client`.
+// `output` nay là trường BẮT BUỘC — client không còn sinh vào node_modules nữa.
+// `previewFeatures = ["driverAdapters"]` cũng bỏ: driver adapters đã GA và bắt buộc ở v7.
+// Import kiểu qua @/lib/prisma-types để chỉ có MỘT chỗ phải sửa nếu output đổi.
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+// Prisma 7: `url` không còn được phép trong schema file.
+// Connection string chuyển sang prisma.config.ts (cho Migrate) và vào
+// PrismaClient qua driver adapter (cho runtime) — xem lib/db.ts.
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUM
+// ============================================================
+
+enum Part {
+  LISTENING          // 聴解
+  LISTENING_READING  // 聴読解
+  READING            // 読解
+}
+
+enum SectionCode {
+  L1  // 場面把握問題
+  L2  // 発言聴解問題
+  L3  // 総合聴解問題
+  LR1 // 状況把握問題
+  LR2 // 資料聴読解問題
+  LR3 // 総合聴読解問題
+  R1  // 語彙・文法問題
+  R2  // 表現読解問題
+  R3  // 総合読解問題
+}
+
+enum Level {
+  J5
+  J4
+  J3
+  J2
+  J1
+  J1_PLUS
+}
+
+enum ContentStatus {
+  DRAFT
+  NEEDS_AUDIO
+  NEEDS_REVIEW
+  PUBLISHED
+  FLAGGED
+  ARCHIVED
+}
+
+enum MaterialKind {
+  AUDIO
+  DOCUMENT
+  IMAGE
+  TABLE
+  CHART
+}
+
+enum Register {
+  SONKEIGO  // 尊敬語
+  KENJOUGO  // 謙譲語
+  TEINEIGO  // 丁寧語
+  PLAIN
+  WRITTEN
+}
+
+enum PartOfSpeech {
+  NOUN
+  VERB_U
+  VERB_RU
+  VERB_IRR
+  I_ADJ
+  NA_ADJ
+  ADVERB
+  EXPRESSION
+  COUNTER
+}
+
+enum UserRole {
+  USER
+  EDITOR
+  ADMIN
+}
+
+enum AttemptMode {
+  PRACTICE
+  MOCK
+  REVIEW
+  WEAKNESS
+}
+
+enum CardType {
+  VOCAB
+  GRAMMAR
+}
+
+enum SrsState {
+  NEW
+  LEARNING
+  REVIEW
+  RELEARNING
+}
+
+// ============================================================
+// CẤU TRÚC ĐỀ — seed, gần như không đổi
+// ============================================================
+
+model PartDef {
+  code          Part     @id
+  nameJa        String
+  nameVi        String
+  questionCount Int
+  timeLimitSec  Int
+  order         Int
+  sections      SectionDef[]
+}
+
+model SectionDef {
+  code          SectionCode @id
+  part          Part
+  partDef       PartDef     @relation(fields: [part], references: [code])
+  nameJa        String
+  nameVi        String
+  questionCount Int
+  order         Int
+  hasAudio      Boolean     @default(false)
+  hasMaterial   Boolean     @default(false)
+  descriptionVi String?
+
+  groups        QuestionGroup[]
+  sets          QuestionSet[]
+}
+
+// ============================================================
+// NỘI DUNG ĐỀ THI
+// ============================================================
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  r2Key      String   @unique // bjt/audio/lr2-007.mp3
+  mime       String
+  bytes      Int
+  durationMs Int?
+  checksum   String?
+  waveform   Json? // mảng peak tính sẵn lúc upload, để vẽ sóng không cần tải file
+  uploadedBy String?
+  createdAt  DateTime @default(now())
+
+  materials      Material[]
+  vocabEntries   VocabEntry[]
+  vocabExamples  VocabExample[]
+  grammarExamples GrammarExample[]
+}
+
+model Material {
+  id         String        @id @default(cuid())
+  kind       MaterialKind
+  titleAdmin String // tên nội bộ, không hiện cho học viên
+  mediaId    String?
+  media      MediaAsset?   @relation(fields: [mediaId], references: [id])
+
+  // AUDIO: [{ speaker, role, text, startMs, endMs }]
+  transcript Json?
+  // DOCUMENT: { format: 'html'|'markdown', content }
+  // TABLE:    { headers: [], rows: [][], caption }
+  // CHART:    { chartType, series, axisLabels }
+  body       Json?
+  altText    String?
+
+  status     ContentStatus @default(DRAFT)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  groups     GroupMaterial[]
+
+  @@index([kind, status])
+}
+
+model QuestionGroup {
+  id            String        @id @default(cuid())
+  sectionCode   SectionCode
+  section       SectionDef    @relation(fields: [sectionCode], references: [code])
+  level         Level
+  titleAdmin    String
+  instructionJa String?
+  instructionVi String?
+  status        ContentStatus @default(DRAFT)
+  createdById   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  materials     GroupMaterial[]
+  questions     Question[]
+  setItems      QuestionSetItem[]
+  mockItems     MockTestItem[]
+
+  @@index([sectionCode, level, status])
+}
+
+model GroupMaterial {
+  groupId    String
+  materialId String
+  order      Int
+  group      QuestionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  material   Material      @relation(fields: [materialId], references: [id])
+
+  @@id([groupId, materialId])
+}
+
+model Question {
+  id             String        @id @default(cuid())
+  groupId        String
+  group          QuestionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  order          Int // thứ tự trong group
+  sectionCode    SectionCode // lặp lại để query nhanh, luôn đồng bộ với group
+  level          Level
+
+  stemJa         String
+  stemFurigana   Json?
+  stemVi         String? // bản dịch, chỉ hiện ở màn hình xem lại
+
+  audioStartMs   Int? // đoạn audio của group ứng với câu này
+  audioEndMs     Int?
+
+  explanationVi  String? // vì sao đáp án đúng
+  businessNoteVi String? // bối cảnh công sở Nhật cần biết
+
+  // Không dùng để chấm điểm. Dùng để soát chất lượng nội dung.
+  // Tính bằng cron hàng ngày, chỉ cho câu đã có >= 30 lượt làm.
+  correctRate    Float?
+  discrimination Float?
+  attemptCount   Int           @default(0)
+
+  status         ContentStatus @default(DRAFT)
+  createdById    String?
+  reviewedById   String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  options        QuestionOption[]
+  tags           QuestionTag[]
+  vocabLinks     QuestionVocab[]
+  grammarLinks   QuestionGrammar[]
+  answers        AttemptAnswer[]
+  reports        QuestionReport[]
+
+  @@unique([groupId, order])
+  @@index([sectionCode, level, status])
+}
+
+model QuestionOption {
+  id             String   @id @default(cuid())
+  questionId     String
+  question       Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  order          Int // 1..4
+  textJa         String
+  isCorrect      Boolean  @default(false)
+  distractorNote String? // vì sao phương án này sai
+
+  answers        AttemptAnswer[]
+
+  @@unique([questionId, order])
+}
+
+// ============================================================
+// BỘ LUYỆN TẬP VÀ ĐỀ THI THỬ
+// ============================================================
+
+model QuestionSet {
+  id          String        @id @default(cuid())
+  sectionCode SectionCode
+  section     SectionDef    @relation(fields: [sectionCode], references: [code])
+  level       Level
+  indexNo     Int // "bộ 7"
+  titleVi     String
+  descVi      String?
+  estMinutes  Int?
+  status      ContentStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  items       QuestionSetItem[]
+  attempts    Attempt[]
+
+  @@unique([sectionCode, indexNo])
+  @@index([sectionCode, level, status])
+}
+
+model QuestionSetItem {
+  setId   String
+  groupId String
+  order   Int
+  set     QuestionSet   @relation(fields: [setId], references: [id], onDelete: Cascade)
+  group   QuestionGroup @relation(fields: [groupId], references: [id])
+
+  @@id([setId, groupId])
+}
+
+model MockTest {
+  id          String        @id @default(cuid())
+  code        String        @unique // MT-01
+  titleVi     String
+  descVi      String?
+  status      ContentStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  items       MockTestItem[]
+  attempts    Attempt[]
+}
+
+model MockTestItem {
+  mockTestId  String
+  groupId     String
+  sectionCode SectionCode
+  order       Int
+  mockTest    MockTest      @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+  group       QuestionGroup @relation(fields: [groupId], references: [id])
+
+  @@id([mockTestId, groupId])
+  @@index([mockTestId, sectionCode, order])
+}
+
+// ============================================================
+// NHÃN KỸ NĂNG — nguồn của "Đang yếu nhất"
+// ============================================================
+
+model Tag {
+  id       String @id @default(cuid())
+  slug     String @unique // keigo-phone
+  nameVi   String // Kính ngữ trong hội thoại điện thoại
+  nameJa   String?
+  category String // skill | scenario | function | document
+  order    Int    @default(0)
+
+  questions QuestionTag[]
+}
+
+model QuestionTag {
+  questionId String
+  tagId      String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([questionId, tagId])
+  @@index([tagId])
+}
+
+// ============================================================
+// TỪ VỰNG
+// ============================================================
+
+model VocabTopic {
+  id      String @id @default(cuid())
+  slug    String @unique
+  nameVi  String
+  nameJa  String?
+  order   Int    @default(0)
+
+  entries VocabEntry[]
+}
+
+model VocabEntry {
+  id          String        @id @default(cuid())
+  headword    String // 稟議書
+  readingKana String // りんぎしょ
+  accent      Int? // vị trí xuống giọng, kiểu Tokyo
+  pos         PartOfSpeech
+  meaningVi   String
+  meaningEn   String?
+  level       Level
+  topicId     String?
+  topic       VocabTopic?   @relation(fields: [topicId], references: [id])
+  register    Register?
+  audioId     String?
+  audio       MediaAsset?   @relation(fields: [audioId], references: [id])
+  noteVi      String?
+  status      ContentStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  examples    VocabExample[]
+  relationsFrom VocabRelation[] @relation("from")
+  relationsTo   VocabRelation[] @relation("to")
+  questionLinks QuestionVocab[]
+
+  @@unique([headword, readingKana])
+  @@index([topicId, level, status])
+}
+
+model VocabExample {
+  id           String      @id @default(cuid())
+  vocabId      String
+  vocab        VocabEntry  @relation(fields: [vocabId], references: [id], onDelete: Cascade)
+  sentenceJa   String
+  sentenceKana String?
+  meaningVi    String
+  contextTag   String? // email | meeting | phone | report
+  audioId      String?
+  audio        MediaAsset? @relation(fields: [audioId], references: [id])
+  order        Int         @default(0)
+}
+
+// 言う → おっしゃる (sonkeigo) / 申す (kenjougo)
+// Đây là chỗ người học BJT sai nhiều nhất.
+model VocabRelation {
+  vocabId   String
+  relatedId String
+  relation  String // synonym | antonym | sonkeigo | kenjougo | teineigo
+  from      VocabEntry @relation("from", fields: [vocabId], references: [id], onDelete: Cascade)
+  to        VocabEntry @relation("to", fields: [relatedId], references: [id], onDelete: Cascade)
+
+  @@id([vocabId, relatedId, relation])
+}
+
+// ============================================================
+// NGỮ PHÁP
+// ============================================================
+
+model GrammarPoint {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  pattern         String // 〜させていただく
+  formation       String // V使役形 + ていただく
+  meaningVi       String
+  register        Register
+  level           Level
+  usageNoteVi     String?
+  commonMistakeVi String? // lỗi người Việt hay mắc
+  jlptLevel       String? // N2 — để sẵn cho phần JLPT bổ trợ sau này
+  status          ContentStatus @default(DRAFT)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  examples        GrammarExample[]
+  questionLinks   QuestionGrammar[]
+
+  @@index([level, register, status])
+}
+
+model GrammarExample {
+  id         String       @id @default(cuid())
+  grammarId  String
+  grammar    GrammarPoint @relation(fields: [grammarId], references: [id], onDelete: Cascade)
+  sentenceJa String
+  meaningVi  String
+  contextTag String?
+  isNegative Boolean      @default(false) // ví dụ về cách dùng SAI
+  noteVi     String?
+  audioId    String?
+  audio      MediaAsset?  @relation(fields: [audioId], references: [id])
+  order      Int          @default(0)
+}
+
+// ============================================================
+// LIÊN KẾT NGƯỢC — sai câu nào thì biết ôn gì
+// ============================================================
+
+model QuestionVocab {
+  questionId String
+  vocabId    String
+  relevance  String // tested | appears
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  vocab      VocabEntry @relation(fields: [vocabId], references: [id], onDelete: Cascade)
+
+  @@id([questionId, vocabId])
+}
+
+model QuestionGrammar {
+  questionId String
+  grammarId  String
+  relevance  String
+  question   Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  grammar    GrammarPoint @relation(fields: [grammarId], references: [id], onDelete: Cascade)
+
+  @@id([questionId, grammarId])
+}
+
+// ============================================================
+// BETTER AUTH
+//
+// QUAN TRỌNG: bốn model dưới đây do Better Auth quản lý.
+// Trước khi migrate, chạy `npx @better-auth/cli generate` để sinh lại
+// và đối chiếu — schema của Better Auth có thể đổi giữa các phiên bản.
+// Trường `role` do plugin admin() thêm vào.
+// ============================================================
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // plugin admin()
+  role          UserRole @default(USER)
+  banned        Boolean  @default(false)
+  banReason     String?
+  banExpires    DateTime?
+
+  // của riêng dự án
+  locale        String   @default("vi")
+
+  sessions      Session[]
+  accounts      Account[]
+  profile       UserProfile?
+  attempts      Attempt[]
+  srsCards      SrsCard[]
+  srsReviews    SrsReview[]
+  skillStats    UserSkillStat[]
+  reports       QuestionReport[]
+
+  @@map("user")
+}
+
+model Session {
+  id             String   @id @default(cuid())
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // plugin admin(): cho phép admin đăng nhập thay user để soát lỗi
+  impersonatedBy String?
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+model UserProfile {
+  userId           String    @id
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetLevel      Level?
+  examDate         DateTime?
+  dailyGoalMinutes Int       @default(20)
+  timezone         String    @default("Asia/Ho_Chi_Minh")
+  updatedAt        DateTime  @updatedAt
+}
+
+// ============================================================
+// HỌC VÀ ÔN — SRS dùng FSRS (ts-fsrs), không tự viết SM-2
+// ============================================================
+
+model SrsCard {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardType      CardType
+  refId         String // vocabId hoặc grammarId
+  dueAt         DateTime
+  stability     Float     @default(0)
+  difficulty    Float     @default(0)
+  elapsedDays   Int       @default(0)
+  scheduledDays Int       @default(0)
+  reps          Int       @default(0)
+  lapses        Int       @default(0)
+  state         SrsState  @default(NEW)
+  lastReviewAt  DateTime?
+
+  reviews       SrsReview[]
+
+  @@unique([userId, cardType, refId])
+  @@index([userId, dueAt]) // truy vấn nóng nhất của cả app
+}
+
+model SrsReview {
+  id         String   @id @default(cuid())
+  cardId     String
+  card       SrsCard  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating     Int // 1 again · 2 hard · 3 good · 4 easy
+  durationMs Int?
+  reviewedAt DateTime @default(now())
+
+  @@index([userId, reviewedAt])
+}
+
+// ============================================================
+// LƯỢT LÀM BÀI
+// ============================================================
+
+model Attempt {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mode           AttemptMode
+  questionSetId  String?
+  questionSet    QuestionSet? @relation(fields: [questionSetId], references: [id])
+  mockTestId     String?
+  mockTest       MockTest?    @relation(fields: [mockTestId], references: [id])
+
+  startedAt      DateTime     @default(now())
+  finishedAt     DateTime?
+  timeSpentSec   Int?
+
+  rawCorrect     Int          @default(0)
+  totalQuestions Int
+  // Chỉ điền khi mode = MOCK. PRACTICE để null.
+  estimatedScore Int?
+  estimatedLevel Level?
+  perSection     Json? // { "L1": { correct: 4, total: 5 }, ... }
+
+  answers        AttemptAnswer[]
+
+  @@index([userId, startedAt])
+  @@index([userId, mode, finishedAt])
+}
+
+model AttemptAnswer {
+  id               String          @id @default(cuid())
+  attemptId        String
+  attempt          Attempt         @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId       String
+  question         Question        @relation(fields: [questionId], references: [id])
+  selectedOptionId String? // null = bỏ trống
+  selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id])
+  isCorrect        Boolean         @default(false)
+  timeSpentMs      Int?
+  flagged          Boolean         @default(false)
+  answeredAt       DateTime        @default(now())
+
+  @@unique([attemptId, questionId])
+  @@index([questionId]) // để cron tính correctRate
+}
+
+// Bảng dẫn xuất, cập nhật bằng cron mỗi giờ.
+// Đừng tính trực tiếp từ AttemptAnswer mỗi lần vào trang chủ.
+model UserSkillStat {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dimension String // section | tag
+  key       String // "L3" hoặc "keigo-phone"
+  attempts  Int      @default(0)
+  correct   Int      @default(0)
+  accuracy  Float    @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, dimension, key])
+  @@index([userId, accuracy])
+}
+
+// ============================================================
+// CHẤM ĐIỂM
+// ============================================================
+
+model ScoringConfig {
+  id        String   @id @default("active")
+  version   Int      @default(1)
+  rules     Json // { "pointsPerQuestion": 10 }
+  updatedAt DateTime @updatedAt
+}
+
+model ScoringBand {
+  level    Level @id
+  minScore Int
+  maxScore Int
+  order    Int
+}
+
+// ============================================================
+// VẬN HÀNH
+// ============================================================
+
+model QuestionReport {
+  id         String    @id @default(cuid())
+  questionId String
+  question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id])
+  reason     String // wrong_answer | typo | audio_broken | unclear | other
+  detail     String?
+  status     String    @default("open") // open | resolved | rejected
+  resolvedBy String?
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  entity    String
+  entityId  String
+  action    String // create | update | delete | publish
+  diff      Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
+}
