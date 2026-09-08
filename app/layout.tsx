@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { Be_Vietnam_Pro, BIZ_UDPGothic } from 'next/font/google';
+import { NavigationProgress } from '@/components/common/NavigationProgress';
 import { ThemeProvider } from '@/components/common/ThemeProvider';
 import './globals.css';
 
@@ -37,7 +39,13 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       className={`${beVietnamPro.variable} ${bizUDPGothic.variable} h-full`}
     >
       <body className="min-h-full">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {/* useSearchParams cần Suspense — thanh progress bắt click Link toàn app. */}
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
