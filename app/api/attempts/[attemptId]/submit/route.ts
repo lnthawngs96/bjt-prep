@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { submitAttempt } from '@/lib/data/attempts';
-import type { AttemptMode } from '@/lib/prisma-types';
 
 /**
  * CHẤM ĐIỂM Ở SERVER. Client chỉ gửi lên "tôi chọn phương án nào",
  * server tự tra đáp án. Không bao giờ tin con số đúng/sai do client tính,
  * kể cả khi dữ liệu còn là mock — thiết kế sai bây giờ thì sau phải viết lại.
+ *
+ * `mode` và `totalQuestions` đọc từ bản ghi Attempt, KHÔNG nhận từ client:
+ * nếu không thì ai cũng khai mình đang làm đề 80 câu để lấy điểm thang 800.
  */
 export async function POST(req: Request, ctx: RouteContext<'/api/attempts/[attemptId]/submit'>) {
   const { attemptId } = await ctx.params;
@@ -35,9 +37,10 @@ export async function POST(req: Request, ctx: RouteContext<'/api/attempts/[attem
     ];
   });
 
-  // TODO(db): mode lấy từ bản ghi Attempt, không nhận từ client.
-  const mode: AttemptMode = 'PRACTICE';
-  const result = await submitAttempt({ attemptId, mode, answers: parsed });
+  const result = await submitAttempt({ attemptId, answers: parsed });
+  if (!result) {
+    return NextResponse.json({ error: 'Không tìm thấy lượt làm bài' }, { status: 404 });
+  }
 
   return NextResponse.json(result);
 }

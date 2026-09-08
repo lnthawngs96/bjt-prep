@@ -1,44 +1,35 @@
 import { notFound } from 'next/navigation';
-import {
-  getFirstGroupOfMockTest,
-  getFirstGroupOfSet,
-  getMockTest,
-  getSet,
-} from '@/lib/data/attempts';
+import { getAttempt } from '@/lib/data/attempts';
 import { getGroupsForExamByMockTest, getGroupsForExamBySet } from '@/lib/data/questions';
+import { getMockTest, getSet } from '@/lib/data/attempts';
 import { getPartsWithSections, getSection } from '@/lib/data/sections';
 import { getPlaybackUrl } from '@/lib/data/media';
 import { audioPlayOnce, navigationModeFor } from '@/lib/exam-rules';
-import type { AttemptMode } from '@/lib/prisma-types';
 import { ExamRunner } from './ExamRunner';
 
 /** Màn làm bài không có header — nó nằm ngoài layout học viên về mặt thị giác. */
 export default async function ExamPage({ params }: PageProps<'/exam/[attemptId]'>) {
   const { attemptId } = await params;
 
-  // Giai đoạn tĩnh: attemptId dạng "att-<setId>" hoặc "att-<mockTestId>".
-  // TODO(db): đọc Attempt thật, kiểm userId khớp session rồi lấy mode và đề từ đó.
-  const refId = attemptId.replace(/^att-/, '');
-  const mockTest = await getMockTest(refId);
-  const mode: AttemptMode = mockTest ? 'MOCK' : 'PRACTICE';
+  // Đọc bản ghi lượt làm bài thay vì suy từ chuỗi id.
+  // TODO(db): getAttempt kiểm luôn attempt.userId === session.user.id.
+  const attempt = await getAttempt(attemptId);
+  if (!attempt) notFound();
 
-  const [groups, firstGroup, title] = mockTest
+  const [groups, meta] = attempt.mockTestId
     ? await Promise.all([
-        getGroupsForExamByMockTest(refId),
-        getFirstGroupOfMockTest(refId),
-        Promise.resolve(mockTest.titleVi),
+        getGroupsForExamByMockTest(attempt.mockTestId),
+        getMockTest(attempt.mockTestId),
       ])
-    : await (async () => {
-        const set = await getSet(refId);
-        if (!set) return [[], null, ''] as const;
-        return Promise.all([
-          getGroupsForExamBySet(refId),
-          getFirstGroupOfSet(refId),
-          Promise.resolve(set.titleVi),
-        ]);
-      })();
+    : attempt.questionSetId
+      ? await Promise.all([
+          getGroupsForExamBySet(attempt.questionSetId),
+          getSet(attempt.questionSetId),
+        ])
+      : [[], null];
 
-  if (groups.length === 0 || !firstGroup) notFound();
+  const firstGroup = groups[0];
+  if (!firstGroup || !meta) notFound();
 
   const [section, parts] = await Promise.all([
     getSection(firstGroup.sectionCode),
@@ -57,18 +48,20 @@ export default async function ExamPage({ params }: PageProps<'/exam/[attemptId]'
     await Promise.all(mediaIds.map(async (id) => [id, await getPlaybackUrl(id)] as const)),
   );
 
-  // Thời gian: đề thi thử dùng giới hạn của phần, bộ luyện tập dùng estMinutes.
-  const timeLimitSec = mockTest ? (part?.timeLimitSec ?? 1800) : 15 * 60;
+  // Đề thi thử dùng giới hạn thời gian của phần; bộ luyện tập dùng estMinutes.
+  const timeLimitSec = attempt.mockTestId
+    ? (part?.timeLimitSec ?? 1800)
+    : ('estMinutes' in meta ? (meta.estMinutes ?? 15) : 15) * 60;
 
   return (
     <ExamRunner
       attemptId={attemptId}
-      title={title}
+      title={meta.titleVi}
       partNameJa={part?.nameJa ?? section.nameJa}
       sectionLabel={`Section ${section.order}`}
       timeLimitSec={timeLimitSec}
-      navigationMode={navigationModeFor(mode, section.code)}
-      playOnce={audioPlayOnce(mode)}
+      navigationMode={navigationModeFor(attempt.mode, section.code)}
+      playOnce={audioPlayOnce(attempt.mode)}
       groups={groups}
       mediaUrls={mediaUrls}
     />

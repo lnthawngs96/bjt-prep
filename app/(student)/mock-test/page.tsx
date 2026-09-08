@@ -56,24 +56,49 @@ export default async function MockTestPage() {
       <Section>
         <SectionHeading title="Đề sẵn có" meta={`${tests.length} đề`} />
         {tests.map((t, i) => {
-          const ready = t.questionCount >= MOCK_TEST_QUESTION_COUNT;
+          const full = t.questionCount >= MOCK_TEST_QUESTION_COUNT;
+          const trailing = (
+            <span className="flex items-center gap-2.5">
+              {!full && t.questionCount > 0 && (
+                <Badge tone="wr">
+                  Đang soạn · {t.questionCount}/{MOCK_TEST_QUESTION_COUNT} câu
+                </Badge>
+              )}
+              {t.questionCount === 0 && <Badge tone="neutral">Chưa có câu hỏi</Badge>}
+              {t.lastAttempt && <Badge tone="ok">{t.lastAttempt.score} điểm</Badge>}
+            </span>
+          );
+
+          // Đề chưa có câu nào thì không mở được — bấm vào sẽ ra màn thi trắng.
+          // Đề đã có câu thì mở lượt mới qua API, kể cả khi chưa đủ 80.
+          if (t.questionCount === 0) {
+            return (
+              <div
+                key={t.id}
+                className="flex w-full items-center gap-3.5 border-b border-ln px-3 py-3.5 opacity-55 first-of-type:border-t"
+              >
+                <span className="w-3.5 flex-none text-[11.5px] tabular-nums text-fg3">{i + 1}</span>
+                <span className="min-w-0 flex-1">
+                  <b className="block text-[14.5px] font-medium">{t.titleVi}</b>
+                  <span className="block text-[12.5px] text-fg2">{t.descVi}</span>
+                </span>
+                {trailing}
+              </div>
+            );
+          }
+
           return (
             <ListRow
               key={t.id}
-              href={t.lastAttempt ? `/result/${t.lastAttempt.attemptId}` : '/mock-test'}
+              mockTestId={t.id}
               index={i + 1}
               title={t.titleVi}
-              subtitle={t.descVi}
-              trailing={
-                <span className="flex items-center gap-2.5">
-                  {!ready && (
-                    <Badge tone="wr">
-                      Đang soạn · {t.questionCount}/{MOCK_TEST_QUESTION_COUNT}
-                    </Badge>
-                  )}
-                  {t.lastAttempt && <Badge tone="ok">{t.lastAttempt.score} điểm</Badge>}
-                </span>
+              subtitle={
+                full
+                  ? t.descVi
+                  : `${t.descVi} — đề chưa đủ 80 câu, làm thử được nhưng chưa quy ra thang 800.`
               }
+              trailing={trailing}
             />
           );
         })}

@@ -14,13 +14,24 @@ export default async function StudentLayout({ children }: LayoutProps<'/'>) {
   return (
     <ToastProvider>
       <Header
-        score={estimate.score}
-        level={estimate.level}
-        dueVocabCount={dueVocabCount}
-        // TODO(db): Phase 2 đọc role từ session Better Auth thay vì mock.
-        isAdmin={user?.role === 'ADMIN'}
+        // TODO(auth): Phase 2 đọc từ session Better Auth. Chưa đăng nhập thì
+        // getCurrentUser() trả null và header hiện nút Đăng nhập.
+        user={user ? { name: user.name, initials: initialsOf(user.name), isAdmin: user.role === 'ADMIN' } : null}
+        score={user ? estimate.score : null}
+        level={user ? estimate.level : null}
+        dueVocabCount={user ? dueVocabCount : 0}
       />
       <main className="min-h-dvh pt-[58px]">{children}</main>
     </ToastProvider>
   );
+}
+
+/** "Minh Anh" → "MA". Lấy hai từ cuối vì tên Việt xếp họ trước. */
+function initialsOf(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(-2)
+    .map((w) => w[0]?.toUpperCase() ?? '')
+    .join('');
 }

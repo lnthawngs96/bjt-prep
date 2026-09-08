@@ -116,6 +116,17 @@ export async function getGroupsWithAnswersBySet(setId: string): Promise<GroupWit
     });
 }
 
+export async function getGroupsWithAnswersByMockTest(mockTestId: string): Promise<GroupWithAnswers[]> {
+  // TODO(db): như getGroupsForExamByMockTest nhưng include: { options: true }
+  return MOCK_TEST_ITEMS.filter((i) => i.mockTestId === mockTestId)
+    .sort((a, b) => a.order - b.order)
+    .flatMap((i) => {
+      const g = MOCK_GROUP_BY_ID.get(i.groupId);
+      if (!g) return [];
+      return [{ ...g, materials: materialsOf(g.id), questions: questionsOfGroup(g.id).map(toFull) }];
+    });
+}
+
 export async function getQuestionWithAnswer(questionId: string): Promise<QuestionWithAnswer | null> {
   // TODO(db): return db.question.findUnique({ where: { id: questionId }, include: { options: { orderBy: { order: 'asc' } } } })
   const q = MOCK_QUESTION_BY_ID.get(questionId);

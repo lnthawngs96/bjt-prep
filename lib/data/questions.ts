@@ -3,6 +3,7 @@ export {
   getGroupsForExamBySet,
   getGroupsForExamByMockTest,
   getGroupsWithAnswersBySet,
+  getGroupsWithAnswersByMockTest,
   getQuestionWithAnswer,
   getCorrectOptionIds,
   getTagsForQuestion,

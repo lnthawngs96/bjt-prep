@@ -79,7 +79,7 @@ export function PracticeBrowser({ parts, setsBySection }: PracticeBrowserProps) 
             sets.map((s) => (
               <ListRow
                 key={s.id}
-                href={`/exam/att-${s.id}`}
+                questionSetId={s.id}
                 index={s.indexNo}
                 title={s.titleVi}
                 subtitle={s.descVi}

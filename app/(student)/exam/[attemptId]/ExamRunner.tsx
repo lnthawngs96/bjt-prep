@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaClock, FaFlag } from 'react-icons/fa6';
 import { MaterialView } from '@/components/student/MaterialView';
@@ -40,6 +40,8 @@ export function ExamRunner({
   const { currentIndex, answers, flagged, select, toggleFlag, setIndex, reset } = useExamSession();
   const [remaining, setRemaining] = useState(timeLimitSec);
   const [submitting, setSubmitting] = useState(false);
+  const submittedRef = useRef(false);
+  const submitRef = useRef<() => void>(() => {});
 
   const total = slots.length;
   const canGoTo = (to: number) => canNavigate(navigationMode, currentIndex, to, total);
@@ -58,11 +60,12 @@ export function ExamRunner({
   }, []);
 
   const slot = slots[currentIndex];
-  if (!slot) return null;
-  const { group, question } = slot;
   const isLast = currentIndex === slots.length - 1;
 
   async function submit() {
+    // Chặn nộp hai lần: hết giờ và người dùng bấm Nộp bài có thể trùng nhau.
+    if (submittedRef.current) return;
+    submittedRef.current = true;
     setSubmitting(true);
     // Gửi lựa chọn thô lên server. Server tự tra đáp án và chấm —
     // client không bao giờ biết câu nào đúng cho tới khi nộp xong.
@@ -79,8 +82,26 @@ export function ExamRunner({
     router.push(`/result/${attemptId}`);
   }
 
+  // Ref luôn trỏ tới bản submit mới nhất, để effect hết giờ gọi được mà không
+  // phải đưa answers/slots vào dependency. Cập nhật trong effect chứ không phải
+  // lúc render — render phải thuần, và effect này chạy sau mỗi lần render nên
+  // ref luôn kịp thời.
+  useEffect(() => {
+    submitRef.current = submit;
+  });
+
+  // Hết giờ thì tự nộp. Kỳ thi thật không cho làm tiếp sau khi hết giờ, và để
+  // đồng hồ về 0 rồi vẫn làm được là mất hết ý nghĩa của một bài thi thử.
+  useEffect(() => {
+    if (remaining === 0) void submitRef.current();
+  }, [remaining]);
+
   const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
   const ss = String(remaining % 60).padStart(2, '0');
+
+  // Thoát sớm phải nằm sau mọi hook, nếu không thứ tự hook đổi giữa các render.
+  if (!slot) return null;
+  const { group, question } = slot;
 
   return (
     // Không header, không nav. Chỉ đồng hồ, dãy số câu, nút Thoát.
@@ -123,8 +144,15 @@ export function ExamRunner({
           })}
         </div>
 
-        <div className="flex flex-none items-center gap-[7px] text-[15px] font-semibold">
-          <FaClock className="size-3.5 text-acc" />
+        <div
+          className={cn(
+            'flex flex-none items-center gap-[7px] text-[15px] font-semibold',
+            remaining <= 60 && 'text-ng',
+          )}
+          // Đọc lên khi còn một phút, rồi im để không làm phiền suốt hai tiếng.
+          role={remaining <= 60 ? 'alert' : undefined}
+        >
+          <FaClock className={cn('size-3.5', remaining <= 60 ? 'text-ng' : 'text-acc')} />
           <span className="tabular-nums">
             {mm}:{ss}
           </span>
@@ -230,12 +258,18 @@ export function ExamRunner({
             <button
               type="button"
               onClick={isLast ? submit : () => goTo(currentIndex + 1)}
-              disabled={submitting}
+              disabled={submitting || remaining === 0}
               className="ml-auto rounded-lg bg-(image:--g) px-4 py-2.5 text-[13.5px] font-semibold text-on-g shadow-[0_4px_16px_rgba(35,150,232,.3)] transition-[filter] duration-200 hover:brightness-110 disabled:opacity-60"
             >
               {isLast ? (submitting ? 'Đang nộp…' : 'Nộp bài') : 'Câu tiếp theo'}
             </button>
           </div>
+
+          {remaining === 0 && (
+            <p className="mt-3 text-[11.5px] font-semibold text-ng" role="status">
+              Hết giờ. Bài đang được nộp tự động.
+            </p>
+          )}
 
           {navigationMode === 'linear' && (
             <p className="mt-3 text-[11.5px] text-fg3">

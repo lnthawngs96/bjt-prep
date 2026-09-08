@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ScoreRuler } from '@/components/shared/ScoreRuler';
 import { ListRow } from '@/components/student/ListRow';
+import { StartAttemptButton } from '@/components/student/StartAttemptButton';
 import { Section, SectionHeading } from '@/components/student/SectionHeading';
 import { getStudentDashboard } from '@/lib/data/user';
 import { getMockTests } from '@/lib/data/attempts';
@@ -47,12 +48,13 @@ export default async function HomePage() {
             />
             <Stat value={String(dash.continueHere.questionCount)} label="Câu trong bộ" />
             <Stat value={dash.continueHere.level.replace('_PLUS', '+')} label="Mức độ" />
-            <Link
-              href={`/exam/att-${dash.continueHere.setId}`}
+            <StartAttemptButton
+              questionSetId={dash.continueHere.setId}
+              loadingLabel="Đang mở bài…"
               className="ml-auto rounded-[9px] bg-(image:--g) px-7 py-3.5 text-[14.5px] font-semibold text-on-g shadow-[0_5px_20px_rgba(35,150,232,.32)] transition-[filter,transform] duration-200 hover:-translate-y-px hover:brightness-110"
             >
               Bắt đầu bộ {dash.continueHere.indexNo}
-            </Link>
+            </StartAttemptButton>
           </div>
         </section>
       )}

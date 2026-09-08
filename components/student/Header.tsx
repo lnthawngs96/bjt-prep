@@ -26,14 +26,15 @@ const NAV = [
 ] as const;
 
 export interface HeaderProps {
-  score: number;
-  level: string;
+  /** null khi chưa đăng nhập. */
+  user: { name: string; initials: string; isAdmin: boolean } | null;
+  /** Chỉ có khi đã đăng nhập. */
+  score: number | null;
+  level: string | null;
   dueVocabCount: number;
-  /** Mục "Quản trị" chỉ hiện khi role === 'ADMIN'. */
-  isAdmin: boolean;
 }
 
-export function Header({ score, level, dueVocabCount, isAdmin }: HeaderProps) {
+export function Header({ user, score, level, dueVocabCount }: HeaderProps) {
   const pathname = usePathname();
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,7 +117,8 @@ export function Header({ score, level, dueVocabCount, isAdmin }: HeaderProps) {
             </NavLink>
           );
         })}
-        {isAdmin && (
+        {/* Mục "Quản trị" chỉ hiện khi role === 'ADMIN'. */}
+        {user?.isAdmin && (
           <NavLink
             href="/admin"
             label="Quản trị"
@@ -127,18 +129,34 @@ export function Header({ score, level, dueVocabCount, isAdmin }: HeaderProps) {
       </nav>
 
       <div className="flex flex-none items-center gap-2.5 border-l border-ln pl-3.5">
-        <Link
-          href="/mock-test"
-          className="flex items-baseline gap-1.5 rounded-[20px] border border-ln px-2.5 py-[5px]"
-          title="Điểm tham khảo trên thang 800"
-        >
-          <b className="gt text-sm font-bold tabular-nums">{score}</b>
-          <span className="text-[11px] text-fg3">{level.replace('_PLUS', '+')}</span>
-        </Link>
+        {user && score != null && level != null && (
+          <Link
+            href="/mock-test"
+            className="hidden items-baseline gap-1.5 rounded-[20px] border border-ln px-2.5 py-[5px] sm:flex"
+            title="Điểm tham khảo trên thang 800"
+          >
+            <b className="gt text-sm font-bold tabular-nums">{score}</b>
+            <span className="text-[11px] text-fg3">{level.replace('_PLUS', '+')}</span>
+          </Link>
+        )}
         <ThemeToggle />
-        <span className="grid size-[30px] flex-none place-items-center rounded-full bg-(image:--g) text-[11px] font-bold text-on-g">
-          MA
-        </span>
+        {user ? (
+          <span
+            title={user.name}
+            className="grid size-[30px] flex-none place-items-center rounded-full bg-(image:--g) text-[11px] font-bold text-on-g"
+          >
+            {user.initials}
+          </span>
+        ) : (
+          // TODO(auth): Phase 2 — bấm vào đây mở LoginDialog TẠI CHỖ,
+          // không điều hướng sang trang khác.
+          <Link
+            href="/login"
+            className="rounded-lg bg-(image:--g) px-3.5 py-2 text-[12.5px] font-semibold text-on-g transition-[filter] duration-200 hover:brightness-110"
+          >
+            Đăng nhập
+          </Link>
+        )}
       </div>
     </header>
   );

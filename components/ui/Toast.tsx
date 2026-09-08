@@ -1,10 +1,10 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import { FaCircleCheck, FaCircleExclamation, FaCircleInfo } from 'react-icons/fa6';
+import { FaCircleCheck, FaCircleExclamation, FaCircleInfo, FaTriangleExclamation } from 'react-icons/fa6';
 import { cn } from '@/lib/utils';
 
-type Tone = 'ok' | 'ng' | 'info';
+type Tone = 'ok' | 'ng' | 'wr' | 'info';
 
 interface Toast {
   id: number;
@@ -24,12 +24,14 @@ export function useToast() {
 const ICONS: Record<Tone, typeof FaCircleCheck> = {
   ok: FaCircleCheck,
   ng: FaCircleExclamation,
+  wr: FaTriangleExclamation,
   info: FaCircleInfo,
 };
 
 const TONES: Record<Tone, string> = {
   ok: 'text-ok',
   ng: 'text-ng',
+  wr: 'text-wr',
   info: 'text-acc',
 };
 
