@@ -126,8 +126,9 @@ export const MOCK_ATTEMPTS: Attempt[] = [
     startedAt: new Date('2026-09-05T20:10:00+07:00'),
     finishedAt: new Date('2026-09-05T20:21:00+07:00'),
     timeSpentSec: 660,
-    rawCorrect: 8,
-    totalQuestions: 10,
+    // Bộ 5 gồm đúng một group 3 câu — khớp với MOCK_ATTEMPT_ANSWERS bên dưới.
+    rawCorrect: 1,
+    totalQuestions: 3,
     // PRACTICE để null — ngoại suy thang 800 từ 10 câu làm điểm nhảy 200 đơn vị
     // chỉ vì đoán trúng một câu, học viên sẽ mất niềm tin vào con số.
     estimatedScore: null,
@@ -143,8 +144,8 @@ export const MOCK_ATTEMPTS: Attempt[] = [
     startedAt: new Date('2026-09-06T21:00:00+07:00'),
     finishedAt: new Date('2026-09-06T21:13:00+07:00'),
     timeSpentSec: 780,
-    rawCorrect: 5,
-    totalQuestions: 10,
+    rawCorrect: 2,
+    totalQuestions: 3,
     estimatedScore: null,
     estimatedLevel: null,
     perSection: null,

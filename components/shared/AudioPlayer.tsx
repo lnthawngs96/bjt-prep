@@ -89,7 +89,10 @@ export function AudioPlayer({
 
   return (
     <div className={cn('flex items-center gap-3.5 rounded-[10px] border border-ln px-4 py-3.5', className)}>
-      <audio ref={audioRef} src={src} preload="metadata" />
+      {/* preload="none": màn kết quả có thể có hàng chục trình phát, để
+          "metadata" thì trình duyệt tải hết cùng lúc và treo cả trang.
+          Độ dài và hình sóng đã có sẵn từ MediaAsset nên không cần đọc file. */}
+      <audio ref={audioRef} src={src} preload="none" />
 
       <button
         type="button"

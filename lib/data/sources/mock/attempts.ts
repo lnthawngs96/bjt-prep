@@ -5,11 +5,15 @@ import {
   MOCK_ESTIMATED_LEVEL,
   MOCK_ESTIMATED_SCORE,
 } from '@/mock/user';
+import { MOCK_USER } from '@/mock/user';
+
+const MOCK_USER_ID = MOCK_USER.id;
 import { MOCK_SETS, MOCK_SET_BY_ID, MOCK_SET_ITEMS } from '@/mock/sets';
 import { MOCK_TESTS, MOCK_TEST_ITEMS } from '@/mock/mockTests';
 import { MOCK_GROUP_BY_ID } from '@/mock/groups';
 import { MOCK_QUESTIONS } from '@/mock/questions';
 import { MOCK_TEST_QUESTION_COUNT, scoreAttempt } from '@/lib/scoring';
+import { attemptStore } from './store';
 import {
   getCorrectOptionIds,
   getGrammarToReview,
@@ -155,15 +159,32 @@ export async function submitAttempt(input: {
 }) {
   // TODO(db): transaction — chèn AttemptAnswer, cập nhật Attempt, đẩy job cập nhật UserSkillStat
   const correctMap = await getCorrectOptionIds(input.answers.map((a) => a.questionId));
-  let correct = 0;
-  for (const a of input.answers) {
-    if (a.selectedOptionId && correctMap.get(a.questionId) === a.selectedOptionId) correct++;
-  }
+
+  const graded = input.answers.map((a) => ({
+    questionId: a.questionId,
+    selectedOptionId: a.selectedOptionId,
+    isCorrect: Boolean(a.selectedOptionId && correctMap.get(a.questionId) === a.selectedOptionId),
+  }));
+  const correct = graded.filter((a) => a.isCorrect).length;
+
   const isFullMockTest = input.mode === 'MOCK' && input.answers.length === MOCK_TEST_QUESTION_COUNT;
-  return {
+  const scored = scoreAttempt(correct, input.answers.length, isFullMockTest);
+
+  // Cất kết quả ở server để màn /result render được mà không cần client
+  // gửi lại gì. Đây chính là chỗ database sẽ thay.
+  attemptStore.set(input.attemptId, {
     attemptId: input.attemptId,
-    ...scoreAttempt(correct, input.answers.length, isFullMockTest),
-  };
+    setId: input.attemptId.replace(/^att-/, ''),
+    correct,
+    total: input.answers.length,
+    accuracy: scored.accuracy,
+    estimatedScore: scored.estimatedScore,
+    estimatedLevel: scored.estimatedLevel,
+    answers: graded,
+    finishedAt: new Date(),
+  });
+
+  return { attemptId: input.attemptId, ...scored };
 }
 
 /* ============================================================
@@ -175,12 +196,32 @@ export async function getAttemptResult(attemptId: string): Promise<AttemptResult
   //   include: { question: { include: { options: true, group: { include: { materials: ... } },
   //   vocabLinks: { include: { vocab: true } }, grammarLinks: { include: { grammar: true } },
   //   tags: { include: { tag: true } } } } } } } })
-  const attempt = MOCK_ATTEMPT_BY_ID.get(attemptId);
-  if (!attempt) return null;
+  // Ưu tiên lượt vừa làm trong phiên chạy này, sau đó mới đến lượt mẫu.
+  const live = attemptStore.get(attemptId);
+  const seeded = MOCK_ATTEMPT_BY_ID.get(attemptId);
+  if (!live && !seeded) return null;
 
-  const setId = attempt.questionSetId;
+  const setId = live?.setId ?? seeded?.questionSetId ?? null;
   const groups = setId ? await getGroupsWithAnswersBySet(setId) : [];
-  const answers = MOCK_ATTEMPT_ANSWERS.filter((a) => a.attemptId === attemptId);
+  const answers = live
+    ? live.answers
+    : MOCK_ATTEMPT_ANSWERS.filter((a) => a.attemptId === attemptId);
+
+  const attempt: Attempt = seeded ?? {
+    id: attemptId,
+    userId: MOCK_USER_ID,
+    mode: 'PRACTICE',
+    questionSetId: setId,
+    mockTestId: null,
+    startedAt: live!.finishedAt,
+    finishedAt: live!.finishedAt,
+    timeSpentSec: null,
+    rawCorrect: live!.correct,
+    totalQuestions: live!.total,
+    estimatedScore: live!.estimatedScore,
+    estimatedLevel: live!.estimatedLevel as Attempt['estimatedLevel'],
+    perSection: null,
+  };
 
   const items: ResultItem[] = [];
   for (const g of groups) {
@@ -211,10 +252,11 @@ export async function getAttemptResult(attemptId: string): Promise<AttemptResult
   }
 
   return {
-    attempt,
+    // Lượt vừa làm thắng số liệu của lượt mẫu cùng id.
+    attempt: live ? { ...attempt, rawCorrect: live.correct, totalQuestions: live.total } : attempt,
     items,
-    estimatedScore: attempt.estimatedScore,
-    estimatedLevel: attempt.estimatedLevel,
+    estimatedScore: live ? live.estimatedScore : attempt.estimatedScore,
+    estimatedLevel: (live ? live.estimatedLevel : attempt.estimatedLevel) as Attempt['estimatedLevel'],
   };
 }
 
