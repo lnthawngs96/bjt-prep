@@ -12,9 +12,14 @@
     "test:watch": "vitest",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:seed:content": "tsx prisma/seed-content.ts",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

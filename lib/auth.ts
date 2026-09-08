@@ -1,18 +1,23 @@
 import { betterAuth } from 'better-auth';
 import { memoryAdapter, type MemoryDB } from 'better-auth/adapters/memory';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin } from 'better-auth/plugins/admin';
+import { db } from '@/lib/db';
+import { USE_DB } from '@/lib/data/source';
 
 /**
  * Better Auth — Google OAuth + plugin admin().
  *
- * GIAI ĐOẠN NÀY CHƯA CÓ DATABASE nên dùng memoryAdapter. Người dùng và phiên
- * nằm trong tiến trình Node và mất khi restart dev server. Đó là điều bình
- * thường ở giai đoạn dựng giao diện, KHÔNG được mang lên production.
+ * Có DATABASE_URL → prismaAdapter: người dùng và phiên nằm trong Postgres,
+ * dùng chung bốn model User/Session/Account/Verification trong
+ * prisma/schema.prisma. Đây là cấu hình production.
  *
- * TODO(db): Phase 4 thay memoryAdapter bằng prismaAdapter(db, { provider: 'postgresql' }).
- *   Trước khi migrate PHẢI chạy `npx @better-auth/cli generate` và đối chiếu với
- *   bốn model User/Session/Account/Verification trong prisma/schema.prisma —
- *   schema của Better Auth đổi giữa các phiên bản, đừng tin bản trong repo là mới nhất.
+ * Không có → memoryAdapter: phiên nằm trong tiến trình Node, mất khi restart.
+ * Chỉ để dev trên mock. Vercel chạy nhiều instance nên KHÔNG dùng được ở đó.
+ *
+ * Khi nâng Better Auth, chạy lại `npx @better-auth/cli generate` (cần
+ * DATABASE_URL đặt tạm, ví dụ DATABASE_URL=postgres://x) và đối chiếu với
+ * schema — cấu trúc bảng của nó đổi giữa các phiên bản.
  */
 
 // globalThis để phiên đăng nhập sống sót qua hot-reload của Next dev.
@@ -28,10 +33,9 @@ const memoryDb: MemoryDB = globalThis.__bjtAuthDb ?? {
 if (process.env.NODE_ENV !== 'production') globalThis.__bjtAuthDb = memoryDb;
 
 /**
- * Danh sách email được coi là admin ở giai đoạn tĩnh.
- *
- * TODO(db): Phase 4 bỏ hẳn biến này. Vai trò đọc từ cột `role` của bảng user
- * do plugin admin() quản lý, đổi qua trang /admin/users.
+ * Email được gán ADMIN lúc tài khoản được TẠO. Chỉ để bootstrap admin đầu
+ * tiên trên một database mới; sau đó đổi vai trò ở /admin/users. Hook chỉ
+ * chạy khi tạo user nên không đụng tài khoản đã có.
  */
 export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? '')
   .split(',')
@@ -48,12 +52,16 @@ export const isGoogleConfigured = Boolean(
   process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
 );
 
+const baseURL = process.env.BETTER_AUTH_URL ?? 'http://localhost:3000';
+
 export const auth = betterAuth({
   appName: 'BJT Prep',
-  baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:3000',
+  baseURL,
   secret: process.env.BETTER_AUTH_SECRET,
+  // Chỉ chấp nhận request từ chính domain của app (và NEXT_PUBLIC_APP_URL nếu khác).
+  trustedOrigins: [...new Set([baseURL, process.env.NEXT_PUBLIC_APP_URL].filter((x): x is string => Boolean(x)))],
 
-  database: memoryAdapter(memoryDb),
+  database: USE_DB ? prismaAdapter(db, { provider: 'postgresql' }) : memoryAdapter(memoryDb),
 
   // Chỉ đăng ký provider khi đã có credentials. Đăng ký với chuỗi rỗng thì
   // Better Auth trả 500 với body rỗng và người dùng chỉ thấy spinner quay mãi.
@@ -76,11 +84,12 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        // Gán vai trò lúc tạo tài khoản dựa trên ADMIN_EMAILS.
-        // TODO(db): Phase 4 bỏ hook này, đổi vai trò qua trang /admin/users.
-        before: async (user) => ({
-          data: { ...user, role: isAdminEmail(user.email) ? 'ADMIN' : 'USER' },
-        }),
+        // Bootstrap admin đầu tiên theo ADMIN_EMAILS. Không có trong danh sách
+        // thì để plugin admin() gán vai trò mặc định (USER).
+        before: async (user) => {
+          if (!isAdminEmail(user.email)) return { data: user };
+          return { data: { ...user, role: 'ADMIN' } };
+        },
       },
     },
   },

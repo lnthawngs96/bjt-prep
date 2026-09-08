@@ -2,10 +2,10 @@
 
 Sản phẩm luyện thi **BJT (ビジネス日本語能力テスト)** cho người Việt. Nội dung do chủ dự án tự viết, nạp qua trang admin.
 
-**Giai đoạn hiện tại: dựng giao diện. Chưa có database, chưa có cloud.**
-Toàn bộ dữ liệu lấy từ mock tĩnh. Đọc kỹ mục "Tầng dữ liệu" — làm đúng phần đó thì sau này nối DB thật chỉ sửa một thư mục.
+**Giai đoạn hiện tại: nối database thật (Stage B), tiếp theo là admin (Stage C) và deploy Vercel (Stage D).**
+Tầng dữ liệu có hai nguồn cùng chữ ký: có `DATABASE_URL` thì đọc Prisma + Neon, không có thì đọc `mock/`. Đọc kỹ mục "Tầng dữ liệu". Chưa có R2, chưa có SRS.
 
-Đọc `docs/build-plan.md` trước khi bắt đầu bất kỳ phase nào.
+Đọc `docs/build-plan.md` (bốn phase gốc) và `docs/db-setup.md` trước khi bắt đầu.
 
 ---
 
@@ -70,6 +70,8 @@ Prisma 7 sinh client vào `app/generated/prisma` (không còn `node_modules`). �
 ```ts
 // lib/prisma-types.ts — chỗ DUY NHẤT chạm vào đường dẫn generated
 export type * from '@/app/generated/prisma/client';
+export { Prisma } from '@/app/generated/prisma/client'; // namespace giá trị: DbNull, TransactionClient, lỗi P2002
+export * from '@/app/generated/prisma/enums';
 ```
 
 ```ts
@@ -83,29 +85,31 @@ import type { Question, QuestionGroup, VocabEntry, Level, SectionCode } from '@/
 
 ```
 prisma/schema.prisma   nguồn sự thật về cấu trúc dữ liệu
-mock/                  dữ liệu tĩnh, gõ kiểu theo type của Prisma
-lib/data/              hàm truy xuất — HÔM NAY đọc mock, SAU NÀY gọi Prisma
+mock/                  fixture nội dung, gõ kiểu theo type của Prisma — seed-content.ts nạp nó vào DB
+lib/data/              API công khai — chọn nguồn theo DATABASE_URL
+  sources/mock/          đọc mock/ (dev không DB, Vitest)
+  sources/db/            gọi Prisma (production) — CÙNG chữ ký
 ```
 
 **Quy tắc tuyệt đối: component không bao giờ import từ `mock/`.** Chỉ import từ `lib/data/`.
 
 ```ts
-// lib/data/questions.ts
-import { MOCK_GROUPS } from '@/mock/groups';
+// lib/data/questions.ts — barrel, không có logic
+import * as mock from './sources/mock/questions';
+import * as dbSource from './sources/db/questions';
+import { USE_DB } from './source';
 
-export async function getGroupsBySet(setId: string) {
-  // TODO(db): db.questionSetItem.findMany({ where: { setId }, include: { group: ... } })
-  return MOCK_GROUPS.filter(g => g.setId === setId);
-}
+const src: typeof mock = USE_DB ? dbSource : mock; // lệch chữ ký là typecheck gãy
+export const { getGroupsForExamBySet, /* … */ } = src;
 ```
 
-Mọi hàm trong `lib/data/` phải `async` **ngay từ bây giờ**, kể cả khi chỉ trả mảng tĩnh. Để đồng bộ thì lúc nối DB phải sửa mọi nơi gọi nó.
+Thêm một hàm mới = viết ở **cả hai** nguồn rồi thêm vào barrel. Mọi hàm `async`. Hàm theo người dùng nhận `userId` (hoặc `userId | null` cho khách). `lib/db.ts` khởi tạo Prisma lười, chỉ khi có truy vấn đầu tiên — import không có DB vẫn an toàn.
 
-Đánh dấu mọi chỗ cần thay bằng `// TODO(db):` hoặc `// TODO(r2):` để grep lại được.
+Còn chỗ nào chưa làm thì đánh dấu `// TODO(r2):`, `// TODO(srs):`, `// TODO(cron):` để grep lại được.
 
-### Media giai đoạn tĩnh
+### Media
 
-Vài file mp3 mẫu trong `public/mock-audio/`. `lib/data/media.ts` xuất `getPlaybackUrl(mediaId): Promise<string>` trả đường dẫn tĩnh. Sau này hàm này gọi R2 presigned URL — **chữ ký hàm không đổi**.
+Media là file tĩnh trong `public/`; `MediaAsset.r2Key` là đường dẫn tương đối, URL = `'/' + r2Key`. `lib/data/media.ts` xuất `getPlaybackUrl(mediaId): Promise<string>`. Sau này hàm này gọi R2 presigned URL — **chữ ký hàm không đổi**.
 
 ---
 
@@ -131,18 +135,22 @@ components/
   student/  admin/  shared/
 lib/
   data/                       TẦNG TRUY XUẤT — đọc mục trên
-    types.ts                        QuestionForExam · QuestionWithAnswer
-    sources/mock/                   HÔM NAY — đọc mock/
-    sources/db/                     PHASE 4 — gọi Prisma, cùng chữ ký
+    types.ts                        QuestionForExam · QuestionWithAnswer · ExamPart
+    source.ts                       USE_DB = Boolean(DATABASE_URL)
+    sources/mock/                   đọc mock/
+    sources/db/                     gọi Prisma, cùng chữ ký
+  validation/                 zod schema cho body request
   prisma-types.ts             chỗ DUY NHẤT chạm đường dẫn client generated
-  auth.ts  utils.ts  scoring.ts  db.ts
-mock/                         dữ liệu tĩnh
-prisma/schema.prisma
+  auth.ts  auth-server.ts  db.ts  exam-rules.ts  grading.ts  scoring.ts  markdown.ts  utils.ts
+mock/                         fixture nội dung
+prisma/schema.prisma  seed.ts (cấu trúc)  seed-content.ts (nội dung từ mock/)
 prisma.config.ts              Prisma 7 — thay cho key "prisma" trong package.json
+proxy.ts                      chắn /admin/* khi chưa đăng nhập (Next 16, thay middleware.ts)
+tests/                        Vitest — logic thuần và nguồn mock
 docs/
 ```
 
-`lib/data/*.ts` là **API công khai, chữ ký cố định**. Mỗi file chỉ re-export từ `sources/mock/`. Phase 4 đổi đúng một dòng import mỗi file sang `sources/db/` — không component nào phải sửa.
+`lib/data/*.ts` là **API công khai, chữ ký cố định** — barrel chọn nguồn, không có logic. Không component nào biết dữ liệu đến từ đâu.
 
 Hai route group `(student)` và `(admin)` có layout hoàn toàn khác nhau. Đừng gộp.
 

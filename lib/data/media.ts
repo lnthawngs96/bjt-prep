@@ -1,5 +1,11 @@
+import * as mock from './sources/mock/media';
+import * as dbSource from './sources/db/media';
+import { USE_DB } from './source';
+
 /**
- * API công khai của tầng truy xuất media.
- * Phase 4: đổi đúng dòng import dưới sang './sources/db/media'. Hết.
+ * API công khai của tầng truy xuất media. Chữ ký getPlaybackUrl KHÔNG đổi
+ * khi lên R2 — chỉ ruột của sources/db/media.ts đổi.
  */
-export { getPlaybackUrl, getMediaAsset, getWaveform } from './sources/mock/media';
+const src: typeof mock = USE_DB ? dbSource : mock;
+
+export const { getPlaybackUrl, getMediaAsset, getWaveform } = src;

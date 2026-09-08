@@ -4,9 +4,11 @@ Web luyện thi **BJT — ビジネス日本語能力テスト** (Kỳ thi năng
 
 ## Trạng thái
 
-**Phase 1–2 xong, Stage A (sửa lỗi + nghiệp vụ BJT + test) xong** — trang học viên, đăng nhập Google,
-màn thi nhiều phần, chấm điểm ở server có test. Vẫn chạy trên mock.
-Tiếp theo: Stage B — nối Neon + Better Auth thật, rồi Stage C — admin, Stage D — deploy Vercel.
+**Stage A xong** — trang học viên, đăng nhập Google, màn thi nhiều phần, chấm điểm ở server có test.
+**Stage B (nối Neon + Better Auth thật) đã viết code**, chờ có `DATABASE_URL` để migrate và kiểm thật — xem `docs/db-setup.md`.
+Tiếp theo: Stage C — admin CRUD trên DB, Stage D — deploy Vercel (`docs/deploy-vercel.md`).
+
+Không có `DATABASE_URL` thì app chạy trên `mock/`: đủ để dev giao diện và chạy test, nhưng đăng nhập không bền và không lưu bài làm.
 
 ## Chạy
 
@@ -27,8 +29,10 @@ Mở http://localhost:3000. Giai đoạn này **không cần database** — dữ
 | `npm run lint` | ESLint |
 | `npm test` | Vitest — scoring, quy tắc làm bài, chấm điểm, markdown, luồng nộp bài |
 | `npm run db:generate` | Sinh Prisma Client (không cần DB) |
-| `npm run db:migrate` | Tạo bảng — cần `DATABASE_URL` |
-| `npm run db:seed` | Nạp dữ liệu nền — cần `DATABASE_URL` |
+| `npm run db:migrate` | Tạo bảng (dev) — cần `DATABASE_URL_UNPOOLED` |
+| `npm run db:migrate:deploy` | Áp migration lên production |
+| `npm run db:seed` | Nạp dữ liệu cấu trúc — cần `DATABASE_URL` |
+| `npm run db:seed:content` | Nạp nội dung mẫu từ `mock/` — chạy sau `db:seed` |
 | `npm run db:studio` | Prisma Studio |
 
 ## Tài liệu
@@ -48,11 +52,11 @@ Mở http://localhost:3000. Giai đoạn này **không cần database** — dữ
 
 ```
 prisma/schema.prisma      nguồn sự thật về cấu trúc dữ liệu
-mock/                     dữ liệu tĩnh, gõ kiểu theo type của Prisma
-lib/data/                 tầng truy xuất — API công khai, chữ ký cố định
-  sources/mock/             HÔM NAY
-  sources/db/               PHASE 4, cùng chữ ký
+mock/                     fixture nội dung, gõ kiểu theo type của Prisma
+lib/data/                 tầng truy xuất — API công khai, chọn nguồn theo DATABASE_URL
+  sources/mock/             không có DB (dev, test)
+  sources/db/               có DB (production), cùng chữ ký
 ```
 
-**Component không bao giờ import từ `mock/`.** Chỉ import từ `lib/data/`.
-Nhờ vậy khi nối database thật, mỗi file trong `lib/data/` chỉ đổi một dòng import — không component nào phải sửa.
+**Component không bао giờ import từ `mock/`.** Chỉ import từ `lib/data/`.
+Hai nguồn bị ép cùng chữ ký bằng TypeScript, nên không component nào biết dữ liệu đến từ đâu.

@@ -1,101 +1,89 @@
 # Deploy lên Vercel
 
-## Trả lời ngắn cho câu "có cần add Postgres không?"
+Điều kiện: đã có Neon (`docs/db-setup.md`) và Google OAuth (`docs/google-oauth.md`) chạy ở local. Trên Vercel **bắt buộc có database** — nó chạy nhiều instance serverless, bộ nhớ tiến trình không chia sẻ được, nên đăng nhập và làm bài sẽ hỏng ngẫu nhiên nếu thiếu.
 
-**Build không cần database.** Nhưng nếu không có, trên Vercel sẽ **đăng nhập không được
-và làm bài không được** — xem mục "Vì sao" bên dưới. Xem trang thì vẫn xem được.
-
-Nếu chọn thêm database: **chọn Neon, không chọn Prisma Postgres.**
-`docs/schema-plan.md` đã chốt Neon, và `lib/db.ts` viết sẵn cho `@prisma/adapter-neon`.
-Chọn Prisma Postgres thì phải đổi adapter và sửa lại cách kết nối.
+Build không cần database (`prisma generate` chỉ đọc schema), nhưng runtime cần.
 
 ---
 
-## Vì sao thiếu database thì đăng nhập hỏng trên Vercel
+## 1. Đưa code lên GitHub
 
-Giai đoạn này Better Auth dùng `memoryAdapter`, và lượt làm bài lưu trong
-`lib/data/sources/mock/store.ts` — cả hai đều nằm trong bộ nhớ tiến trình Node.
+```bash
+git remote add origin git@github.com:<user>/bjt-prep.git   # nếu chưa có
+git push -u origin main
+```
 
-Ở localhost chỉ có **một** tiến trình nên chạy tốt. Vercel chạy **nhiều instance
-serverless**, mỗi request có thể rơi vào instance khác nhau:
+`prisma/migrations/` phải nằm trong repo — production tạo bảng từ đó.
 
-| Việc | Chuyện xảy ra |
-|---|---|
-| Đăng nhập Google | Bản ghi `verification` lưu ở instance A, Google gọi callback về instance B → không thấy state → **đăng nhập thất bại** |
-| Bấm làm bài | `POST /api/attempts` tạo lượt ở instance A, mở `/exam/<id>` rơi vào instance B → **404** |
-| Nộp bài | Tương tự, không tìm thấy lượt |
+## 2. Tạo project trên Vercel
 
-Nên chỉ có hai lựa chọn thành thật:
+1. Vercel → **Add New… → Project** → import repo
+2. Framework preset: **Next.js** (tự nhận). Build command để mặc định — `package.json` đã có `"build": "prisma generate && next build"`.
+3. Settings → General → **Node.js Version: 22.x** (`package.json` khai `engines.node >= 22`; Node 22 có `WebSocket` sẵn cho driver Neon)
+4. **Chưa bấm Deploy** — đặt biến môi trường trước.
 
-**A. Deploy để XEM giao diện.** Không thêm database. Trang chủ, luyện thi, từ vựng,
-ngữ pháp, thi thử, xếp hạng đều render bằng dữ liệu mẫu. Đăng nhập và làm bài không
-dùng được. Đủ để bạn xem thiết kế trên máy thật và gửi link cho người khác xem.
+## 3. Biến môi trường (Settings → Environment Variables, môi trường Production)
 
-**B. Deploy để DÙNG được.** Thêm Neon, rồi chuyển Better Auth sang `prismaAdapter`
-và đưa lượt làm bài xuống bảng `Attempt`/`AttemptAnswer`. Nội dung đề vẫn lấy từ
-`mock/` cũng được — dù sao hiện mới có 14 câu.
+```
+DATABASE_URL=            # chuỗi POOLED của Neon (host có -pooler)
+DATABASE_URL_UNPOOLED=   # chuỗi trực tiếp (không -pooler) — cho migrate
+BETTER_AUTH_SECRET=      # sinh MỚI: openssl rand -base64 32 — KHÔNG dùng lại secret local
+BETTER_AUTH_URL=https://<tên-miền>.vercel.app
+NEXT_PUBLIC_APP_URL=https://<tên-miền>.vercel.app
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+ADMIN_EMAILS=<email của bạn>   # bootstrap admin đầu tiên
+```
 
----
+Tên miền: Vercel gán `<project>.vercel.app` ngay khi tạo project; lấy nó điền vào hai biến URL.
 
-## Các bước chung (cả A và B)
+## 4. Google Cloud Console
 
-1. Vercel → **Add New… → Project** → import `lnthawngs96/bjt-prep`
-2. Framework preset: **Next.js** (tự nhận)
-3. Build command để **mặc định** — `package.json` đã có
-   `"build": "prisma generate && next build"`.
-   Bước `prisma generate` là bắt buộc: client sinh vào `app/generated/` và thư mục
-   đó nằm trong `.gitignore`, không có bước này thì build hỏng với
-   `Module not found: Can't resolve '@/app/generated/prisma/enums'`.
-4. Đặt biến môi trường (Settings → Environment Variables):
+OAuth client đang dùng → thêm:
 
-   ```
-   BETTER_AUTH_SECRET=<sinh MỚI: openssl rand -base64 32>
-   BETTER_AUTH_URL=https://<tên-miền>.vercel.app
-   NEXT_PUBLIC_APP_URL=https://<tên-miền>.vercel.app
-   ADMIN_EMAILS=lengocthang3111996@gmail.com
-   GOOGLE_CLIENT_ID=...
-   GOOGLE_CLIENT_SECRET=...
-   ```
+```
+Authorized JavaScript origins:  https://<tên-miền>.vercel.app
+Authorized redirect URIs:       https://<tên-miền>.vercel.app/api/auth/callback/google
+```
 
-   **Đừng dùng lại `BETTER_AUTH_SECRET` của máy local.** Sinh một cái riêng cho production.
+OAuth consent screen → **Publish app**. Ở chế độ Testing chỉ email trong Test users đăng nhập được; scope `email` và `profile` không cần Google xét duyệt.
 
-5. Google Cloud Console → OAuth client → thêm vào cùng client đang dùng:
+**Preview deployment** có URL ngẫu nhiên nên OAuth sẽ báo `redirect_uri_mismatch` ở preview. Đăng nhập chỉ hoạt động trên domain production. Chấp nhận, không sửa.
 
-   ```
-   Authorized JavaScript origins:  https://<tên-miền>.vercel.app
-   Authorized redirect URIs:       https://<tên-miền>.vercel.app/api/auth/callback/google
-   ```
+## 5. Tạo bảng và nạp dữ liệu vào DB production
 
-   Lưu ý: **preview deployment có URL ngẫu nhiên** (`bjt-prep-abc123.vercel.app`) nên
-   OAuth sẽ báo `redirect_uri_mismatch` ở preview. Đăng nhập chỉ hoạt động trên domain
-   production cố định. Nếu cần đăng nhập ở preview thì thêm từng URL vào Google, hoặc
-   gắn một domain cố định cho nhánh đó.
+Từ máy local, trỏ vào database production **một lần**:
 
----
+```bash
+DATABASE_URL_UNPOOLED="<chuỗi unpooled>" npm run db:migrate:deploy
+DATABASE_URL="<chuỗi pooled>" npm run db:seed
+DATABASE_URL="<chuỗi pooled>" npm run db:seed:content
+```
 
-## Thêm cho phương án B
+Dùng `migrate deploy` chứ không phải `migrate dev` — `dev` có thể xoá dữ liệu.
 
-6. Vercel → **Storage** → **Neon** → tạo database, gắn vào project.
-   Integration tự thêm `DATABASE_URL` và vài biến `PG*` khác. Dùng chuỗi **pooled**
-   (có `-pooler` trong host) — `lib/db.ts` viết cho pooled connection.
+Nếu local đã trỏ sẵn vào cùng Neon project (chỉ có một DB) thì ba lệnh trên đã chạy ở bước setup, bỏ qua.
 
-7. Chạy migration. Từ máy local, trỏ vào database production **một lần**:
+## 6. Deploy và kiểm
 
-   ```bash
-   DATABASE_URL="<chuỗi pooled từ Neon>" npx prisma migrate deploy
-   DATABASE_URL="<chuỗi pooled từ Neon>" npm run db:seed
-   ```
+Bấm **Deploy** (hoặc push lên `main`). Sau khi xong:
 
-   Dùng `migrate deploy` chứ không phải `migrate dev` — `dev` có thể xoá dữ liệu.
+- Mở trang chủ: render được, chuyển sáng/tối không nhấp nháy
+- Đăng nhập Google bằng email trong `ADMIN_EMAILS` → header hiện mục "Quản trị"
+- `/practice` → làm một bộ → nộp → `/result` hiện giải thích
+- Mở `/mock-test` → MT-03: ba phần, ba đồng hồ, "Kết thúc phần 1" khoá phần 1
+- Mở tab ẩn danh, dán URL `/result/<id>` vừa xem → chuyển sang đăng nhập
+- Neon console → bảng `attempt` có dòng mới
 
-8. Phần code còn lại (đổi `memoryAdapter` → `prismaAdapter`, đưa lượt làm bài xuống
-   bảng) chưa làm. Xem `docs/db-setup.md`.
+Nếu log Vercel báo `WebSocket is not defined`: Node runtime cũ hơn 22. Kiểm lại mục 2, hoặc thêm vào `lib/db.ts`:
 
----
+```ts
+import ws from 'ws';
+import { neonConfig } from '@neondatabase/serverless';
+if (typeof WebSocket === 'undefined') neonConfig.webSocketConstructor = ws;
+```
 
-## Sau khi deploy, kiểm nhanh
+## Sau này
 
-- Mở trang chủ: thước điểm, việc hôm nay, biểu đồ tuần hiện đủ
-- Chuyển sáng/tối, tải lại trang — không nhấp nháy
-- Mở trên điện thoại: dưới 860px header thu thành hamburger
-- `/practice` bấm một bộ: chưa đăng nhập thì dialog mở tại chỗ, không nhảy trang
+- **Domain riêng**: Vercel → Domains → thêm; rồi đổi `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL` và redirect URI trên Google.
+- **Migration mới**: local `npm run db:migrate` → commit `prisma/migrations/` → push → trước khi deploy chạy `db:migrate:deploy` trỏ vào production. Thứ tự này tránh code mới chạy trên schema cũ.

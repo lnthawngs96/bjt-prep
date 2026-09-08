@@ -1,5 +1,11 @@
-/** Phase 4: đổi './sources/mock/attempts' thành './sources/db/attempts'. */
-export {
+import * as mock from './sources/mock/attempts';
+import * as dbSource from './sources/db/attempts';
+import { USE_DB } from './source';
+
+/** Hai nguồn phải cùng chữ ký — ép `typeof mock` ở đây, lệch là typecheck gãy. */
+const src: typeof mock = USE_DB ? dbSource : mock;
+
+export const {
   getSetsBySection,
   getMockTests,
   getAttempt,
@@ -11,4 +17,4 @@ export {
   getSet,
   getFirstGroupOfSet,
   getMockTest,
-} from './sources/mock/attempts';
+} = src;

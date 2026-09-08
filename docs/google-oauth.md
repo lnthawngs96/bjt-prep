@@ -85,18 +85,18 @@ BETTER_AUTH_SECRET=   # sinh MỚI cho production: openssl rand -base64 32
 
 ---
 
-## Lưu ý về giai đoạn hiện tại
+## Vai trò admin
 
-Chưa có database, nên Better Auth đang dùng `memoryAdapter`: tài khoản và phiên
-đăng nhập nằm trong tiến trình Node và **mất khi restart dev server**. Đăng nhập
-lại là xong. Phase 4 nối `prismaAdapter` thì dữ liệu mới bền.
+`ADMIN_EMAILS` chỉ dùng để **bootstrap admin đầu tiên**: email trong danh sách
+được gán `role = ADMIN` đúng lúc tài khoản được tạo (đăng nhập lần đầu). Tài
+khoản đã tồn tại không bị đổi. Sau đó đổi vai trò ở `/admin/users`.
 
-Trước khi migrate PHẢI chạy:
+Trên một database mới: đặt `ADMIN_EMAILS` là email của bạn, đăng nhập một lần,
+bạn là admin. Xong có thể bỏ biến đó.
 
-```bash
-npx @better-auth/cli generate
-```
+## Không có database
 
-rồi đối chiếu với bốn model `User` / `Session` / `Account` / `Verification` trong
-`prisma/schema.prisma`. Schema của Better Auth đổi giữa các phiên bản — đừng tin
-bản trong repo là mới nhất.
+Không đặt `DATABASE_URL` thì Better Auth dùng `memoryAdapter`: tài khoản và phiên
+nằm trong tiến trình Node, **mất khi restart dev server**. Chỉ dùng khi dev giao
+diện. Trên Vercel chạy nhiều instance nên bắt buộc có database — xem
+`docs/db-setup.md`.
