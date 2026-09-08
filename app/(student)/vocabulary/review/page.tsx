@@ -1,11 +1,17 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { getDueVocabCards } from '@/lib/data/vocab';
+import { getSession } from '@/lib/auth-server';
 import { Flashcards } from './Flashcards';
 
 export const metadata: Metadata = { title: 'Ôn từ vựng' };
 
 export default async function VocabReviewPage() {
-  const cards = await getDueVocabCards(20);
+  // Hàng đợi ôn là của từng người — chưa đăng nhập thì không có gì để ôn.
+  const session = await getSession();
+  if (!session) redirect('/login?next=/vocabulary/review');
+
+  const cards = await getDueVocabCards(session.user.id, 20);
 
   return (
     <div className="mx-auto max-w-[680px] px-6 pt-12">

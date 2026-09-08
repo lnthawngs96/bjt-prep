@@ -149,8 +149,8 @@ Giai đoạn này **chưa có database**, nên dùng bộ nhớ tạm thay adapt
   ADMIN_EMAILS=you@example.com
   ```
   `// TODO(db):` ở chỗ này — sau này `role` lấy từ bảng `user` qua plugin `admin()`
-- `middleware.ts` chặn `/admin/*` khi không phải admin
-- Helper `requireAdmin()` dùng trong mọi Route Handler admin. **Middleware một mình không đủ.**
+- `proxy.ts` (Next 16 đổi tên từ `middleware.ts`) chặn `/admin/*` khi chưa đăng nhập
+- Helper `requireAdmin()` dùng trong mọi Route Handler admin. **Proxy một mình không đủ.**
 
 Bốn model `User` / `Session` / `Account` / `Verification` trong `prisma/schema.prisma` đã viết sẵn theo chuẩn Better Auth. Ở Phase 4, trước khi migrate phải chạy:
 
@@ -179,7 +179,7 @@ Bản thiết kế đã duyệt: **`docs/login-dialog.html`**. Dựng lại đú
 - Đang xem `/practice`, bấm làm bài khi chưa đăng nhập → dialog mở tại chỗ, đăng nhập xong quay lại đúng trang đó
 - Email trong `ADMIN_EMAILS` thấy mục "Quản trị" trên header, tài khoản khác không thấy
 - Truy cập thẳng `/admin` bằng tài khoản thường bị chặn
-- Gọi thẳng một Route Handler admin bằng tài khoản thường trả 403 — chứng minh `requireAdmin()` chạy, không chỉ middleware
+- Gọi thẳng một Route Handler admin bằng tài khoản thường trả 403 — chứng minh `requireAdmin()` chạy, không chỉ proxy
 - **Kiểm tra accessibility của dialog**: Esc đóng được · click ra ngoài đóng được · Tab không thoát ra khỏi dialog · đóng xong focus quay về đúng nút đã mở nó · nền không cuộn được khi dialog mở
 
 Mục cuối là lý do bắt buộc dùng `<dialog>` gốc. Nếu tự viết bằng `<div>` thì phải làm tay cả năm thứ đó và gần như chắc chắn sẽ sót.

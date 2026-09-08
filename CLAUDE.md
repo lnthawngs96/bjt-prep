@@ -293,9 +293,28 @@ Thiết kế sai từ bây giờ thì sau này phải viết lại.
 
 ---
 
+## Quy tắc nghiệp vụ đã chốt thêm (08/09/2026)
+
+- **Phương án ở L1 場面把握, L2 発言聴解, LR1 状況把握 được đọc trong audio.** `QuestionOption.textJa` là `String?`; khi mọi phương án của một câu không có chữ, màn thi hiện lưới bốn nút số. Transcript của audio ghi lại câu hỏi và bốn phương án để admin soát và màn xem lại dùng.
+- **Đề thi thử chia PHẦN, mỗi phần một đồng hồ.** `buildExamParts` trong `lib/exam-rules.ts` gom group theo Part; hết giờ hoặc bấm "Kết thúc phần" thì sang phần kế và phần cũ khoá. Luyện tập là một phần.
+- **Mọi quy tắc chấm nằm trong `lib/grading.ts`**, dùng chung cho nguồn mock và DB: không nộp lại, chỉ chấm câu thuộc đề, từ chối nộp trễ quá `SUBMIT_GRACE_SEC`. Sửa quy tắc thì sửa ở đó và thêm test.
+- **Hàm tầng dữ liệu theo người dùng nhận `userId`** (`getAttempt(id, userId)`, `getMockTests(userId | null)`…). Lượt làm bài của người khác trả `null`, trang trả 404.
+- **DOCUMENT chỉ là markdown**, render qua `components/shared/Markdown.tsx`. Không `dangerouslySetInnerHTML` ở bất cứ đâu.
+- **Next 16 dùng `proxy.ts`** thay cho `middleware.ts`, cùng vai trò.
+
 ## Thói quen
 
 - Trước khi code một phase, đọc phần tương ứng trong `docs/build-plan.md` và làm đúng tiêu chí nghiệm thu ở đó.
-- Chạy `npm run typecheck` và `npm run lint` trước khi commit.
+- Chạy `npm run typecheck`, `npm run lint` và `npm test` trước khi commit. Test bằng Vitest, nằm trong `tests/`, chỉ cho logic thuần và nguồn mock.
 - Không tự thêm tính năng ngoài phase đang làm.
 - Không sửa `prisma/schema.prisma` mà không hỏi — nó là nguồn sự thật của cả dự án.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

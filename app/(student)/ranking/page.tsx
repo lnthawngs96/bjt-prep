@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import { Badge } from '@/components/ui/Badge';
 import { getRanking } from '@/lib/data/user';
+import { getSession } from '@/lib/auth-server';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = { title: 'Xếp hạng' };
 
 export default async function RankingPage() {
-  const rows = await getRanking();
+  const session = await getSession();
+  const rows = await getRanking(session?.user.id ?? null);
 
   return (
     <div className="mx-auto max-w-[1000px] px-6 pt-10">

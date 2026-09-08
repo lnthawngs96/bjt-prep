@@ -4,8 +4,9 @@ Web luyện thi **BJT — ビジネス日本語能力テスト** (Kỳ thi năng
 
 ## Trạng thái
 
-**Phase 0 xong** — khung dự án, phiên bản đã chốt, hạ tầng DB dựng sẵn.
-Đang làm: Phase 1 — nền tảng giao diện và các trang học viên.
+**Phase 1–2 xong, Stage A (sửa lỗi + nghiệp vụ BJT + test) xong** — trang học viên, đăng nhập Google,
+màn thi nhiều phần, chấm điểm ở server có test. Vẫn chạy trên mock.
+Tiếp theo: Stage B — nối Neon + Better Auth thật, rồi Stage C — admin, Stage D — deploy Vercel.
 
 ## Chạy
 
@@ -24,6 +25,7 @@ Mở http://localhost:3000. Giai đoạn này **không cần database** — dữ
 | `npm run build` | Build production |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
+| `npm test` | Vitest — scoring, quy tắc làm bài, chấm điểm, markdown, luồng nộp bài |
 | `npm run db:generate` | Sinh Prisma Client (không cần DB) |
 | `npm run db:migrate` | Tạo bảng — cần `DATABASE_URL` |
 | `npm run db:seed` | Nạp dữ liệu nền — cần `DATABASE_URL` |

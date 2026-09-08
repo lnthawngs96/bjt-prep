@@ -28,7 +28,9 @@ Khi nâng bất kỳ dòng nào, cập nhật file này cùng lúc.
 | tailwind-merge | ^3.6.0 | ngoại lệ được duyệt trong CLAUDE.md |
 | tsx | ^4.23.13 | dev, chạy seed |
 | dotenv | ^17 | dev, cho prisma.config.ts và seed |
-| better-auth | **chưa cài** — Phase 2, ghim `1.7.3` | |
+| better-auth | **1.7.3 — ghim cứng** | API plugin đổi giữa các bản minor |
+| zod | ^4.5.4 | validate body request và form admin — ngoại lệ được duyệt 08/09/2026 |
+| vitest | ^4.1.11 | dev. **Không lên 5.x**: Better Auth 1.7.3 khai `peerOptional vitest ^2‖^3‖^4`, cài 5.0.0 bị ERESOLVE |
 | ts-fsrs | **chưa cài** — phase SRS, `5.4.2` | |
 
 ### Quyết định: `cn()` dùng `clsx` + `tailwind-merge`

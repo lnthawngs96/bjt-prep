@@ -11,5 +11,4 @@ export {
   getSet,
   getFirstGroupOfSet,
   getMockTest,
-  getFirstGroupOfMockTest,
 } from './sources/mock/attempts';

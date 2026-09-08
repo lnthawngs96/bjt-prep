@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { FaCheck, FaXmark } from 'react-icons/fa6';
 import { AudioPlayer } from '@/components/shared/AudioPlayer';
 import { ScoreRuler } from '@/components/shared/ScoreRuler';
@@ -8,13 +8,19 @@ import { Badge } from '@/components/ui/Badge';
 import { Section, SectionHeading } from '@/components/student/SectionHeading';
 import { getAttemptResult } from '@/lib/data/attempts';
 import { getPlaybackUrl } from '@/lib/data/media';
+import { getSession } from '@/lib/auth-server';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = { title: 'Kết quả' };
 
 export default async function ResultPage({ params }: PageProps<'/result/[attemptId]'>) {
   const { attemptId } = await params;
-  const result = await getAttemptResult(attemptId);
+
+  // Kết quả là của một người: chưa đăng nhập thì đi đăng nhập, không phải chủ thì 404.
+  const session = await getSession();
+  if (!session) redirect(`/login?next=/result/${attemptId}`);
+
+  const result = await getAttemptResult(attemptId, session.user.id);
   if (!result) notFound();
 
   const { attempt, items, estimatedScore, estimatedLevel } = result;
@@ -154,8 +160,8 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
                           {o.order}
                         </span>
                         <div className="min-w-0">
-                          <p className="jp text-[14px]">
-                            {o.textJa}
+                          <p className={cn('text-[14px]', o.textJa ? 'jp' : 'text-fg3')}>
+                            {o.textJa ?? 'Phương án được đọc trong audio'}
                             {isChosen && (
                               <span className="jp-none ml-2 text-[11.5px] text-fg3">— bạn chọn</span>
                             )}

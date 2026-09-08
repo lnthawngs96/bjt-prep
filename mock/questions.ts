@@ -255,6 +255,224 @@ const q: Q[] = [
     businessNoteVi:
       '打診する là "thăm dò ý kiến trước", nhẹ hơn 予約する hay 決める. Với đối tác, lịch chưa được chốt cho đến khi họ đồng ý — dùng sai động từ ở đây là hiểu sai mức độ cam kết.',
   },
+
+  /* ---- grp-l1-001 · 場面把握 · phương án đọc trong audio, textJa = null ---- */
+  {
+    ...base,
+    id: 'q-l1-001-1',
+    groupId: 'grp-l1-001',
+    order: 1,
+    sectionCode: SectionCode.L1,
+    level: Level.J3,
+    stemJa: '訪問先で初めて会う相手に名刺を渡すとき、何と言いますか。',
+    stemVi: 'Khi đưa danh thiếp cho người gặp lần đầu ở công ty khách, bạn nói gì?',
+    audioStartMs: 0,
+    audioEndMs: 14000,
+    explanationVi:
+      'Giới thiệu bản thân với người ngoài công ty thì dùng 謙譲語 「〜と申します」 và nêu tên công ty trước tên mình. Phương án 1 「ABC商事の田中と申します」 đúng cả trật tự lẫn tầng lịch sự.',
+    businessNoteVi:
+      'Trật tự cố định khi tự giới thiệu: công ty → (phòng ban) → họ. Không gắn さん/様 vào tên mình, và ở lần gặp đầu không dùng お世話になります vì hai bên chưa có quan hệ công việc.',
+  },
+  {
+    ...base,
+    id: 'q-l1-001-2',
+    groupId: 'grp-l1-001',
+    order: 2,
+    sectionCode: SectionCode.L1,
+    level: Level.J3,
+    stemJa: '相手から名刺を受け取るとき、何と言いますか。',
+    stemVi: 'Khi nhận danh thiếp từ đối phương, bạn nói gì?',
+    audioStartMs: 14000,
+    audioEndMs: 28000,
+    explanationVi:
+      'Nhận thứ gì từ người trên hoặc người ngoài công ty thì dùng 謙譲語 「頂戴いたします」. Đây là câu gần như cố định trong 名刺交換.',
+    businessNoteVi:
+      'Nhận danh thiếp bằng hai tay, nói 頂戴いたします, đọc tên trên thiếp rồi mới cất. Nếu chưa rõ cách đọc tên, hỏi ngay lúc đó là lịch sự; hỏi lại sau mới là thất lễ.',
+  },
+
+  /* ---- grp-lr1-001 · 状況把握 · phương án đọc trong audio ---- */
+  {
+    ...base,
+    id: 'q-lr1-001-1',
+    groupId: 'grp-lr1-001',
+    order: 1,
+    sectionCode: SectionCode.LR1,
+    level: Level.J3,
+    stemJa: '山田さんは今どうしていますか。',
+    stemVi: 'Anh Yamada hiện đang thế nào?',
+    audioStartMs: 0,
+    audioEndMs: 21500,
+    explanationVi:
+      'Lễ tân nói 「山田はただいま席を外しております」— rời khỏi chỗ ngồi tạm thời. Ảnh cho thấy ghế bàn 山田 trống, khớp với audio. Không có thông tin về họp hay công tác.',
+    businessNoteVi:
+      '席を外す là cách nói chuẩn khi người được hỏi không có mặt mà không cần nêu lý do. Nói với người ngoài về đồng nghiệp thì bỏ さん và dùng 謙譲語 おります.',
+  },
+  {
+    ...base,
+    id: 'q-lr1-001-2',
+    groupId: 'grp-lr1-001',
+    order: 2,
+    sectionCode: SectionCode.LR1,
+    level: Level.J3,
+    stemJa: '受付の人はこれから何をしますか。',
+    stemVi: 'Người lễ tân sẽ làm gì tiếp theo?',
+    audioStartMs: 21500,
+    audioEndMs: 32000,
+    explanationVi:
+      'Lễ tân đề nghị 「戻り次第、こちらからお電話いたしましょうか」— khi Yamada về sẽ gọi lại từ phía công ty. 〜次第 nghĩa là "ngay khi".',
+    businessNoteVi:
+      'Khi người được gọi vắng mặt, thứ tự xử lý chuẩn là: xin lỗi, nêu tình trạng, rồi đề xuất một hướng (gọi lại, nhận lời nhắn). Đề xuất gọi lại là cách phổ biến nhất vì không làm khách phải chờ.',
+  },
+
+  /* ---- grp-l3-001 · 総合聴解 · 3 câu, phương án có chữ ---- */
+  {
+    ...base,
+    id: 'q-l3-001-1',
+    groupId: 'grp-l3-001',
+    order: 1,
+    sectionCode: SectionCode.L3,
+    level: Level.J2,
+    stemJa: '会議はいつになりましたか。',
+    stemVi: 'Cuộc họp được chuyển sang lúc nào?',
+    audioStartMs: 0,
+    audioEndMs: 12000,
+    explanationVi:
+      'Trưởng phòng nói 「火曜から木曜に変更したい」 rồi 「午前10時からです」. Ghép hai lượt nói mới ra đáp án: thứ Năm, 10 giờ sáng.',
+    businessNoteVi:
+      'Khi nhận thông báo đổi lịch, nhân viên xác nhận lại bằng cách lặp lại mốc mới 「木曜ですね」 rồi hỏi phần còn thiếu. Đây là phản xạ 確認 được đánh giá cao.',
+  },
+  {
+    ...base,
+    id: 'q-l3-001-2',
+    groupId: 'grp-l3-001',
+    order: 2,
+    sectionCode: SectionCode.L3,
+    level: Level.J2,
+    stemJa: '中村さんはいつまでに資料を送りますか。',
+    stemVi: 'Nakamura sẽ gửi tài liệu trước khi nào?',
+    audioStartMs: 12000,
+    audioEndMs: 30000,
+    explanationVi:
+      'Trưởng phòng yêu cầu 「前日までに」 (trước ngày hôm trước), Nakamura cụ thể hoá thành 「水曜の午前中にお送りします」. Đáp án là điều Nakamura cam kết, không phải mốc tối thiểu của trưởng phòng.',
+    businessNoteVi:
+      '〜ておいてください là chỉ thị chuẩn bị trước. Khi nhận chỉ thị có hạn mở như 前日までに, nhân viên giỏi tự đưa ra mốc cụ thể sớm hơn — đó là cách thể hiện chủ động.',
+  },
+  {
+    ...base,
+    id: 'q-l3-001-3',
+    groupId: 'grp-l3-001',
+    order: 3,
+    sectionCode: SectionCode.L3,
+    level: Level.J2,
+    stemJa: '鈴木さんについて、正しいものはどれですか。',
+    stemVi: 'Về Suzuki, phương án nào đúng?',
+    audioStartMs: 30000,
+    audioEndMs: 52000,
+    explanationVi:
+      '「鈴木さんは木曜が出張なので、議事録を後で共有してあげてください」: Suzuki đi công tác đúng ngày họp, và sẽ nhận biên bản sau. Phải nghe hết cả câu mới ghép được hai ý.',
+    businessNoteVi:
+      '議事録 gửi cho người vắng mặt là việc mặc định sau mỗi cuộc họp ở công ty Nhật. Người được giao ghi biên bản thường là nhân viên trẻ nhất trong phòng.',
+  },
+
+  /* ---- grp-lr3-001 · 総合聴読解 · audio + bảng + email ---- */
+  {
+    ...base,
+    id: 'q-lr3-001-1',
+    groupId: 'grp-lr3-001',
+    order: 1,
+    sectionCode: SectionCode.LR3,
+    level: Level.J2,
+    stemJa: '案内状の発送はいつ終わりますか。',
+    stemVi: 'Việc gửi thư mời sẽ xong khi nào?',
+    audioStartMs: 0,
+    audioEndMs: 11000,
+    explanationVi:
+      'Bảng ghi hạn là 9月15日 và trạng thái 進行中, nhưng Sato nói trong audio 「残りは明日中に終わります」. Câu hỏi hỏi thực tế sẽ xong khi nào, nên lấy theo audio: trong ngày mai.',
+    businessNoteVi:
+      'Dạng 総合聴読解 luôn có ít nhất một chỗ audio cập nhật hoặc phủ định thông tin trên tài liệu. Bảng là trạng thái lúc in, audio là trạng thái mới nhất.',
+  },
+  {
+    ...base,
+    id: 'q-lr3-001-2',
+    groupId: 'grp-lr3-001',
+    order: 2,
+    sectionCode: SectionCode.LR3,
+    level: Level.J2,
+    stemJa: '鈴木さんは今週中に何をしますか。',
+    stemVi: 'Trong tuần này Suzuki sẽ làm gì?',
+    audioStartMs: 11000,
+    audioEndMs: 26000,
+    explanationVi:
+      'Trưởng phòng chỉ thị 「今週中に見積もりを取ってください」— lấy báo giá, chưa phải in. Email cũng viết 見積もりを取り直してください. Việc in (期限 9月20日) là bước sau.',
+    businessNoteVi:
+      '見積もりを取る là bước bắt buộc trước mọi chi tiêu ở công ty Nhật, kể cả khi đã có nhà cung cấp quen. Số lượng đổi thì phải lấy lại báo giá.',
+  },
+  {
+    ...base,
+    id: 'q-lr3-001-3',
+    groupId: 'grp-lr3-001',
+    order: 3,
+    sectionCode: SectionCode.LR3,
+    level: Level.J2,
+    stemJa: '資料の印刷部数は何部になりましたか。',
+    stemVi: 'Số lượng tài liệu cần in đã thành bao nhiêu bản?',
+    audioStartMs: 26000,
+    audioEndMs: 45000,
+    explanationVi:
+      'Email viết rõ 「200部から300部に変更」 và Suzuki xác nhận lại trong audio 「300部で見積もりを依頼します」. Hai nguồn khớp nhau: 300 bản.',
+    businessNoteVi:
+      'Khi thông tin thay đổi, người Nhật thường lặp lại con số mới thành lời trong cuộc họp để mọi người cùng xác nhận. Nghe thấy con số được lặp lại là dấu hiệu đó là số chốt.',
+  },
+
+  /* ---- grp-r3-001 · 総合読解 · 稟議書 ---- */
+  {
+    ...base,
+    id: 'q-r3-001-1',
+    groupId: 'grp-r3-001',
+    order: 1,
+    sectionCode: SectionCode.R3,
+    level: Level.J2,
+    stemJa: 'この稟議書の目的は何ですか。',
+    stemVi: 'Mục đích của đơn xin phê duyệt này là gì?',
+    audioStartMs: null,
+    audioEndMs: null,
+    explanationVi:
+      'Mục 目的 viết: máy tính xách tay đi ngoài của phòng kinh doanh đã cũ, hỏng nhiều, nên muốn mua mới 10 máy. Bên đề xuất là 総務部 nhưng người dùng là 営業部 — đọc kỹ chủ ngữ.',
+    businessNoteVi:
+      '稟議書 là văn bản xin phê duyệt luân chuyển qua nhiều cấp. Mục 目的 luôn phải nêu vấn đề hiện tại rồi mới đến đề xuất; đề xuất không có vấn đề đi kèm thường bị trả lại.',
+  },
+  {
+    ...base,
+    id: 'q-r3-001-2',
+    groupId: 'grp-r3-001',
+    order: 2,
+    sectionCode: SectionCode.R3,
+    level: Level.J2,
+    stemJa: '購入の合計金額はいくらですか。',
+    stemVi: 'Tổng số tiền mua là bao nhiêu?',
+    audioStartMs: null,
+    audioEndMs: null,
+    explanationVi:
+      'Mục 金額: 1台あたり15万円、合計150万円. 15万 là đơn giá, 40万 là chi phí sửa hàng năm trong 備考 — hai con số gây nhiễu.',
+    businessNoteVi:
+      '税抜 (chưa thuế) là cách ghi mặc định trong 稟議書. Nếu cần số thực chi, người duyệt sẽ tự cộng 10% thuế tiêu dùng.',
+  },
+  {
+    ...base,
+    id: 'q-r3-001-3',
+    groupId: 'grp-r3-001',
+    order: 3,
+    sectionCode: SectionCode.R3,
+    level: Level.J2,
+    stemJa: '備考の内容として正しいものはどれですか。',
+    stemVi: 'Nội dung nào đúng với phần ghi chú?',
+    audioStartMs: null,
+    audioEndMs: null,
+    explanationVi:
+      'Mục 備考 có ba ý: máy hiện tại dùng được 6 năm, chi phí sửa khoảng 40万円 mỗi năm, và máy mới sẽ gần như không tốn tiền sửa. Chỉ phương án 2 khớp.',
+    businessNoteVi:
+      'Phần 備考 trong 稟議書 là nơi đặt lý lẽ về chi phí: số tiền đang mất mỗi năm so với số tiền bỏ ra một lần. Người duyệt nhìn vào đây để quyết định nhanh.',
+  },
 ];
 
 export const MOCK_QUESTIONS: Question[] = q.map((x) => ({ ...x, ...stamps }));
@@ -264,7 +482,8 @@ export const MOCK_QUESTION_BY_ID = new Map(MOCK_QUESTIONS.map((x) => [x.id, x]))
    PHƯƠNG ÁN — isCorrect và distractorNote KHÔNG BAO GIỜ xuống client trước khi nộp
    ============================================================ */
 
-type Opt = [order: number, textJa: string, isCorrect: boolean, distractorNote: string | null];
+/** textJa = null khi phương án được đọc trong audio (L1, L2, LR1) — màn thi chỉ hiện số. */
+type Opt = [order: number, textJa: string | null, isCorrect: boolean, distractorNote: string | null];
 
 const OPTIONS: Record<string, Opt[]> = {
   'q-lr2-007-1': [
@@ -351,6 +570,94 @@ const OPTIONS: Record<string, Opt[]> = {
     [3, '10月20日', false, 'Sai. Con số này không có trong thư.'],
     [4, 'まだ決まっていない。', false, 'Sai. Thư có nêu ngày dự kiến cụ thể. 現時点では chỉ báo hiệu ngày có thể đổi, chứ không phải chưa quyết định.'],
   ],
+
+  // L1 · phương án đọc trong audio — distractorNote trích lại lời đọc để màn xem lại còn hiểu được.
+  'q-l1-001-1': [
+    [1, null, true, null],
+    [2, null, false, '「ABC商事の田中さんです」— gắn さん vào tên mình là tự tôn kính bản thân. Lỗi rất phổ biến ở người mới đi làm.'],
+    [3, null, false, '「どうも。田中です。よろしく。」— thể thường, thiếu tên công ty. Dùng được với đồng nghiệp thân, không dùng với khách gặp lần đầu.'],
+    [4, null, false, '「お世話になります。田中様でございます。」— 様 cho chính mình là sai nặng, và お世話になります không dùng ở lần gặp đầu.'],
+  ],
+  'q-l1-001-2': [
+    [1, null, false, '「はい、もらいます」— もらう là thể thường, không có kính ngữ. Với khách phải là 頂戴いたします hoặc いただきます.'],
+    [2, null, true, null],
+    [3, null, false, '「ありがとうございます。差し上げます。」— 差し上げる là ĐƯA cho người trên, ngược chiều với việc đang nhận.'],
+    [4, null, false, '「お受け取りください」— là câu mời NGƯỜI KIA nhận, dùng khi mình đưa danh thiếp, không phải khi mình nhận.'],
+  ],
+
+  // LR1 · phương án đọc trong audio
+  'q-lr1-001-1': [
+    [1, null, false, '「会議中です」— audio không nhắc đến họp. Đây là bẫy suy đoán từ bối cảnh văn phòng.'],
+    [2, null, true, null],
+    [3, null, false, '「出張中です」— 席を外す chỉ là rời chỗ tạm thời, không phải đi công tác. Ảnh cũng cho thấy đồ đạc vẫn trên bàn.'],
+    [4, null, false, '「退社しました」— nếu đã về thì lễ tân sẽ nói 本日は退社いたしました, và không đề nghị gọi lại "khi quay về".'],
+  ],
+  'q-lr1-001-2': [
+    [1, null, true, null],
+    [2, null, false, '「佐々木さんをそのまま待たせる」— để khách chờ trên máy khi không rõ bao lâu là điều tối kỵ; lễ tân đã chủ động đề xuất gọi lại.'],
+    [3, null, false, '「別の担当者に電話をつなぐ」— không có lời nào về việc chuyển máy cho người khác.'],
+    [4, null, false, '「伝言を断る」— ngược hoàn toàn với thái độ 「お電話いたしましょうか」 của lễ tân.'],
+  ],
+
+  // L3
+  'q-l3-001-1': [
+    [1, '火曜日の午前10時', false, 'Sai. Thứ Ba là lịch CŨ đã bị đổi. Nghe thấy 火曜 trước nên dễ bắt nhầm.'],
+    [2, '木曜日の午前10時', true, null],
+    [3, '木曜日の午後', false, 'Sai ngày đúng nhưng giờ sai: trưởng phòng nói rõ 午前10時.'],
+    [4, '水曜日の午前中', false, 'Sai. Thứ Tư sáng là lúc Nakamura GỬI TÀI LIỆU, không phải giờ họp.'],
+  ],
+  'q-l3-001-2': [
+    [1, '木曜日の朝', false, 'Sai. Trưởng phòng yêu cầu trước ngày hôm trước, và Nakamura cam kết sớm hơn nữa.'],
+    [2, '水曜日の午前中', true, null],
+    [3, '会議の後', false, 'Sai. Sau cuộc họp là lúc chia sẻ 議事録 cho Suzuki, không phải gửi tài liệu.'],
+    [4, '火曜日', false, 'Sai. Thứ Ba không còn liên quan gì sau khi đổi lịch.'],
+  ],
+  'q-l3-001-3': [
+    [1, '会議に出席する。', false, 'Sai. Suzuki đi công tác đúng ngày họp nên không dự được.'],
+    [2, '会議の資料を作る。', false, 'Sai. Tài liệu do Nakamura gửi; không ai nói Suzuki làm tài liệu.'],
+    [3, '出張のため欠席し、後で議事録を受け取る。', true, null],
+    [4, '会議の進行を担当する。', false, 'Sai. Không có chỗ nào nói ai điều hành cuộc họp.'],
+  ],
+
+  // LR3
+  'q-lr3-001-1': [
+    [1, '今日中', false, 'Sai. Sato nói 残りは明日中, không phải hôm nay.'],
+    [2, '明日中', true, null],
+    [3, '9月15日', false, 'Sai. Đây là HẠN trên bảng, không phải thời điểm thực tế xong việc. Audio cập nhật sớm hơn hạn.'],
+    [4, '来週', false, 'Sai. Không có mốc "tuần sau" nào trong cả bảng lẫn audio.'],
+  ],
+  'q-lr3-001-2': [
+    [1, '資料を印刷する。', false, 'Sai. In là việc có hạn 9月20日; tuần này mới là lấy báo giá.'],
+    [2, '印刷の見積もりを取る。', true, null],
+    [3, '案内状を発送する。', false, 'Sai. Thư mời là việc của Sato.'],
+    [4, '会場を予約する。', false, 'Sai. Đặt phòng do Tanaka làm và đã 完了.'],
+  ],
+  'q-lr3-001-3': [
+    [1, '200部', false, 'Sai. 200 là số ban đầu, email nói rõ đã đổi.'],
+    [2, '250部', false, 'Sai. Không có con số này ở đâu.'],
+    [3, '300部', true, null],
+    [4, 'まだ決まっていない。', false, 'Sai. Cả email lẫn audio đều chốt 300 bản.'],
+  ],
+
+  // R3
+  'q-r3-001-1': [
+    [1, '古いパソコンを修理して修理費を減らす。', false, 'Sai. Đơn xin MUA MỚI, không xin sửa. Chi phí sửa được nêu để chứng minh sửa không còn đáng.'],
+    [2, '営業部の外出用パソコンを新しくする。', true, null],
+    [3, '総務部のパソコンを増やす。', false, 'Sai. 総務部 là bên ĐỀ XUẤT; người dùng máy là 営業部.'],
+    [4, 'パソコンをリースに切り替える。', false, 'Sai. Không có chữ リース nào trong văn bản.'],
+  ],
+  'q-r3-001-2': [
+    [1, '15万円', false, 'Sai. Đây là đơn giá một máy.'],
+    [2, '40万円', false, 'Sai. Đây là chi phí sửa mỗi năm trong phần 備考.'],
+    [3, '150万円', true, null],
+    [4, '90万円', false, 'Sai. Không có con số này trong văn bản.'],
+  ],
+  'q-r3-001-3': [
+    [1, '現行機は3年前に購入した。', false, 'Sai. 備考 ghi 6年が経過.'],
+    [2, '修理費は年間約40万円かかっている。', true, null],
+    [3, '納期は承認後3か月以内である。', false, 'Sai. 納期 là 3 TUẦN (3週間), và nó nằm ở mục 納期, không phải 備考.'],
+    [4, '修理費は1台あたり15万円である。', false, 'Sai. 15万円 là giá mua một máy, không phải phí sửa.'],
+  ],
 };
 
 export const MOCK_OPTIONS: QuestionOption[] = Object.entries(OPTIONS).flatMap(([questionId, opts]) =>
@@ -389,9 +696,36 @@ export const MOCK_QUESTION_TAGS: QuestionTag[] = [
   { questionId: 'q-lr2-009-2', tagId: 'tag-doc-schedule' },
   { questionId: 'q-lr2-009-3', tagId: 'tag-confirm-info' },
   { questionId: 'q-lr2-009-3', tagId: 'tag-sc-colleague' },
+  { questionId: 'q-l1-001-1', tagId: 'tag-sc-meishi' },
+  { questionId: 'q-l1-001-1', tagId: 'tag-keigo-facetoface' },
+  { questionId: 'q-l1-001-2', tagId: 'tag-sc-meishi' },
+  { questionId: 'q-l1-001-2', tagId: 'tag-keigo-facetoface' },
+  { questionId: 'q-lr1-001-1', tagId: 'tag-sc-phone' },
+  { questionId: 'q-lr1-001-1', tagId: 'tag-keigo-phone' },
+  { questionId: 'q-lr1-001-2', tagId: 'tag-sc-phone' },
+  { questionId: 'q-l3-001-1', tagId: 'tag-sc-meeting' },
+  { questionId: 'q-l3-001-1', tagId: 'tag-confirm-info' },
+  { questionId: 'q-l3-001-2', tagId: 'tag-indirect-order' },
+  { questionId: 'q-l3-001-3', tagId: 'tag-doc-minutes' },
+  { questionId: 'q-lr3-001-1', tagId: 'tag-progress-report' },
+  { questionId: 'q-lr3-001-2', tagId: 'tag-indirect-order' },
+  { questionId: 'q-lr3-001-2', tagId: 'tag-doc-email-internal' },
+  { questionId: 'q-lr3-001-3', tagId: 'tag-doc-email-internal' },
+  { questionId: 'q-r3-001-1', tagId: 'tag-doc-ringi' },
+  { questionId: 'q-r3-001-2', tagId: 'tag-doc-ringi' },
+  { questionId: 'q-r3-001-2', tagId: 'tag-table-numbers' },
+  { questionId: 'q-r3-001-3', tagId: 'tag-doc-ringi' },
 ];
 
 export const MOCK_QUESTION_VOCAB: QuestionVocab[] = [
+  { questionId: 'q-l1-001-1', vocabId: 'v-meishi', relevance: 'appears' },
+  { questionId: 'q-l1-001-1', vocabId: 'v-mousu', relevance: 'tested' },
+  { questionId: 'q-l1-001-2', vocabId: 'v-meishi', relevance: 'appears' },
+  { questionId: 'q-lr1-001-1', vocabId: 'v-mousu', relevance: 'appears' },
+  { questionId: 'q-lr1-001-1', vocabId: 'v-irassharu', relevance: 'appears' },
+  { questionId: 'q-l3-001-3', vocabId: 'v-gijiroku', relevance: 'tested' },
+  { questionId: 'q-lr3-001-1', vocabId: 'v-shinchoku', relevance: 'appears' },
+  { questionId: 'q-r3-001-1', vocabId: 'v-ringisho', relevance: 'tested' },
   { questionId: 'q-lr2-007-1', vocabId: 'v-tasseiritsu', relevance: 'tested' },
   { questionId: 'q-lr2-007-2', vocabId: 'v-oguchi', relevance: 'appears' },
   { questionId: 'q-lr2-007-3', vocabId: 'v-kaizenan', relevance: 'tested' },
@@ -406,4 +740,7 @@ export const MOCK_QUESTION_GRAMMAR: QuestionGrammar[] = [
   { questionId: 'q-lr2-007-3', grammarId: 'g-temorau', relevance: 'tested' },
   { questionId: 'q-r1-033-1', grammarId: 'g-sasete-itadaku', relevance: 'tested' },
   { questionId: 'q-r2-021-1', grammarId: 'g-degozaimasu', relevance: 'appears' },
+  { questionId: 'q-l3-001-2', grammarId: 'g-teoku', relevance: 'tested' },
+  { questionId: 'q-lr3-001-2', grammarId: 'g-ni-tsuite', relevance: 'appears' },
+  { questionId: 'q-r3-001-1', grammarId: 'g-ni-tsuite', relevance: 'appears' },
 ];

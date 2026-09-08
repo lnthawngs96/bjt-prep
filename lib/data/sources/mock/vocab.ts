@@ -50,11 +50,12 @@ export async function getAllVocab(): Promise<VocabEntry[]> {
  * TODO(db): db.srsCard.findMany({ where: { userId, dueAt: { lte: new Date() } }, orderBy: { dueAt: 'asc' } })
  * Đây là truy vấn NÓNG NHẤT của cả app — index [userId, dueAt] đã có sẵn trong schema.
  */
-export async function getDueVocabCount(): Promise<number> {
-  return MOCK_DUE_VOCAB_COUNT;
+export async function getDueVocabCount(userId: string | null): Promise<number> {
+  // Chỉ học viên mẫu có hàng đợi ôn; người thật chưa có SRS cho tới phase SRS.
+  return userId === 'usr-demo' ? MOCK_DUE_VOCAB_COUNT : 0;
 }
 
-export async function getDueVocabCards(limit = 20): Promise<VocabWithExamples[]> {
+export async function getDueVocabCards(_userId: string, limit = 20): Promise<VocabWithExamples[]> {
   // TODO(db): join srsCard (cardType = VOCAB, dueAt <= now) với vocabEntry
   const due = MOCK_VOCAB.slice(0, limit);
   return due.map((v) => ({
@@ -71,6 +72,10 @@ export async function getDueVocabCards(limit = 20): Promise<VocabWithExamples[]>
  * Ghi lại một lượt ôn. Dùng FSRS (ts-fsrs), KHÔNG tự viết SM-2.
  * TODO(db): tính lịch bằng ts-fsrs rồi cập nhật srsCard + chèn srsReview.
  */
-export async function recordVocabReview(_vocabId: string, _rating: 1 | 2 | 3 | 4): Promise<void> {
+export async function recordVocabReview(
+  _userId: string,
+  _vocabId: string,
+  _rating: 1 | 2 | 3 | 4,
+): Promise<void> {
   // Giai đoạn tĩnh chưa lưu gì.
 }

@@ -3,8 +3,10 @@ import type {
   AttemptAnswer,
   GrammarExample,
   GrammarPoint,
+  Level,
   Material,
   MediaAsset,
+  Part,
   Question,
   QuestionGroup,
   QuestionOption,
@@ -17,6 +19,7 @@ import type {
   VocabExample,
   VocabTopic,
 } from '@/lib/prisma-types';
+import type { scoreAttempt } from '@/lib/scoring';
 
 /* ============================================================
    HAI KIỂU CÂU HỎI — ranh giới bảo mật của cả sản phẩm
@@ -95,6 +98,27 @@ export type MockTestSummary = MockTest & {
 /** Điều hướng trong màn làm bài — xem mục cùng tên trong CLAUDE.md. */
 export type NavigationMode = 'linear' | 'free';
 
+/** Một câu trên màn thi, kèm group chứa tài liệu của nó. */
+export type ExamSlot = { group: GroupForExam; question: QuestionForExam };
+
+/**
+ * Một PHẦN của màn thi. BJT thật có ba phần với ba đồng hồ riêng; phần nghe
+ * tuyến tính, phần đọc tự do trong phần, không quay lại phần đã xong.
+ * Luyện tập chỉ có một phần.
+ */
+export type ExamPart = {
+  part: Part;
+  nameJa: string;
+  nameVi: string;
+  order: number;
+  timeLimitSec: number;
+  navigationMode: NavigationMode;
+  slots: ExamSlot[];
+};
+
+export type SubmitError = 'NOT_FOUND' | 'ALREADY_SUBMITTED' | 'TIME_EXCEEDED';
+export type SubmitResult = { attemptId: string } & ReturnType<typeof scoreAttempt>;
+
 export type AttemptWithAnswers = Attempt & { answers: AttemptAnswer[] };
 
 /** Một câu trên màn kết quả: câu hỏi đầy đủ + người dùng đã chọn gì. */
@@ -148,8 +172,9 @@ export type WeakSkill = {
 
 export type StudentDashboard = {
   displayName: string;
-  estimatedScore: number;
-  estimatedLevel: Attempt['estimatedLevel'];
+  /** null khi chưa làm đề thi thử nào — trang chủ hiện lời mời thay vì thước điểm. */
+  estimatedScore: number | null;
+  estimatedLevel: Level | null;
   daysToExam: number | null;
   /** Khối "Tiếp tục ở đây". */
   continueHere: {

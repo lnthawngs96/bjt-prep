@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import { AudioPlayer } from '@/components/shared/AudioPlayer';
+import { Markdown } from '@/components/shared/Markdown';
 import type { MaterialWithMedia } from '@/lib/data/types';
 
 type TableBody = { caption?: string; headers: string[]; rows: string[][]; numericColumns?: number[] };
-type DocBody = { format: 'html' | 'markdown'; content: string };
+type DocBody = { format: 'markdown'; content: string };
 type ChartBody = {
   chartType: string;
   caption?: string;
@@ -153,14 +154,10 @@ export function MaterialView({
   // DOCUMENT
   const body = material.body as DocBody | null;
   if (!body) return null;
+  // Chỉ markdown. Parser tự viết không cho HTML lọt, nên không cần sanitizer.
   return (
     <div className="mb-5 rounded-[10px] border border-ln px-5 py-4">
-      <div
-        className="jp space-y-3 text-[13.5px] leading-[1.9]"
-        // Nội dung do admin của chính dự án soạn qua trang quản trị, không phải
-        // đầu vào từ người dùng ngoài. Phase 3 vẫn phải làm sạch HTML lúc lưu.
-        dangerouslySetInnerHTML={{ __html: body.content }}
-      />
+      <Markdown source={body.content} className="jp text-[13.5px] leading-[1.9]" />
     </div>
   );
 }

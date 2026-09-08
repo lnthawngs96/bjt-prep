@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { startAttempt } from '@/lib/data/attempts';
 import { getSession } from '@/lib/auth-server';
+import { startAttemptBodySchema } from '@/lib/validation/attempts';
 import type { AttemptMode } from '@/lib/prisma-types';
 
 /**
@@ -24,22 +25,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Body không phải JSON hợp lệ' }, { status: 400 });
   }
 
-  const { questionSetId, mockTestId } = (body ?? {}) as Record<string, unknown>;
-  const setId = typeof questionSetId === 'string' ? questionSetId : null;
-  const testId = typeof mockTestId === 'string' ? mockTestId : null;
-
-  if (!setId && !testId) {
-    return NextResponse.json({ error: 'Cần questionSetId hoặc mockTestId' }, { status: 400 });
+  const parsed = startAttemptBodySchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Cần questionSetId hoặc mockTestId', code: 'VALIDATION' }, { status: 400 });
   }
+  const { questionSetId = null, mockTestId = null } = parsed.data;
 
   // Chế độ do server quyết định theo loại đề, không nhận từ client.
-  const mode: AttemptMode = testId ? 'MOCK' : 'PRACTICE';
-  const result = await startAttempt({
-    userId: session.user.id,
-    mode,
-    questionSetId: setId,
-    mockTestId: testId,
-  });
+  const mode: AttemptMode = mockTestId ? 'MOCK' : 'PRACTICE';
+  const result = await startAttempt({ userId: session.user.id, mode, questionSetId, mockTestId });
 
   if ('error' in result) {
     return NextResponse.json({ error: 'Đề này chưa có câu hỏi nào', code: 'EMPTY' }, { status: 409 });

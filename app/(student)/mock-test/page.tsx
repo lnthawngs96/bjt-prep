@@ -5,14 +5,17 @@ import { ListRow } from '@/components/student/ListRow';
 import { Section, SectionHeading } from '@/components/student/SectionHeading';
 import { getAttemptHistory, getMockTests } from '@/lib/data/attempts';
 import { getPartsWithSections } from '@/lib/data/sections';
+import { getSession } from '@/lib/auth-server';
 import { MOCK_TEST_QUESTION_COUNT, SCORING_BANDS } from '@/lib/scoring';
 
 export const metadata: Metadata = { title: 'Thi thử' };
 
 export default async function MockTestPage() {
+  const session = await getSession();
+  const userId = session?.user.id ?? null;
   const [tests, history, parts] = await Promise.all([
-    getMockTests(),
-    getAttemptHistory(),
+    getMockTests(userId),
+    userId ? getAttemptHistory(userId) : Promise.resolve([]),
     getPartsWithSections(),
   ]);
   const mockHistory = history.filter((a) => a.mode === 'MOCK' && a.finishedAt);
@@ -117,7 +120,7 @@ export default async function MockTestPage() {
               href={`/result/${a.id}`}
               title={`${a.estimatedScore} điểm · bậc ${a.estimatedLevel?.replace('_PLUS', '+')}`}
               subtitle={`${a.rawCorrect}/${a.totalQuestions} câu đúng · ${Math.round((a.timeSpentSec ?? 0) / 60)} phút`}
-              meta={a.finishedAt?.toLocaleDateString('vi-VN')}
+              meta={a.finishedAt?.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}
             />
           ))
         )}

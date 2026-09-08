@@ -171,7 +171,7 @@ model Material {
 
   // AUDIO: [{ speaker, role, text, startMs, endMs }]
   transcript Json?
-  // DOCUMENT: { format: 'html'|'markdown', content }
+  // DOCUMENT: { format: 'markdown', content } — chỉ markdown, không HTML thô
   // TABLE:    { headers: [], rows: [][], caption }
   // CHART:    { chartType, series, axisLabels }
   body       Json?
@@ -263,7 +263,9 @@ model QuestionOption {
   questionId     String
   question       Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   order          Int // 1..4
-  textJa         String
+  // null ở 場面把握 (L1), 発言聴解 (L2), 状況把握 (LR1): phương án được đọc
+  // trong audio, màn hình chỉ hiện số 1–4 — đúng như CBT thật.
+  textJa         String?
   isCorrect      Boolean  @default(false)
   distractorNote String? // vì sao phương án này sai
 

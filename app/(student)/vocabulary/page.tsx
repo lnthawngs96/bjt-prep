@@ -1,13 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getDueVocabCount, getVocabByTopic, getVocabTopics } from '@/lib/data/vocab';
+import { getSession } from '@/lib/auth-server';
 import type { VocabEntry } from '@/lib/prisma-types';
 import { VocabBrowser } from './VocabBrowser';
 
 export const metadata: Metadata = { title: 'Từ vựng' };
 
 export default async function VocabularyPage() {
-  const [topics, due] = await Promise.all([getVocabTopics(), getDueVocabCount()]);
+  const session = await getSession();
+  const [topics, due] = await Promise.all([
+    getVocabTopics(),
+    getDueVocabCount(session?.user.id ?? null),
+  ]);
   const entries = await Promise.all(
     topics.map(async (t) => [t.slug, await getVocabByTopic(t.slug)] as const),
   );

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" role="img" aria-label="Nhân viên đang nghe điện thoại tại bàn làm việc, ghế bên cạnh trống">
+  <rect width="640" height="400" fill="#eef3f8"/>
+  <rect x="60" y="250" width="520" height="16" rx="4" fill="#9fb3c8"/>
+  <!-- nhân viên nghe điện thoại -->
+  <circle cx="200" cy="150" r="34" fill="#9fb3c8"/>
+  <rect x="160" y="190" width="80" height="70" rx="14" fill="#1b4fd8"/>
+  <rect x="236" y="130" width="14" height="44" rx="6" fill="#0a1828"/>
+  <!-- bàn bên cạnh trống -->
+  <rect x="380" y="140" width="120" height="110" rx="10" fill="none" stroke="#9fb3c8" stroke-width="3" stroke-dasharray="8 6"/>
+  <text x="440" y="200" text-anchor="middle" font-size="18" fill="#9fb3c8" font-family="sans-serif">山田</text>
+  <text x="320" y="340" text-anchor="middle" font-size="22" fill="#0a1828" font-family="sans-serif">電話の取り次ぎ</text>
+</svg>

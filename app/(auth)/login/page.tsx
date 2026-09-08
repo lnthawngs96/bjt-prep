@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: 'Đăng nhập' };
  *
  * Luồng chính KHÔNG đi qua đây: bấm vào tính năng cần đăng nhập thì dialog mở
  * tại chỗ. Trang này chỉ dùng khi có người vào thẳng /login, hoặc khi
- * middleware đá ra từ /admin.
+ * proxy.ts đá ra từ /admin.
  */
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   const session = await getSession();

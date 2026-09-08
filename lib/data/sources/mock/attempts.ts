@@ -6,11 +6,13 @@ import {
   MOCK_ESTIMATED_SCORE,
 } from '@/mock/user';
 import { MOCK_SETS, MOCK_SET_BY_ID, MOCK_SET_ITEMS } from '@/mock/sets';
-import { MOCK_TESTS, MOCK_TEST_ITEMS } from '@/mock/mockTests';
+import { MOCK_TESTS, MOCK_TEST_BY_ID, MOCK_TEST_ITEMS } from '@/mock/mockTests';
 import { MOCK_GROUP_BY_ID } from '@/mock/groups';
 import { MOCK_QUESTIONS } from '@/mock/questions';
-import { MOCK_TEST_QUESTION_COUNT, scoreAttempt } from '@/lib/scoring';
+import { gradeSubmission } from '@/lib/grading';
+import { mockTimeLimitSec, practiceTimeLimitSec } from '@/lib/exam-rules';
 import { attemptStore, newAttemptId, type StoredAttempt } from './store';
+import { getPartsWithSections } from './sections';
 import {
   getCorrectOptionIds,
   getGrammarToReview,
@@ -24,21 +26,46 @@ import type {
   MockTestSummary,
   QuestionSetSummary,
   ResultItem,
+  SubmitError,
+  SubmitResult,
 } from '@/lib/data/types';
 import type { Attempt, AttemptMode, SectionCode } from '@/lib/prisma-types';
+
+/* ============================================================
+   HÀM NỘI BỘ
+   ============================================================ */
+
+/** Id các group của một đề, đúng thứ tự. */
+function groupIdsOf(input: { questionSetId: string | null; mockTestId: string | null }): string[] {
+  if (input.mockTestId) {
+    return MOCK_TEST_ITEMS.filter((i) => i.mockTestId === input.mockTestId)
+      .sort((a, b) => a.order - b.order)
+      .map((i) => i.groupId);
+  }
+  return MOCK_SET_ITEMS.filter((i) => i.setId === input.questionSetId)
+    .sort((a, b) => a.order - b.order)
+    .map((i) => i.groupId);
+}
+
+/** Mọi câu của đề, đúng thứ tự — đây là tập DUY NHẤT được chấm. */
+function questionsOfGroups(groupIds: string[]) {
+  return groupIds.flatMap((gid) =>
+    MOCK_QUESTIONS.filter((q) => q.groupId === gid).sort((a, b) => a.order - b.order),
+  );
+}
+
+function questionCountOfSet(setId: string): number {
+  return questionsOfGroups(groupIdsOf({ questionSetId: setId, mockTestId: null })).length;
+}
 
 /* ============================================================
    DANH SÁCH BỘ VÀ ĐỀ
    ============================================================ */
 
-function questionCountOfSet(setId: string): number {
-  return MOCK_SET_ITEMS.filter((i) => i.setId === setId).reduce(
-    (n, i) => n + MOCK_QUESTIONS.filter((q) => q.groupId === i.groupId).length,
-    0,
-  );
-}
-
-export async function getSetsBySection(sectionCode: SectionCode): Promise<QuestionSetSummary[]> {
+export async function getSetsBySection(
+  sectionCode: SectionCode,
+  userId: string | null,
+): Promise<QuestionSetSummary[]> {
   // TODO(db): db.questionSet.findMany({ where: { sectionCode, status: 'PUBLISHED' },
   //   include: { items: { include: { group: { include: { _count: { select: { questions: true } } } } } },
   //              attempts: { where: { userId }, orderBy: { startedAt: 'desc' }, take: 1 } },
@@ -46,7 +73,9 @@ export async function getSetsBySection(sectionCode: SectionCode): Promise<Questi
   return MOCK_SETS.filter((s) => s.sectionCode === sectionCode)
     .sort((a, b) => a.indexNo - b.indexNo)
     .map((s) => {
-      const last = MOCK_ATTEMPTS.find((a) => a.questionSetId === s.id && a.finishedAt);
+      const last = userId
+        ? MOCK_ATTEMPTS.find((a) => a.userId === userId && a.questionSetId === s.id && a.finishedAt)
+        : undefined;
       return {
         ...s,
         questionCount: questionCountOfSet(s.id),
@@ -57,7 +86,7 @@ export async function getSetsBySection(sectionCode: SectionCode): Promise<Questi
     });
 }
 
-export async function getMockTests(): Promise<MockTestSummary[]> {
+export async function getMockTests(userId: string | null): Promise<MockTestSummary[]> {
   // TODO(db): db.mockTest.findMany({ include: { items: true, attempts: { where: { userId } } } })
   const rows = MOCK_TESTS.map((t) => {
     const items = MOCK_TEST_ITEMS.filter((i) => i.mockTestId === t.id);
@@ -68,7 +97,9 @@ export async function getMockTests(): Promise<MockTestSummary[]> {
       perSection[i.sectionCode] = (perSection[i.sectionCode] ?? 0) + n;
       questionCount += n;
     }
-    const last = MOCK_ATTEMPTS.find((a) => a.mockTestId === t.id && a.finishedAt);
+    const last = userId
+      ? MOCK_ATTEMPTS.find((a) => a.userId === userId && a.mockTestId === t.id && a.finishedAt)
+      : undefined;
     return {
       ...t,
       questionCount,
@@ -120,17 +151,21 @@ function toAttempt(a: StoredAttempt): Attempt {
   };
 }
 
-export async function getAttempt(attemptId: string): Promise<Attempt | null> {
-  // TODO(db): db.attempt.findUnique({ where: { id: attemptId } })
-  //           kèm kiểm attempt.userId === session.user.id, nếu lệch trả 404.
+/** Lượt làm bài — chỉ trả về khi ĐÚNG chủ. Người khác thấy như không tồn tại. */
+export async function getAttempt(attemptId: string, userId: string): Promise<Attempt | null> {
+  // TODO(db): db.attempt.findFirst({ where: { id: attemptId, userId } })
   const live = attemptStore.get(attemptId);
-  if (live) return toAttempt(live);
-  return MOCK_ATTEMPT_BY_ID.get(attemptId) ?? null;
+  const attempt = live ? toAttempt(live) : (MOCK_ATTEMPT_BY_ID.get(attemptId) ?? null);
+  if (!attempt || attempt.userId !== userId) return null;
+  return attempt;
 }
 
-export async function getAttemptHistory(): Promise<Attempt[]> {
-  // TODO(db): db.attempt.findMany({ where: { userId }, orderBy: { startedAt: 'desc' } })
-  return [...MOCK_ATTEMPTS].sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
+export async function getAttemptHistory(userId: string): Promise<Attempt[]> {
+  // TODO(db): db.attempt.findMany({ where: { userId, finishedAt: { not: null } }, orderBy: { startedAt: 'desc' } })
+  const live = [...attemptStore.values()].map(toAttempt);
+  return [...MOCK_ATTEMPTS, ...live]
+    .filter((a) => a.userId === userId)
+    .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
 }
 
 /**
@@ -148,15 +183,8 @@ export async function startAttempt(input: {
   mockTestId?: string | null;
 }): Promise<{ attemptId: string } | { error: 'EMPTY' }> {
   const { userId } = input;
-
-  const groups = input.mockTestId
-    ? MOCK_TEST_ITEMS.filter((i) => i.mockTestId === input.mockTestId).map((i) => i.groupId)
-    : MOCK_SET_ITEMS.filter((i) => i.setId === input.questionSetId).map((i) => i.groupId);
-
-  const totalQuestions = groups.reduce(
-    (n, gid) => n + MOCK_QUESTIONS.filter((q) => q.groupId === gid).length,
-    0,
-  );
+  const ref = { questionSetId: input.questionSetId ?? null, mockTestId: input.mockTestId ?? null };
+  const totalQuestions = questionsOfGroups(groupIdsOf(ref)).length;
   // Đề chưa có câu nào thì không mở được — nếu không sẽ vào màn thi trắng.
   if (totalQuestions === 0) return { error: 'EMPTY' };
 
@@ -165,8 +193,7 @@ export async function startAttempt(input: {
     id,
     userId,
     mode: input.mode,
-    questionSetId: input.questionSetId ?? null,
-    mockTestId: input.mockTestId ?? null,
+    ...ref,
     startedAt: new Date(),
     finishedAt: null,
     timeSpentSec: null,
@@ -182,60 +209,70 @@ export async function startAttempt(input: {
 /**
  * CHẤM ĐIỂM — luôn ở server, kể cả khi dữ liệu còn mock.
  * Client gửi lên questionId → optionId, server tự tra đáp án.
- * KHÔNG BAO GIỜ tin con số đúng/sai do client tính.
+ * Toàn bộ quy tắc (không nộp lại, chỉ chấm câu thuộc đề, không nộp trễ)
+ * nằm trong lib/grading.ts để nguồn DB dùng lại y nguyên.
  */
 export async function submitAttempt(input: {
   attemptId: string;
   userId: string;
   answers: { questionId: string; selectedOptionId: string | null }[];
-}) {
+  now?: Date;
+}): Promise<SubmitResult | { error: SubmitError }> {
   // TODO(db): transaction — chèn AttemptAnswer, cập nhật Attempt, đẩy job cập nhật UserSkillStat
   const attempt = attemptStore.get(input.attemptId);
-  if (!attempt) return null;
-  // Không cho nộp hộ lượt của người khác.
-  if (attempt.userId !== input.userId) return null;
+  // Không cho nộp hộ lượt của người khác — trả NOT_FOUND để không lộ id có tồn tại.
+  if (!attempt || attempt.userId !== input.userId) return { error: 'NOT_FOUND' };
 
-  const correctMap = await getCorrectOptionIds(input.answers.map((a) => a.questionId));
-  const graded = input.answers.map((a) => ({
-    questionId: a.questionId,
-    selectedOptionId: a.selectedOptionId,
-    isCorrect: Boolean(a.selectedOptionId && correctMap.get(a.questionId) === a.selectedOptionId),
-  }));
-  const correct = graded.filter((a) => a.isCorrect).length;
+  const groupIds = groupIdsOf(attempt);
+  const questions = questionsOfGroups(groupIds);
+  const attemptQuestionIds = questions.map((q) => q.id);
+  const correctOptionByQuestion = await getCorrectOptionIds(attemptQuestionIds);
 
-  // Chỉ đề thi thử ĐỦ 80 câu mới quy ra thang 800. Ngoại suy từ một bộ nhỏ
-  // làm điểm dao động hàng trăm đơn vị chỉ vì đoán trúng một câu.
-  const isFullMockTest =
-    attempt.mode === 'MOCK' && attempt.totalQuestions === MOCK_TEST_QUESTION_COUNT;
-  const scored = scoreAttempt(correct, attempt.totalQuestions, isFullMockTest);
+  const timeLimitSec =
+    attempt.mode === 'MOCK'
+      ? mockTimeLimitSec(
+          await getPartsWithSections(),
+          questions.map((q) => q.sectionCode),
+        )
+      : practiceTimeLimitSec(
+          attempt.questionSetId ? MOCK_SET_BY_ID.get(attempt.questionSetId)?.estMinutes : null,
+        );
 
-  const finishedAt = new Date();
+  const result = gradeSubmission({
+    attempt,
+    attemptQuestionIds,
+    correctOptionByQuestion,
+    answers: input.answers,
+    now: input.now ?? new Date(),
+    timeLimitSec,
+  });
+  if (!result.ok) return { error: result.code };
+
   attemptStore.set(input.attemptId, {
     ...attempt,
-    finishedAt,
-    timeSpentSec: Math.round((finishedAt.getTime() - attempt.startedAt.getTime()) / 1000),
-    rawCorrect: correct,
-    estimatedScore: scored.estimatedScore,
-    estimatedLevel: scored.estimatedLevel,
-    answers: graded,
+    finishedAt: result.finishedAt,
+    timeSpentSec: result.timeSpentSec,
+    rawCorrect: result.correct,
+    estimatedScore: result.scored.estimatedScore,
+    estimatedLevel: result.scored.estimatedLevel,
+    answers: result.graded,
   });
 
-  return { attemptId: input.attemptId, ...scored };
+  return { attemptId: input.attemptId, ...result.scored };
 }
 
 /* ============================================================
    MÀN KẾT QUẢ — nơi tạo ra giá trị thật, không phải con số điểm
    ============================================================ */
 
-export async function getAttemptResult(attemptId: string): Promise<AttemptResult | null> {
-  // TODO(db): db.attempt.findUnique({ where: { id: attemptId }, include: { answers: {
+export async function getAttemptResult(attemptId: string, userId: string): Promise<AttemptResult | null> {
+  // TODO(db): db.attempt.findFirst({ where: { id: attemptId, userId }, include: { answers: {
   //   include: { question: { include: { options: true, group: { include: { materials: ... } },
   //   vocabLinks: { include: { vocab: true } }, grammarLinks: { include: { grammar: true } },
   //   tags: { include: { tag: true } } } } } } } })
-  //   Nhớ kiểm attempt.userId === session.user.id.
   const live = attemptStore.get(attemptId);
   const attempt = live ? toAttempt(live) : (MOCK_ATTEMPT_BY_ID.get(attemptId) ?? null);
-  if (!attempt) return null;
+  if (!attempt || attempt.userId !== userId) return null;
 
   const groups = attempt.mockTestId
     ? await getGroupsWithAnswersByMockTest(attempt.mockTestId)
@@ -283,23 +320,21 @@ export async function getAttemptResult(attemptId: string): Promise<AttemptResult
   };
 }
 
-/** Điểm ước tính hiện tại — lấy từ lần thi thử gần nhất. */
-export async function getCurrentEstimate() {
+/** Điểm ước tính hiện tại — lấy từ lần thi thử gần nhất, null nếu chưa thi thử. */
+export async function getCurrentEstimate(userId: string) {
   // TODO(db): db.attempt.findFirst({ where: { userId, mode: 'MOCK', finishedAt: { not: null } }, orderBy: { finishedAt: 'desc' } })
-  return { score: MOCK_ESTIMATED_SCORE, level: MOCK_ESTIMATED_LEVEL };
+  const latest = (await getAttemptHistory(userId)).find(
+    (a) => a.mode === 'MOCK' && a.finishedAt && a.estimatedScore != null,
+  );
+  if (latest) return { score: latest.estimatedScore as number, level: latest.estimatedLevel };
+  // Học viên mẫu có sẵn điểm để đối chiếu với prototype.
+  if (userId === 'usr-demo') return { score: MOCK_ESTIMATED_SCORE, level: MOCK_ESTIMATED_LEVEL };
+  return null;
 }
 
 export async function getMockTest(mockTestId: string) {
   // TODO(db): db.mockTest.findUnique({ where: { id: mockTestId } })
-  return MOCK_TESTS.find((t) => t.id === mockTestId) ?? null;
-}
-
-/** Section của group đầu tiên trong đề — dùng suy ra navigationMode. */
-export async function getFirstGroupOfMockTest(mockTestId: string) {
-  const first = MOCK_TEST_ITEMS.filter((i) => i.mockTestId === mockTestId).sort(
-    (a, b) => a.order - b.order,
-  )[0];
-  return first ? (MOCK_GROUP_BY_ID.get(first.groupId) ?? null) : null;
+  return MOCK_TEST_BY_ID.get(mockTestId) ?? null;
 }
 
 export async function getSet(setId: string) {
@@ -307,8 +342,8 @@ export async function getSet(setId: string) {
   return MOCK_SET_BY_ID.get(setId) ?? null;
 }
 
-/** Group đầu tiên của một bộ — dùng suy ra sectionCode cho navigationMode. */
+/** Group đầu tiên của một bộ — còn dùng ở vài chỗ hiển thị. */
 export async function getFirstGroupOfSet(setId: string) {
-  const first = MOCK_SET_ITEMS.filter((i) => i.setId === setId).sort((a, b) => a.order - b.order)[0];
-  return first ? (MOCK_GROUP_BY_ID.get(first.groupId) ?? null) : null;
+  const first = groupIdsOf({ questionSetId: setId, mockTestId: null })[0];
+  return first ? (MOCK_GROUP_BY_ID.get(first) ?? null) : null;
 }

@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
@@ -28,6 +30,7 @@
     "react-icons": "^5.7.0",
     "tailwind-merge": "^3.6.0",
     "ws": "^8.21.3",
+    "zod": "^4.5.4",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
@@ -42,7 +45,8 @@
     "prisma": "7.10.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   },
   "description": "Web luyện thi BJT (ビジネス日本語能力テスト) cho người Việt"
 }

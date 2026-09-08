@@ -42,14 +42,20 @@ export const MOCK_TESTS: MockTest[] = [
 export const MOCK_TEST_BY_ID = new Map(MOCK_TESTS.map((m) => [m.id, m]));
 
 /**
- * Giai đoạn giao diện chỉ lắp vài group mẫu vào MT-03 để màn admin có gì mà đếm
- * và để cảnh báo "chưa đủ 80 câu" hiện ra được.
+ * MT-03 lắp mỗi section ít nhất một group — chưa đủ 80 câu nhưng trải đủ cả
+ * ba phần, để màn thi nhiều phần (ba đồng hồ, khoá phần đã xong) chạy được
+ * end-to-end và để màn admin có gì mà đếm, cảnh báo "chưa đủ 80 câu".
  */
 export const MOCK_TEST_ITEMS: MockTestItem[] = [
-  { mockTestId: 'mt-03', groupId: 'grp-l2-014', sectionCode: SectionCode.L2, order: 1 },
-  { mockTestId: 'mt-03', groupId: 'grp-lr2-007', sectionCode: SectionCode.LR2, order: 2 },
-  { mockTestId: 'mt-03', groupId: 'grp-lr2-008', sectionCode: SectionCode.LR2, order: 3 },
-  { mockTestId: 'mt-03', groupId: 'grp-lr2-009', sectionCode: SectionCode.LR2, order: 4 },
-  { mockTestId: 'mt-03', groupId: 'grp-r1-033', sectionCode: SectionCode.R1, order: 5 },
-  { mockTestId: 'mt-03', groupId: 'grp-r2-021', sectionCode: SectionCode.R2, order: 6 },
+  { mockTestId: 'mt-03', groupId: 'grp-l1-001', sectionCode: SectionCode.L1, order: 1 },
+  { mockTestId: 'mt-03', groupId: 'grp-l2-014', sectionCode: SectionCode.L2, order: 2 },
+  { mockTestId: 'mt-03', groupId: 'grp-l3-001', sectionCode: SectionCode.L3, order: 3 },
+  { mockTestId: 'mt-03', groupId: 'grp-lr1-001', sectionCode: SectionCode.LR1, order: 4 },
+  { mockTestId: 'mt-03', groupId: 'grp-lr2-007', sectionCode: SectionCode.LR2, order: 5 },
+  { mockTestId: 'mt-03', groupId: 'grp-lr2-008', sectionCode: SectionCode.LR2, order: 6 },
+  { mockTestId: 'mt-03', groupId: 'grp-lr2-009', sectionCode: SectionCode.LR2, order: 7 },
+  { mockTestId: 'mt-03', groupId: 'grp-lr3-001', sectionCode: SectionCode.LR3, order: 8 },
+  { mockTestId: 'mt-03', groupId: 'grp-r1-033', sectionCode: SectionCode.R1, order: 9 },
+  { mockTestId: 'mt-03', groupId: 'grp-r2-021', sectionCode: SectionCode.R2, order: 10 },
+  { mockTestId: 'mt-03', groupId: 'grp-r3-001', sectionCode: SectionCode.R3, order: 11 },
 ];

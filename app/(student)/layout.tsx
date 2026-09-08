@@ -11,9 +11,8 @@ export default async function StudentLayout({ children }: LayoutProps<'/'>) {
   const user = session?.user ?? null;
 
   // Số liệu cá nhân chỉ có ý nghĩa khi đã đăng nhập.
-  // TODO(db): Phase 4 truyền userId vào để lấy đúng dữ liệu của người này.
   const [estimate, dueVocabCount] = user
-    ? await Promise.all([getCurrentEstimate(), getDueVocabCount()])
+    ? await Promise.all([getCurrentEstimate(user.id), getDueVocabCount(user.id)])
     : [null, 0];
 
   return (

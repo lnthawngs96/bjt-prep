@@ -5,11 +5,14 @@ import { StartAttemptButton } from '@/components/student/StartAttemptButton';
 import { Section, SectionHeading } from '@/components/student/SectionHeading';
 import { getStudentDashboard } from '@/lib/data/user';
 import { getMockTests } from '@/lib/data/attempts';
+import { getSession } from '@/lib/auth-server';
 import { pointsToNextBand } from '@/lib/scoring';
 
 export default async function HomePage() {
-  const [dash, mockTests] = await Promise.all([getStudentDashboard(), getMockTests()]);
-  const next = pointsToNextBand(dash.estimatedScore);
+  const session = await getSession();
+  const userId = session?.user.id ?? null;
+  const [dash, mockTests] = await Promise.all([getStudentDashboard(userId), getMockTests(userId)]);
+  const next = dash.estimatedScore != null ? pointsToNextBand(dash.estimatedScore) : null;
   const done = mockTests.filter((t) => t.lastAttempt).length;
 
   return (
@@ -75,18 +78,36 @@ export default async function HomePage() {
             </Link>
           }
         />
-        <ScoreRuler score={dash.estimatedScore} />
-        <p className="mt-4 text-[12.5px] text-fg3">
-          Đây là <b className="font-semibold text-fg2">điểm tham khảo</b>, tính 10 điểm mỗi câu trên
-          đề đủ 80 câu. BJT thật chấm bằng IRT và không công bố 配点, nên con số này chỉ dùng để theo
-          dõi tiến bộ của chính bạn.
-          {next && ` Còn ${next.gap} điểm nữa lên bậc ${next.nextLevel.replace('_PLUS', '+')}.`}
-        </p>
+        {dash.estimatedScore != null ? (
+          <>
+            <ScoreRuler score={dash.estimatedScore} />
+            <p className="mt-4 text-[12.5px] text-fg3">
+              Đây là <b className="font-semibold text-fg2">điểm tham khảo</b>, tính 10 điểm mỗi câu
+              trên đề đủ 80 câu. BJT thật chấm bằng IRT và không công bố 配点, nên con số này chỉ dùng
+              để theo dõi tiến bộ của chính bạn.
+              {next && ` Còn ${next.gap} điểm nữa lên bậc ${next.nextLevel.replace('_PLUS', '+')}.`}
+            </p>
+          </>
+        ) : (
+          <div className="border-y border-ln py-8">
+            <p className="mb-1 text-[15px] font-medium">Chưa có điểm tham khảo</p>
+            <p className="mb-5 max-w-[60ch] text-[13px] text-fg2">
+              Làm một đề thi thử đủ 80 câu để có điểm tham khảo trên thang 800 và biết mình đang ở bậc
+              nào. Bộ luyện tập chỉ hiện số câu đúng, không quy ra điểm.
+            </p>
+            <Link
+              href="/mock-test"
+              className="inline-block rounded-[9px] border border-ln px-6 py-3 text-[13.5px] transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
+            >
+              Xem các đề thi thử
+            </Link>
+          </div>
+        )}
       </Section>
 
       {/* ---------- Việc hôm nay ---------- */}
       <Section>
-        <SectionHeading title="Việc hôm nay" meta={`${dash.todayTasks.length} việc · khoảng 40 phút`} />
+        <SectionHeading title="Việc hôm nay" meta={`${dash.todayTasks.length} việc`} />
         {dash.todayTasks.map((t, i) => (
           <ListRow
             key={t.id}
@@ -104,6 +125,11 @@ export default async function HomePage() {
         <div className="flex flex-wrap items-start gap-x-12 gap-y-8">
           <div className="min-w-[260px] flex-1">
             <SectionHeading title="Đang yếu nhất" meta="30 ngày qua" />
+            {dash.weakSkills.length === 0 && (
+              <p className="border-y border-ln py-6 text-[13px] text-fg3">
+                Chưa đủ dữ liệu. Làm vài bộ luyện tập, phần này sẽ chỉ ra đúng kỹ năng bạn hay sai.
+              </p>
+            )}
             {dash.weakSkills.map((s) => (
               <div key={s.key} className="border-b border-ln py-3 first:border-t first:border-t-ln">
                 <div className="mb-[7px] flex justify-between gap-3 text-[13.5px]">
@@ -159,8 +185,8 @@ export default async function HomePage() {
             }
             subtitle={
               t.lastAttempt
-                ? `Làm ngày ${t.lastAttempt.takenAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} · ${t.lastAttempt.correct}/80 câu đúng`
-                : '80 câu · 3 phần · 105 phút'
+                ? `Làm ngày ${t.lastAttempt.takenAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' })} · ${t.lastAttempt.correct}/${t.questionCount} câu đúng`
+                : `${t.questionCount} câu · 3 phần · 105 phút`
             }
             meta={t.lastAttempt ? undefined : 'Sẵn sàng'}
           />
