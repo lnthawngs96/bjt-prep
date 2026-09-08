@@ -14,6 +14,8 @@ import {
   FaStopwatch,
 } from 'react-icons/fa6';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
+import { UserMenu } from '@/components/student/UserMenu';
+import { useAuthDialog } from '@/lib/store/authDialog';
 import { cn } from '@/lib/utils';
 
 const NAV = [
@@ -36,6 +38,7 @@ export interface HeaderProps {
 
 export function Header({ user, score, level, dueVocabCount }: HeaderProps) {
   const pathname = usePathname();
+  const showLogin = useAuthDialog((s) => s.show);
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const lastY = useRef(0);
@@ -141,21 +144,17 @@ export function Header({ user, score, level, dueVocabCount }: HeaderProps) {
         )}
         <ThemeToggle />
         {user ? (
-          <span
-            title={user.name}
-            className="grid size-[30px] flex-none place-items-center rounded-full bg-(image:--g) text-[11px] font-bold text-on-g"
-          >
-            {user.initials}
-          </span>
+          <UserMenu name={user.name} initials={user.initials} />
         ) : (
-          // TODO(auth): Phase 2 — bấm vào đây mở LoginDialog TẠI CHỖ,
-          // không điều hướng sang trang khác.
-          <Link
-            href="/login"
-            className="rounded-lg bg-(image:--g) px-3.5 py-2 text-[12.5px] font-semibold text-on-g transition-[filter] duration-200 hover:brightness-110"
+          // Mở dialog TẠI CHỖ, không điều hướng — người dùng đang xem dở
+          // trang nào thì ở lại đúng trang đó.
+          <button
+            type="button"
+            onClick={() => showLogin({ callbackURL: pathname })}
+            className="flex-none rounded-lg bg-(image:--g) px-3.5 py-2 text-[12.5px] font-semibold text-on-g transition-[filter] duration-200 hover:brightness-110"
           >
             Đăng nhập
-          </Link>
+          </button>
         )}
       </div>
     </header>

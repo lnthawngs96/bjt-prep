@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 import { FaXmark } from 'react-icons/fa6';
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock';
 import { cn } from '@/lib/utils';
 
 export interface ModalProps {
@@ -40,14 +41,7 @@ export function Modal({
   }, [open]);
 
   // Nền không cuộn được khi dialog mở.
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
+  useBodyScrollLock(open);
 
   return (
     <dialog

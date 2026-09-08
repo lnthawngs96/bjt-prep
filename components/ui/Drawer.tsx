@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 import { FaXmark } from 'react-icons/fa6';
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock';
 import { cn } from '@/lib/utils';
 
 export interface DrawerProps {
@@ -30,14 +31,8 @@ export function Drawer({ open, onClose, title, subtitle, children, footer, class
     else if (!open && el.open) el.close();
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
+  // Nền không cuộn được khi dialog mở.
+  useBodyScrollLock(open);
 
   return (
     <dialog

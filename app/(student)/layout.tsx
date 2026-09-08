@@ -1,27 +1,40 @@
 import { Header } from '@/components/student/Header';
+import { LoginDialog } from '@/components/shared/LoginDialog';
 import { ToastProvider } from '@/components/ui/Toast';
+import { getSession } from '@/lib/auth-server';
+import { isGoogleConfigured } from '@/lib/auth';
 import { getCurrentEstimate } from '@/lib/data/attempts';
 import { getDueVocabCount } from '@/lib/data/vocab';
-import { getCurrentUser } from '@/lib/data/user';
 
 export default async function StudentLayout({ children }: LayoutProps<'/'>) {
-  const [estimate, dueVocabCount, user] = await Promise.all([
-    getCurrentEstimate(),
-    getDueVocabCount(),
-    getCurrentUser(),
-  ]);
+  const session = await getSession();
+  const user = session?.user ?? null;
+
+  // Số liệu cá nhân chỉ có ý nghĩa khi đã đăng nhập.
+  // TODO(db): Phase 4 truyền userId vào để lấy đúng dữ liệu của người này.
+  const [estimate, dueVocabCount] = user
+    ? await Promise.all([getCurrentEstimate(), getDueVocabCount()])
+    : [null, 0];
 
   return (
     <ToastProvider>
       <Header
-        // TODO(auth): Phase 2 đọc từ session Better Auth. Chưa đăng nhập thì
-        // getCurrentUser() trả null và header hiện nút Đăng nhập.
-        user={user ? { name: user.name, initials: initialsOf(user.name), isAdmin: user.role === 'ADMIN' } : null}
-        score={user ? estimate.score : null}
-        level={user ? estimate.level : null}
-        dueVocabCount={user ? dueVocabCount : 0}
+        user={
+          user
+            ? {
+                name: user.name,
+                initials: initialsOf(user.name),
+                isAdmin: user.role === 'ADMIN',
+              }
+            : null
+        }
+        score={estimate?.score ?? null}
+        level={estimate?.level ?? null}
+        dueVocabCount={dueVocabCount}
       />
       <main className="min-h-dvh pt-[58px]">{children}</main>
+      {/* Một dialog duy nhất cho cả app, mở từ bất kỳ đâu qua useAuthDialog(). */}
+      <LoginDialog googleConfigured={isGoogleConfigured} />
     </ToastProvider>
   );
 }

@@ -5,9 +5,6 @@ import {
   MOCK_ESTIMATED_LEVEL,
   MOCK_ESTIMATED_SCORE,
 } from '@/mock/user';
-import { MOCK_USER } from '@/mock/user';
-
-const MOCK_USER_ID = MOCK_USER.id;
 import { MOCK_SETS, MOCK_SET_BY_ID, MOCK_SET_ITEMS } from '@/mock/sets';
 import { MOCK_TESTS, MOCK_TEST_ITEMS } from '@/mock/mockTests';
 import { MOCK_GROUP_BY_ID } from '@/mock/groups';
@@ -145,12 +142,12 @@ export async function getAttemptHistory(): Promise<Attempt[]> {
  * TODO(db): db.attempt.create({ data: { userId, mode, questionSetId, mockTestId, totalQuestions } })
  */
 export async function startAttempt(input: {
+  userId: string;
   mode: AttemptMode;
   questionSetId?: string | null;
   mockTestId?: string | null;
 }): Promise<{ attemptId: string } | { error: 'EMPTY' }> {
-  // TODO(db): userId lấy từ session Better Auth.
-  const userId = MOCK_USER_ID;
+  const { userId } = input;
 
   const groups = input.mockTestId
     ? MOCK_TEST_ITEMS.filter((i) => i.mockTestId === input.mockTestId).map((i) => i.groupId)
@@ -189,11 +186,14 @@ export async function startAttempt(input: {
  */
 export async function submitAttempt(input: {
   attemptId: string;
+  userId: string;
   answers: { questionId: string; selectedOptionId: string | null }[];
 }) {
   // TODO(db): transaction — chèn AttemptAnswer, cập nhật Attempt, đẩy job cập nhật UserSkillStat
   const attempt = attemptStore.get(input.attemptId);
   if (!attempt) return null;
+  // Không cho nộp hộ lượt của người khác.
+  if (attempt.userId !== input.userId) return null;
 
   const correctMap = await getCorrectOptionIds(input.answers.map((a) => a.questionId));
   const graded = input.answers.map((a) => ({

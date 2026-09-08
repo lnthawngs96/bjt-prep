@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
+import { useAuthDialog } from '@/lib/store/authDialog';
 import { cn } from '@/lib/utils';
 
 export interface StartAttemptButtonProps {
@@ -28,7 +29,9 @@ export function StartAttemptButton({
   loadingLabel,
 }: StartAttemptButtonProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const toast = useToast();
+  const showLogin = useAuthDialog((s) => s.show);
   const [loading, setLoading] = useState(false);
 
   async function start() {
@@ -40,11 +43,19 @@ export function StartAttemptButton({
         body: JSON.stringify({ questionSetId, mockTestId }),
       });
 
+      // Chưa đăng nhập: mở dialog TẠI CHỖ và quay lại đúng trang này sau đó.
+      // Không điều hướng sang /login — người dùng đang xem dở danh sách bộ.
+      if (res.status === 401) {
+        showLogin({
+          callbackURL: pathname,
+          reason: 'Đăng nhập để lưu kết quả bài làm và theo dõi tiến độ của bạn.',
+        });
+        return;
+      }
       if (res.status === 409) {
         toast('Đề này chưa có câu hỏi nào.', 'wr');
         return;
       }
-      // TODO(db): Phase 2 — 401 thì mở dialog đăng nhập tại chỗ thay vì báo lỗi.
       if (!res.ok) {
         toast('Không mở được bài làm. Thử lại giúp tôi nhé.', 'ng');
         return;

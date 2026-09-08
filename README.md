@@ -38,6 +38,7 @@ Mở http://localhost:3000. Giai đoạn này **không cần database** — dữ
 | `docs/versions.md` | Phiên bản thật, các quyết định, sai lệch so với build-plan |
 | `docs/schema-plan.md` | Lý do đằng sau từng bảng trong schema |
 | `docs/db-setup.md` | Bật Neon khi sẵn sàng |
+| `docs/google-oauth.md` | Bật đăng nhập Google |
 | `docs/prototype.html` | Giao diện đã duyệt — mở ra xem khi phân vân layout |
 | `docs/login-dialog.html` | Dialog đăng nhập đã duyệt |
 

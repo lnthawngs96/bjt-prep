@@ -1,17 +1,22 @@
 import { NextResponse } from 'next/server';
 import { startAttempt } from '@/lib/data/attempts';
+import { getSession } from '@/lib/auth-server';
 import type { AttemptMode } from '@/lib/prisma-types';
 
 /**
- * Mở một lượt làm bài. Server sinh id và gắn với userId.
+ * Mở một lượt làm bài. Server sinh id và gắn với userId của phiên đăng nhập.
  *
- * Có endpoint này thay vì để client tự dựng đường dẫn /exam/att-<setId>:
- * id suy ra từ setId thì hai học viên làm cùng một bộ sẽ dùng chung id và
- * ghi đè kết quả của nhau.
+ * Có endpoint này thay vì để client tự dựng /exam/att-<setId>: id suy ra từ
+ * setId thì hai học viên làm cùng một bộ sẽ dùng chung id và ghi đè kết quả
+ * của nhau.
  */
 export async function POST(req: Request) {
-  // TODO(db): kiểm session Better Auth, lấy userId. Chưa đăng nhập thì trả 401
-  //           để client mở dialog đăng nhập tại chỗ.
+  const session = await getSession();
+  if (!session) {
+    // Client bắt 401 và mở dialog đăng nhập TẠI CHỖ.
+    return NextResponse.json({ error: 'Chưa đăng nhập', code: 'UNAUTHENTICATED' }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -29,13 +34,15 @@ export async function POST(req: Request) {
 
   // Chế độ do server quyết định theo loại đề, không nhận từ client.
   const mode: AttemptMode = testId ? 'MOCK' : 'PRACTICE';
-  const result = await startAttempt({ mode, questionSetId: setId, mockTestId: testId });
+  const result = await startAttempt({
+    userId: session.user.id,
+    mode,
+    questionSetId: setId,
+    mockTestId: testId,
+  });
 
   if ('error' in result) {
-    return NextResponse.json(
-      { error: 'Đề này chưa có câu hỏi nào', code: 'EMPTY' },
-      { status: 409 },
-    );
+    return NextResponse.json({ error: 'Đề này chưa có câu hỏi nào', code: 'EMPTY' }, { status: 409 });
   }
 
   return NextResponse.json(result, { status: 201 });

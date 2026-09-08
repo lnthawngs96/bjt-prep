@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { submitAttempt } from '@/lib/data/attempts';
+import { getSession } from '@/lib/auth-server';
 
 /**
  * CHẤM ĐIỂM Ở SERVER. Client chỉ gửi lên "tôi chọn phương án nào",
@@ -12,7 +13,11 @@ import { submitAttempt } from '@/lib/data/attempts';
 export async function POST(req: Request, ctx: RouteContext<'/api/attempts/[attemptId]/submit'>) {
   const { attemptId } = await ctx.params;
 
-  // TODO(db): kiểm session Better Auth và xác nhận attempt này thuộc về user hiện tại.
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Chưa đăng nhập' }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -37,7 +42,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/attempts/[attem
     ];
   });
 
-  const result = await submitAttempt({ attemptId, answers: parsed });
+  const result = await submitAttempt({ attemptId, userId: session.user.id, answers: parsed });
   if (!result) {
     return NextResponse.json({ error: 'Không tìm thấy lượt làm bài' }, { status: 404 });
   }
