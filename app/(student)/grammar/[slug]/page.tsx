@@ -31,8 +31,8 @@ export default async function GrammarDetailPage({ params }: PageProps<'/grammar/
   const bad = g.examples.filter((e) => e.isNegative);
 
   return (
-    <div className="mx-auto max-w-content px-6">
-      <section className="relative py-12">
+    <>
+      <section className="relative px-6 py-12">
         <span
           aria-hidden
           className="pointer-events-none absolute -inset-x-50 -top-14 bottom-0 bg-(image:--glow)"
@@ -80,13 +80,15 @@ export default async function GrammarDetailPage({ params }: PageProps<'/grammar/
             <p className="mb-3 flex items-center gap-2 text-xs font-bold text-ok">
               <FaCheck className="size-3" /> DÙNG ĐÚNG
             </p>
-            {good.map((e) => (
-              <div key={e.id} className="border-b border-ln py-4 first:border-t">
-                <p className="jp text-sm leading-loose">{e.sentenceJa}</p>
-                <p className="mt-1 text-xs text-fg2">{e.meaningVi}</p>
-                {e.noteVi && <p className="mt-2 text-xs text-fg3">{e.noteVi}</p>}
-              </div>
-            ))}
+            <div className="space-y-5">
+              {good.map((e) => (
+                <div key={e.id}>
+                  <p className="jp text-sm leading-loose">{e.sentenceJa}</p>
+                  <p className="mt-1 text-xs text-fg2">{e.meaningVi}</p>
+                  {e.noteVi && <p className="mt-2 text-xs text-fg3">{e.noteVi}</p>}
+                </div>
+              ))}
+            </div>
           </div>
 
           {bad.length > 0 && (
@@ -94,23 +96,25 @@ export default async function GrammarDetailPage({ params }: PageProps<'/grammar/
               <p className="mb-3 flex items-center gap-2 text-xs font-bold text-ng">
                 <FaXmark className="size-3" /> DÙNG SAI
               </p>
-              {bad.map((e) => (
-                <div key={e.id} className="border-b border-ln py-4 first:border-t">
-                  <p className="jp text-sm leading-loose line-through decoration-ng/50">
-                    {e.sentenceJa}
-                  </p>
-                  <p className="mt-1 text-xs text-fg2">{e.meaningVi}</p>
-                  {e.noteVi && (
-                    <p className="mt-2 border-l-2 border-l-ng pl-3 text-xs text-fg2">{e.noteVi}</p>
-                  )}
-                </div>
-              ))}
+              <div className="space-y-5">
+                {bad.map((e) => (
+                  <div key={e.id}>
+                    <p className="jp text-sm leading-loose line-through decoration-ng/50">
+                      {e.sentenceJa}
+                    </p>
+                    <p className="mt-1 text-xs text-fg2">{e.meaningVi}</p>
+                    {e.noteVi && (
+                      <p className="mt-2 border-l-2 border-l-ng pl-3 text-xs text-fg2">{e.noteVi}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
       </Section>
 
       <div className="h-40" />
-    </div>
+    </>
   );
 }

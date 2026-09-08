@@ -19,12 +19,14 @@ export default async function VocabularyPage() {
   const entriesByTopic: Record<string, VocabEntry[]> = Object.fromEntries(entries);
 
   return (
-    <div className="mx-auto max-w-content px-6 pt-10">
-      <div className="mb-8 flex flex-wrap items-end gap-5">
-        <h1 className="text-3xl font-bold tracking-tight">Từ vựng</h1>
-        <p className="pb-1.5 max-w-prose text-sm text-fg2">
-          Từ vựng thương mại theo chủ đề, kèm tầng lịch sự và ghi chú dùng khi nào.
-        </p>
+    <div className="pt-10">
+      <div className="mb-8 flex flex-wrap items-end gap-5 px-6">
+        <div>
+          <h1 className="mb-2 text-3xl font-bold tracking-tight">Từ vựng</h1>
+          <p className="max-w-prose text-sm text-fg2">
+            Từ vựng thương mại theo chủ đề, kèm tầng lịch sự và ghi chú dùng khi nào.
+          </p>
+        </div>
         {due > 0 && (
           <Link
             href="/vocabulary/review"
@@ -34,7 +36,9 @@ export default async function VocabularyPage() {
           </Link>
         )}
       </div>
-      <VocabularyBrowser topics={topics} entriesByTopic={entriesByTopic} />
+      <div className="px-6">
+        <VocabularyBrowser topics={topics} entriesByTopic={entriesByTopic} />
+      </div>
       <div className="h-40" />
     </div>
   );

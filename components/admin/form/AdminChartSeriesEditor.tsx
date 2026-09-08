@@ -29,7 +29,7 @@ export function AdminChartSeriesEditor({ value, onChange, errors }: { value: Bod
         {value.categories.map((c, i) => (
           <span key={i} className="flex items-center gap-1">
             <input aria-label={`Nhóm ${i + 1}`} value={c} onChange={(e) => setCategory(i, e.target.value)} className="jp w-32 rounded-md border border-ln bg-bg px-2 py-1.5 text-sm outline-none focus:border-acc" />
-            <button type="button" aria-label="Bỏ nhóm" disabled={n <= 1} onClick={() => onChange({ ...value, categories: value.categories.filter((_, k) => k !== i), series: value.series.map((s) => ({ ...s, values: s.values.filter((_, k) => k !== i) })) })} className="grid size-6 place-items-center rounded text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
+            <button type="button" aria-label="Bỏ nhóm" disabled={n <= 1} onClick={() => onChange({ ...value, categories: value.categories.filter((_, k) => k !== i), series: value.series.map((s) => ({ ...s, values: s.values.filter((_, k) => k !== i) })) })} className="cursor-pointer grid size-6 place-items-center rounded text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
               <FaXmark className="size-2.5" />
             </button>
           </span>
@@ -56,7 +56,7 @@ export function AdminChartSeriesEditor({ value, onChange, errors }: { value: Bod
               })
             }
           />
-          <button type="button" aria-label="Bỏ dãy" disabled={value.series.length <= 1} onClick={() => onChange({ ...value, series: value.series.filter((_, k) => k !== i) })} className="mb-2 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
+          <button type="button" aria-label="Bỏ dãy" disabled={value.series.length <= 1} onClick={() => onChange({ ...value, series: value.series.filter((_, k) => k !== i) })} className="cursor-pointer mb-2 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
             <FaXmark className="size-3" />
           </button>
         </div>

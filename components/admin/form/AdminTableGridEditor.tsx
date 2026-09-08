@@ -46,14 +46,14 @@ export function AdminTableGridEditor({ value, onChange, errors }: { value: Body;
                   <input aria-label={`Tiêu đề cột ${j + 1}`} value={h} onChange={(e) => setHeader(j, e.target.value)} className="jp w-full min-w-24 bg-transparent px-1.5 py-1 text-xs font-semibold outline-none focus:bg-ln2" />
                   <div className="mt-1 flex items-center justify-between gap-1">
                     <AdminCheckbox label="Số" className="text-xs" checked={value.numericColumns.includes(j)} onChange={() => toggleNumeric(j)} />
-                    <button type="button" aria-label="Bỏ cột" disabled={cols <= 1} onClick={() => removeCol(j)} className="grid size-6 place-items-center rounded text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
+                    <button type="button" aria-label="Bỏ cột" disabled={cols <= 1} onClick={() => removeCol(j)} className="cursor-pointer grid size-6 place-items-center rounded text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
                       <FaXmark className="size-2.5" />
                     </button>
                   </div>
                 </th>
               ))}
               <th className="border border-ln p-1">
-                <button type="button" onClick={addCol} aria-label="Thêm cột" className="grid size-7 place-items-center rounded text-fg3 hover:bg-ln2 hover:text-fg">
+                <button type="button" onClick={addCol} aria-label="Thêm cột" className="cursor-pointer grid size-7 place-items-center rounded text-fg3 hover:bg-ln2 hover:text-fg">
                   <FaPlus className="size-3" />
                 </button>
               </th>
@@ -68,7 +68,7 @@ export function AdminTableGridEditor({ value, onChange, errors }: { value: Body;
                   </td>
                 ))}
                 <td className="border border-ln p-1">
-                  <button type="button" aria-label="Bỏ dòng" disabled={value.rows.length <= 1} onClick={() => onChange({ ...value, rows: value.rows.filter((_, k) => k !== i) })} className="grid size-6 place-items-center rounded text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
+                  <button type="button" aria-label="Bỏ dòng" disabled={value.rows.length <= 1} onClick={() => onChange({ ...value, rows: value.rows.filter((_, k) => k !== i) })} className="cursor-pointer grid size-6 place-items-center rounded text-fg3 hover:bg-ng-soft hover:text-ng disabled:opacity-30">
                     <FaXmark className="size-2.5" />
                   </button>
                 </td>

@@ -46,7 +46,7 @@ export function AdminLinkPicker({
               type="button"
               aria-label="Bỏ"
               onClick={() => onChange(value.filter((x) => x.id !== v.id))}
-              className="grid size-5 place-items-center rounded hover:bg-ng-soft hover:text-ng"
+              className="cursor-pointer grid size-5 place-items-center rounded hover:bg-ng-soft hover:text-ng"
             >
               <FaXmark className="size-2.5" />
             </button>

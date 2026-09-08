@@ -21,13 +21,14 @@ export type ListRowProps = Content & {
     | { href?: never; questionSetId?: never; mockTestId: string }
   );
 
+/** Dòng danh sách — hover nền mềm, không gạch ngang giữa các dòng. */
 const ROW =
-  'group relative flex w-full items-center gap-3.5 rounded-lg border-b border-ln px-3 py-3.5 ' +
-  'text-left first-of-type:border-t first-of-type:border-t-ln';
+  'group relative -mx-6 flex w-full items-center gap-3.5 rounded-lg px-6 py-3.5 ' +
+  'text-left transition-colors duration-150 hover:bg-ln2';
 
 /**
- * Một dòng trong danh sách. Phân tách bằng đường kẻ 1px chứ không phải card
- * bo góc — xem "Quy tắc giao diện" trong CLAUDE.md.
+ * Một dòng trong danh sách. Phân tách bằng khoảng trắng và hover,
+ * không dùng card hay gạch ngang — xem "Quy tắc giao diện" trong CLAUDE.md.
  */
 export function ListRow({ className, href, questionSetId, mockTestId, ...content }: ListRowProps) {
   const inner = <RowContent {...content} />;
@@ -74,11 +75,13 @@ function RowContent({ index, title, subtitle, meta, trailing }: Content) {
       <span
         aria-hidden
         className={cn(
-          'relative grid size-7 flex-none place-items-center overflow-hidden rounded-full',
-          'border border-ln transition-colors duration-200 group-hover:border-transparent group-hover:text-on-g',
+          'relative grid size-7 flex-none place-items-center rounded-full border border-ln',
+          'transition-colors duration-200 group-hover:border-transparent group-hover:text-on-g',
         )}
       >
-        <span className="absolute inset-0 bg-(image:--g) opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        <span className="absolute inset-0 overflow-hidden rounded-full">
+          <span className="absolute inset-0 bg-(image:--g) opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        </span>
         <FaChevronRight className="relative size-2.5 transition-transform duration-300 ease-overshoot group-hover:translate-x-0.5" />
       </span>
     </>

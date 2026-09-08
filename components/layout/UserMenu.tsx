@@ -38,7 +38,7 @@ export function UserMenu({ name, initials }: { name: string; initials: string })
         <button
           type="button"
           onClick={handleSignOut}
-          className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm text-fg2 transition-colors duration-150 hover:bg-ln2 hover:text-fg"
+          className="flex w-full cursor-pointer items-center gap-2.5 px-3.5 py-2.5 text-left text-sm text-fg2 transition-colors duration-150 hover:bg-ln2 hover:text-fg"
         >
           <FaRightFromBracket className="size-3.5" />
           Đăng xuất
@@ -60,7 +60,7 @@ function MenuLink({
   return (
     <Link
       href={href}
-      className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-fg2 transition-colors duration-150 hover:bg-ln2 hover:text-fg"
+      className="flex cursor-pointer items-center gap-2.5 px-3.5 py-2.5 text-sm text-fg2 transition-colors duration-150 hover:bg-ln2 hover:text-fg"
     >
       <Icon className="size-3.5" />
       {children}

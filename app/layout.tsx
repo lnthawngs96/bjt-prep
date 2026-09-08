@@ -38,9 +38,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
       className={`${beVietnamPro.variable} ${bizUDPGothic.variable} h-full`}
     >
-      <body className="min-h-full">
+      <body className="min-h-full overflow-x-clip">
         <ThemeProvider>
-          {/* useSearchParams cần Suspense — thanh progress bắt click Link toàn app. */}
+          {/* useSearchParams cần Suspense — overlay spinner khi chuyển trang. */}
           <Suspense fallback={null}>
             <NavigationProgress />
           </Suspense>

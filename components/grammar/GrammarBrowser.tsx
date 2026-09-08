@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Chip } from '@/components/ui/Chip';
 import { Badge } from '@/components/ui/Badge';
 import { ListRow } from '@/components/common/ListRow';
+import { SectionHeading } from '@/components/common/SectionHeading';
 import { GRAMMAR_LEVELS, GRAMMAR_REGISTERS } from '@/constants/grammar/grammarFilters';
 import type { GrammarPoint } from '@/lib/prisma-types';
 
@@ -16,7 +17,7 @@ export function GrammarBrowser({ points }: { points: GrammarPoint[] }) {
   );
 
   return (
-    <>
+    <div className="px-6">
       <div className="flex flex-wrap items-center gap-2 pb-3">
         <span className="mr-1 text-xs font-bold text-fg2">Mức độ</span>
         <Chip pressed={level === null} onClick={() => setLevel(null)}>
@@ -29,7 +30,7 @@ export function GrammarBrowser({ points }: { points: GrammarPoint[] }) {
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 pb-6">
+      <div className="flex flex-wrap items-center gap-2 pb-8">
         <span className="mr-1 text-xs font-bold text-fg2">Tầng lịch sự</span>
         <Chip pressed={register === null} onClick={() => setRegister(null)}>
           Tất cả
@@ -41,31 +42,28 @@ export function GrammarBrowser({ points }: { points: GrammarPoint[] }) {
         ))}
       </div>
 
-      <div className="mb-3 flex items-baseline gap-3 border-t border-ln pt-6">
-        <h2 className="text-base font-semibold">Mẫu ngữ pháp</h2>
-        <span className="text-xs tabular-nums text-fg3">{filtered.length} mẫu</span>
-      </div>
+      <SectionHeading title="Mẫu ngữ pháp" meta={`${filtered.length} mẫu`} />
 
       {filtered.length === 0 ? (
-        <p className="border-y border-ln py-10 text-center text-sm text-fg3">
-          Không có mẫu nào khớp bộ lọc này.
-        </p>
+        <p className="py-8 text-sm text-fg3">Không có mẫu nào khớp bộ lọc này.</p>
       ) : (
-        filtered.map((p) => (
-          <ListRow
-            key={p.id}
-            href={`/grammar/${p.slug}`}
-            title={<span className="jp text-base">{p.pattern}</span>}
-            subtitle={p.meaningVi}
-            trailing={
-              <span className="flex items-center gap-2">
-                {p.jlptLevel && <Badge tone="neutral">{p.jlptLevel}</Badge>}
-                <Badge tone="gradient">{p.level.replace('_PLUS', '+')}</Badge>
-              </span>
-            }
-          />
-        ))
+        <div className="flex flex-col gap-0.5">
+          {filtered.map((p) => (
+            <ListRow
+              key={p.id}
+              href={`/grammar/${p.slug}`}
+              title={<span className="jp text-base">{p.pattern}</span>}
+              subtitle={p.meaningVi}
+              trailing={
+                <span className="flex items-center gap-2">
+                  {p.jlptLevel && <Badge tone="neutral">{p.jlptLevel}</Badge>}
+                  <Badge tone="gradient">{p.level.replace('_PLUS', '+')}</Badge>
+                </span>
+              }
+            />
+          ))}
+        </div>
       )}
-    </>
+    </div>
   );
 }

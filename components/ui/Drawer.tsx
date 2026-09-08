@@ -60,7 +60,7 @@ export function Drawer({ open, onClose, title, subtitle, children, footer, class
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="ml-auto grid size-7 place-items-center rounded-md text-fg3 transition-colors duration-200 hover:bg-(image:--g-soft) hover:text-acc-hi"
+            className="ml-auto grid size-7 cursor-pointer place-items-center rounded-md text-fg3 transition-colors duration-200 hover:bg-(image:--g-soft) hover:text-acc-hi"
           >
             <FaXmark className="size-3" />
           </button>

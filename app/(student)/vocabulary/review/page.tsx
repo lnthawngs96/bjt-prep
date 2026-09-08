@@ -14,7 +14,7 @@ export default async function VocabReviewPage() {
   const cards = await getDueVocabCards(session.user.id, 20);
 
   return (
-    <div className="mx-auto max-w-170 px-6 pt-12">
+    <div className="mx-auto w-full max-w-170 px-6 pt-12">
       <h1 className="mb-2 text-2xl font-bold tracking-tight">Ôn từ đến hạn</h1>
       <p className="mb-8 text-sm text-fg2">
         Lịch ôn tính bằng FSRS — chỉ ôn đúng thứ sắp quên, không ôn lại thứ đã nhớ chắc.

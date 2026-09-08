@@ -143,7 +143,7 @@ export function AdminVocabularyList({ rows, lookups }: { rows: AdminVocabRow[]; 
                 <div key={i} className="border-l-2 border-ln pl-3">
                   <div className="mb-2 flex items-start gap-2">
                     <TextareaField label={`Câu ${i + 1}`} rows={2} className="flex-1 [&_textarea]:jp" value={e.sentenceJa} onChange={(ev) => set('examples', v.examples.map((x, j) => (j === i ? { ...x, sentenceJa: ev.target.value } : x)))} error={errors[`examples.${i}.sentenceJa`]} />
-                    <button type="button" aria-label="Bỏ ví dụ" onClick={() => set('examples', v.examples.filter((_, j) => j !== i))} className="mt-6 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
+                    <button type="button" aria-label="Bỏ ví dụ" onClick={() => set('examples', v.examples.filter((_, j) => j !== i))} className="cursor-pointer mt-6 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
                       <FaXmark className="size-3" />
                     </button>
                   </div>
@@ -166,7 +166,7 @@ export function AdminVocabularyList({ rows, lookups }: { rows: AdminVocabRow[]; 
                   <li key={`${r.relation}-${r.relatedId}`} className="flex items-center gap-1.5 rounded-md bg-(image:--g-soft) py-1 pl-2.5 pr-1 text-xs text-acc-hi">
                     <span className="opacity-70">{ADMIN_RELATION_LABELS[r.relation]}</span>
                     <span className="jp font-semibold">{vocabName.get(r.relatedId) ?? r.relatedId}</span>
-                    <button type="button" aria-label="Bỏ" onClick={() => set('relations', v.relations.filter((x) => x !== r))} className="grid size-5 place-items-center rounded hover:bg-ng-soft hover:text-ng">
+                    <button type="button" aria-label="Bỏ" onClick={() => set('relations', v.relations.filter((x) => x !== r))} className="cursor-pointer grid size-5 place-items-center rounded hover:bg-ng-soft hover:text-ng">
                       <FaXmark className="size-2.5" />
                     </button>
                   </li>

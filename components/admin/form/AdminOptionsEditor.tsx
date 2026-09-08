@@ -44,7 +44,7 @@ export function AdminOptionsEditor({
             aria-label={`Phương án ${o.order} là đáp án đúng`}
             onClick={() => markCorrect(i)}
             className={cn(
-              'tnum mt-6 grid size-6 flex-none place-items-center rounded-md border text-xs font-bold transition-colors duration-200',
+              'cursor-pointer tnum mt-6 grid size-6 flex-none place-items-center rounded-md border text-xs font-bold transition-colors duration-200',
               o.isCorrect
                 ? 'border-transparent bg-linear-to-br from-ok to-[#23c9c2] text-white'
                 : 'border-ln text-fg3 hover:border-acc-dim',

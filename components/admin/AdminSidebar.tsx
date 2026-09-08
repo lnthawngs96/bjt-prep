@@ -61,12 +61,12 @@ export function AdminSidebar({ name, initials }: { name: string; initials: strin
         onClick={() => writeOpen(!open)}
         aria-expanded={open}
         aria-label={open ? 'Thu gọn menu' : 'Mở rộng menu'}
-        className="mx-3 mt-3 grid size-9 flex-none place-items-center rounded-lg text-fg2 transition-colors duration-200 hover:bg-ln2 hover:text-fg"
+        className="mx-3 mt-3 grid size-9 flex-none cursor-pointer place-items-center rounded-lg text-fg2 transition-colors duration-200 hover:bg-ln2 hover:text-fg"
       >
         <FaBars className="size-3.5" />
       </button>
 
-      <Link href="/admin" className="mx-3 mt-2 flex h-9 items-center gap-2.5 overflow-hidden px-1">
+      <Link href="/admin" className="mx-3 mt-2 flex h-9 cursor-pointer items-center gap-2.5 overflow-hidden px-1">
         <span className="grid size-7 flex-none place-items-center rounded-md bg-(image:--g) text-xs font-bold text-on-g shadow-btn-xs">
           B
         </span>
@@ -142,7 +142,7 @@ function Item({
       href={href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'group relative mx-2 flex h-10 items-center gap-3 rounded-lg px-3 text-sm whitespace-nowrap',
+        'group relative mx-2 flex h-10 cursor-pointer items-center gap-3 rounded-lg px-3 text-sm whitespace-nowrap',
         'transition-colors duration-150',
         active ? 'font-semibold text-acc-hi' : 'text-fg2 hover:text-fg',
       )}

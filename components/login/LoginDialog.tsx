@@ -54,9 +54,9 @@ export function LoginDialog({ googleConfigured = true }: { googleConfigured?: bo
           disabled={loading || !googleConfigured}
           aria-busy={loading || undefined}
           className={cn(
-            'flex w-full items-center justify-center gap-3 rounded-lg border border-ln px-4 py-3.5',
+            'flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg border border-ln px-4 py-3.5',
             'text-sm font-medium transition-all duration-200',
-            'hover:border-acc hover:bg-ln2 active:scale-98 disabled:opacity-70',
+            'hover:border-acc hover:bg-ln2 active:scale-98 disabled:cursor-not-allowed disabled:opacity-70',
           )}
         >
           {loading ? (

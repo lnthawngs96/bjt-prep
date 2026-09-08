@@ -115,7 +115,7 @@ export function AdminGrammarList({ rows }: { rows: AdminGrammarRow[] }) {
                 <div key={i} className={e.isNegative ? 'border-l-2 border-ng pl-3' : 'border-l-2 border-ln pl-3'}>
                   <div className="mb-2 flex items-start gap-2">
                     <TextareaField label={`Câu ${i + 1}`} rows={2} className="flex-1 [&_textarea]:jp" value={e.sentenceJa} onChange={(ev) => patchEx(i, { sentenceJa: ev.target.value })} error={errors[`examples.${i}.sentenceJa`]} />
-                    <button type="button" aria-label="Bỏ ví dụ" onClick={() => set('examples', v.examples.filter((_, j) => j !== i))} className="mt-6 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
+                    <button type="button" aria-label="Bỏ ví dụ" onClick={() => set('examples', v.examples.filter((_, j) => j !== i))} className="cursor-pointer mt-6 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
                       <FaXmark className="size-3" />
                     </button>
                   </div>

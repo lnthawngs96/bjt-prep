@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Chip } from '@/components/ui/Chip';
 import { Badge } from '@/components/ui/Badge';
+import { SectionHeading } from '@/components/common/SectionHeading';
 import type { VocabTopicWithCount } from '@/lib/data/types';
 import type { VocabEntry } from '@/lib/prisma-types';
 
@@ -27,7 +28,7 @@ export function VocabularyBrowser({
 
   return (
     <>
-      <div className="flex flex-wrap gap-2 pb-6">
+      <div className="flex flex-wrap gap-2 pb-8">
         {topics.map((t) => (
           <Chip key={t.id} pressed={t.slug === slug} onClick={() => setSlug(t.slug)}>
             {t.nameVi}
@@ -37,16 +38,21 @@ export function VocabularyBrowser({
       </div>
 
       {topic && (
-        <div className="mb-4 flex items-baseline gap-3 border-t border-ln pt-6">
-          <h2 className="text-base font-semibold">{topic.nameVi}</h2>
-          {topic.nameJa && <span className="jp text-xs text-fg3">{topic.nameJa}</span>}
-          <span className="ml-auto text-xs text-fg3 tabular-nums">{entries.length} từ</span>
-        </div>
+        <SectionHeading
+          title={topic.nameVi}
+          meta={
+            <>
+              {topic.nameJa && <span className="jp">{topic.nameJa}</span>}
+              {topic.nameJa ? ' · ' : ''}
+              {entries.length} từ
+            </>
+          }
+        />
       )}
 
-      <ul>
+      <ul className="flex flex-col gap-1">
         {entries.map((v) => (
-          <li key={v.id} className="border-b border-ln py-4 first:border-t">
+          <li key={v.id} className="-mx-6 rounded-lg px-6 py-4">
             <div className="flex flex-wrap items-baseline gap-3">
               <span className="jp text-xl font-bold">{v.headword}</span>
               <span className="jp text-sm text-fg2">{v.readingKana}</span>

@@ -15,7 +15,7 @@ export function Chip({ pressed, className, children, ...props }: ChipProps) {
       type="button"
       aria-pressed={pressed}
       className={cn(
-        'rounded-md px-3 py-1.5 text-xs transition-colors duration-200',
+        'rounded-md px-3 py-1.5 text-xs transition-colors duration-200 cursor-pointer',
         pressed
           ? 'border border-transparent bg-(image:--g) font-semibold text-on-g'
           : 'border border-ln text-fg2 hover:border-acc-dim hover:text-fg',

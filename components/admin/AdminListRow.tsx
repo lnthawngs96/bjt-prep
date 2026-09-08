@@ -39,7 +39,7 @@ export function AdminListRow({
   );
   const base = cn(
     'flex w-full items-center gap-3.5 border-b border-ln px-3 py-3 text-left first:border-t',
-    onClick && 'transition-colors duration-150 hover:bg-ln2',
+    onClick && 'cursor-pointer transition-colors duration-150 hover:bg-ln2',
     className,
   );
   return onClick ? (

@@ -2,14 +2,20 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Khối nội dung — phân tách bằng khoảng trắng, không gạch ngang full.
- * Điểm nhấn tiêu đề nằm ở SectionHeading (gạch gradient ngắn).
+ * Khối trang chủ — không border-t full ngang (tránh rối mắt).
+ * Phân tách bằng khoảng trắng; điểm nhấn là gạch gradient ngắn dưới tiêu đề.
  */
-export function Section({ children, className }: { children: ReactNode; className?: string }) {
-  return <section className={cn('px-6 py-8 md:py-10', className)}>{children}</section>;
+export function HomeSection({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <section className={cn('px-6 py-10 md:py-12', className)}>{children}</section>;
 }
 
-export function SectionHeading({
+export function HomeHeading({
   title,
   meta,
   action,
@@ -19,7 +25,7 @@ export function SectionHeading({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-5">
+    <div className="mb-6">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h2 className="text-base font-semibold tracking-tight">{title}</h2>
         {meta && <span className="text-xs text-fg3">{meta}</span>}
@@ -32,3 +38,4 @@ export function SectionHeading({
     </div>
   );
 }
+

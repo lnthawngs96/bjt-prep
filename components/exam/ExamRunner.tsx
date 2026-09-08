@@ -219,8 +219,7 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
                 className={cn(
                   'grid size-5 place-items-center rounded-sm border text-xs tabular-nums',
                   'transition-transform duration-200',
-                  reachable && 'hover:-translate-y-0.75',
-                  !reachable && 'cursor-default opacity-45',
+                  reachable ? 'cursor-pointer hover:-translate-y-0.75' : 'cursor-default opacity-45',
                   isCurrent
                     ? 'border-transparent bg-(image:--g) font-bold text-on-g'
                     : answered
@@ -251,7 +250,7 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
         <button
           type="button"
           onClick={() => router.push(exitHref)}
-          className="ml-3.5 flex-none rounded-lg border border-ln px-3 py-1.5 text-xs transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
+          className="ml-3.5 flex-none cursor-pointer rounded-lg border border-ln px-3 py-1.5 text-xs transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
         >
           Thoát
         </button>
@@ -300,7 +299,7 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
                       aria-label={`Phương án ${o.order}`}
                       onClick={() => select(question.id, o.id)}
                       className={cn(
-                        'grid aspect-square place-items-center rounded-lg border text-2xl font-semibold tabular-nums',
+                        'grid aspect-square cursor-pointer place-items-center rounded-lg border text-2xl font-semibold tabular-nums',
                         'transition-colors duration-200',
                         chosen
                           ? 'border-transparent bg-(image:--g) text-on-g'
@@ -324,7 +323,7 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
                     role="radio"
                     aria-checked={chosen}
                     onClick={() => select(question.id, o.id)}
-                    className="group relative flex w-full gap-3.5 rounded-lg border-b border-ln px-4 py-3.5 text-left first-of-type:border-t"
+                    className="group relative flex w-full cursor-pointer gap-3.5 rounded-lg border-b border-ln px-4 py-3.5 text-left first-of-type:border-t"
                   >
                     <span
                       aria-hidden
@@ -356,7 +355,7 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
               type="button"
               onClick={() => goTo(currentIndex - 1)}
               disabled={!canGoTo(currentIndex - 1)}
-              className="rounded-lg border border-ln px-4 py-2.5 text-sm transition-colors duration-200 hover:border-acc-dim hover:bg-ln2 disabled:pointer-events-none disabled:opacity-40"
+              className="cursor-pointer rounded-lg border border-ln px-4 py-2.5 text-sm transition-colors duration-200 hover:border-acc-dim hover:bg-ln2 disabled:pointer-events-none disabled:opacity-40"
               title={
                 part.navigationMode === 'linear'
                   ? 'Đề thi thử không cho quay lại câu trước, giống kỳ thi thật'
@@ -370,7 +369,7 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
               onClick={() => toggleFlag(question.id)}
               aria-pressed={Boolean(flagged[question.id])}
               className={cn(
-                'flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200',
+                'flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200',
                 flagged[question.id]
                   ? 'border-wr text-wr'
                   : 'border-ln hover:border-acc-dim hover:bg-ln2',
@@ -383,7 +382,7 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
               type="button"
               onClick={onPrimary}
               disabled={submitting || remaining === 0}
-              className="ml-auto rounded-lg bg-(image:--g) px-4 py-2.5 text-sm font-semibold text-on-g shadow-btn-sm transition duration-200 hover:brightness-110 disabled:opacity-60"
+              className="ml-auto cursor-pointer rounded-lg bg-(image:--g) px-4 py-2.5 text-sm font-semibold text-on-g shadow-btn-sm transition duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {primaryLabel}
             </button>
@@ -416,14 +415,14 @@ export function ExamRunner({ attemptId, title, playOnce, parts, mediaUrls, exitH
             <button
               type="button"
               onClick={() => setConfirmEnd(false)}
-              className="rounded-lg border border-ln px-4 py-2.5 text-sm transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
+              className="cursor-pointer rounded-lg border border-ln px-4 py-2.5 text-sm transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
             >
               Ở lại
             </button>
             <button
               type="button"
               onClick={finishPart}
-              className="rounded-lg bg-(image:--g) px-4 py-2.5 text-sm font-semibold text-on-g transition duration-200 hover:brightness-110"
+              className="cursor-pointer rounded-lg bg-(image:--g) px-4 py-2.5 text-sm font-semibold text-on-g transition duration-200 hover:brightness-110"
             >
               Sang phần {part.order + 1}
             </button>

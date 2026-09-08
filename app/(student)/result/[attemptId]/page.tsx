@@ -41,9 +41,9 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
   );
 
   return (
-    <div className="mx-auto max-w-content px-6">
+    <>
       {/* ---------- Điểm ---------- */}
-      <section className="relative py-12">
+      <section className="relative px-6 py-12">
         <span
           aria-hidden
           className="pointer-events-none absolute -inset-x-50 -top-14 bottom-0 bg-(image:--glow)"
@@ -272,7 +272,7 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
       </Section>
 
       <div className="h-40" />
-    </div>
+    </>
   );
 }
 

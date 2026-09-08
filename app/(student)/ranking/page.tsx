@@ -11,8 +11,8 @@ export default async function RankingPage() {
   const rows = await getRanking(session?.user.id ?? null);
 
   return (
-    <div className="mx-auto max-w-content px-6 pt-10">
-      <div className="mb-8">
+    <div className="pt-10">
+      <div className="mb-8 px-6">
         <h1 className="mb-2 text-3xl font-bold tracking-tight">Xếp hạng</h1>
         <p className="max-w-prose text-sm text-fg2">
           Theo điểm tham khảo của lần thi thử gần nhất. Chỉ tính người đã làm ít nhất một đề đủ 80
@@ -20,20 +20,17 @@ export default async function RankingPage() {
         </p>
       </div>
 
-      <ul>
+      <ul className="flex flex-col gap-0.5 px-6">
         {rows.map((r) => (
           <li
             key={r.rank}
             className={cn(
-              'relative flex items-center gap-4 rounded-lg border-b border-ln px-3 py-3.5 first:border-t',
+              'relative -mx-6 flex items-center gap-4 rounded-lg px-6 py-3.5',
               r.isMe && 'font-medium',
             )}
           >
             {r.isMe && (
-              <span
-                aria-hidden
-                className="absolute inset-0 rounded-lg bg-(image:--g-soft)"
-              />
+              <span aria-hidden className="absolute inset-0 rounded-lg bg-(image:--g-soft)" />
             )}
             <span
               className={cn(
@@ -64,7 +61,7 @@ export default async function RankingPage() {
         ))}
       </ul>
 
-      <p className="mt-6 text-xs text-fg3">
+      <p className="mt-6 px-6 text-xs text-fg3">
         Bảng xếp hạng dùng dữ liệu mẫu ở giai đoạn này.
       </p>
       <div className="h-40" />

@@ -33,7 +33,7 @@ export function AdminTranscriptEditor({
             <Field label="Vai" value={l.role} placeholder="boss · staff · client · narrator · option" onChange={(e) => patch(i, { role: e.target.value })} error={errors[`transcript.${i}.role`]} />
             <Field label="Bắt đầu (ms)" type="number" min={0} value={l.startMs} onChange={(e) => patch(i, { startMs: Number(e.target.value) })} error={errors[`transcript.${i}.startMs`]} />
             <Field label="Kết thúc (ms)" type="number" min={0} value={l.endMs} onChange={(e) => patch(i, { endMs: Number(e.target.value) })} error={errors[`transcript.${i}.endMs`]} />
-            <button type="button" aria-label="Bỏ dòng" onClick={() => onChange(value.filter((_, j) => j !== i))} className="mb-2 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
+            <button type="button" aria-label="Bỏ dòng" onClick={() => onChange(value.filter((_, j) => j !== i))} className="cursor-pointer mb-2 grid size-8 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
               <FaXmark className="size-3" />
             </button>
           </div>

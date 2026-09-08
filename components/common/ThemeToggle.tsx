@@ -18,15 +18,17 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
       aria-label="Chuyển giao diện sáng hoặc tối"
       className={cn(
-        'group relative grid size-8 place-items-center overflow-hidden rounded-lg border border-ln',
+        'group relative grid size-8 cursor-pointer place-items-center rounded-lg border border-ln',
         'text-fg3 transition-colors duration-200 hover:border-transparent hover:text-on-g',
         className,
       )}
     >
       <span
         aria-hidden
-        className="absolute inset-0 bg-(image:--g) opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-      />
+        className="absolute inset-0 overflow-hidden rounded-lg"
+      >
+        <span className="absolute inset-0 bg-(image:--g) opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      </span>
       <FaMoon aria-hidden className="relative z-10 size-3.5 dark:hidden" />
       <FaSun aria-hidden className="relative z-10 hidden size-3.5 dark:block" />
     </button>

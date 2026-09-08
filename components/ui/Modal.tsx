@@ -76,7 +76,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="absolute right-3.5 top-3.5 z-10 grid size-8 place-items-center rounded-lg text-fg3 transition-colors duration-200 hover:bg-ln2 hover:text-fg"
+            className="absolute right-3.5 top-3.5 z-10 grid size-8 cursor-pointer place-items-center rounded-lg text-fg3 transition-colors duration-200 hover:bg-ln2 hover:text-fg"
           >
             <FaXmark className="size-3" />
           </button>

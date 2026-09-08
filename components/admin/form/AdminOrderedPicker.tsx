@@ -54,13 +54,13 @@ export function AdminOrderedPicker({
                 {p?.label ?? id}
                 {p?.hint && <span className="ml-2 text-xs text-fg3">{p.hint}</span>}
               </span>
-              <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Lên" className="grid size-7 place-items-center rounded-md text-fg3 hover:bg-ln2 hover:text-fg disabled:opacity-30">
+              <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Lên" className="cursor-pointer grid size-7 place-items-center rounded-md text-fg3 hover:bg-ln2 hover:text-fg disabled:opacity-30">
                 <FaArrowUp className="size-3" />
               </button>
-              <button type="button" onClick={() => move(i, 1)} disabled={i === value.length - 1} aria-label="Xuống" className="grid size-7 place-items-center rounded-md text-fg3 hover:bg-ln2 hover:text-fg disabled:opacity-30">
+              <button type="button" onClick={() => move(i, 1)} disabled={i === value.length - 1} aria-label="Xuống" className="cursor-pointer grid size-7 place-items-center rounded-md text-fg3 hover:bg-ln2 hover:text-fg disabled:opacity-30">
                 <FaArrowDown className="size-3" />
               </button>
-              <button type="button" onClick={() => onChange(value.filter((x) => x !== id))} aria-label="Bỏ" className="grid size-7 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
+              <button type="button" onClick={() => onChange(value.filter((x) => x !== id))} aria-label="Bỏ" className="cursor-pointer grid size-7 place-items-center rounded-md text-fg3 hover:bg-ng-soft hover:text-ng">
                 <FaXmark className="size-3" />
               </button>
             </li>

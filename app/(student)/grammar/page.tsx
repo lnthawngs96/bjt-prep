@@ -8,8 +8,8 @@ export default async function GrammarPage() {
   const points = await getGrammarPoints();
 
   return (
-    <div className="mx-auto max-w-content px-6 pt-10">
-      <div className="mb-8">
+    <div className="pt-10">
+      <div className="mb-8 px-6">
         <h1 className="mb-2 text-3xl font-bold tracking-tight">Ngữ pháp</h1>
         <p className="max-w-prose text-sm text-fg2">
           Mẫu ngữ pháp thương mại, lọc theo mức độ và tầng lịch sự. Mỗi mẫu có ví dụ dùng đúng đặt

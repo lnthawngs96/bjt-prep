@@ -99,7 +99,7 @@ export function AudioPlayer({
         disabled={disabled}
         aria-label={playing ? 'Tạm dừng' : 'Phát audio'}
         className={cn(
-          'grid size-9 flex-none place-items-center rounded-full bg-(image:--g) text-on-g',
+          'grid size-9 flex-none cursor-pointer place-items-center rounded-full bg-(image:--g) text-on-g',
           'shadow-btn-sm transition-transform duration-200',
           'hover:scale-105 disabled:pointer-events-none disabled:opacity-40',
         )}

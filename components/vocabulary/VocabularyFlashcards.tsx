@@ -99,7 +99,7 @@ export function VocabularyFlashcards({ cards }: { cards: VocabWithExamples[] }) 
           <button
             type="button"
             onClick={() => setRevealed(true)}
-            className="mt-6 rounded-lg border border-ln px-8 py-3.5 text-sm transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
+            className="mt-6 cursor-pointer rounded-lg border border-ln px-8 py-3.5 text-sm transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
           >
             Hiện nghĩa
           </button>
@@ -114,7 +114,7 @@ export function VocabularyFlashcards({ cards }: { cards: VocabWithExamples[] }) 
               type="button"
               onClick={() => rate(r.value)}
               className={cn(
-                'rounded-lg border px-4 py-3 text-center transition-colors duration-200',
+                'cursor-pointer rounded-lg border px-4 py-3 text-center transition-colors duration-200',
                 r.tone === 'ng' && 'border-ng/40 text-ng hover:bg-ng-soft',
                 r.tone === 'wr' && 'border-wr/40 text-wr hover:bg-wr-soft',
                 r.tone === 'ok' && 'border-ok/40 text-ok hover:bg-ok-soft',

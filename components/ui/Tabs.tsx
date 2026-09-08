@@ -65,7 +65,7 @@ export function Tabs({ items, value, onChange, className, ...aria }: TabsProps) 
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(t.id)}
             className={cn(
-              'group relative -mb-px whitespace-nowrap px-6 pb-3.5 pt-4 transition-colors duration-150',
+              'group relative -mb-px cursor-pointer whitespace-nowrap px-6 pb-3.5 pt-4 transition-colors duration-150',
               selected ? 'text-fg' : 'text-fg2 hover:text-fg',
             )}
           >

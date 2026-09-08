@@ -18,7 +18,7 @@ export interface PracticeBrowserProps {
 export function PracticeBrowser({ parts, setsBySection }: PracticeBrowserProps) {
   const [partCode, setPartCode] = useState(parts[1]?.code ?? parts[0].code);
   const part = parts.find((p) => p.code === partCode) ?? parts[0];
-  const [sectionCode, setSectionCode] = useState<string>(part.sections[1]?.code ?? part.sections[0].code);
+  const [sectionCode, setSectionCode] = useState<string>(part.sections[0].code);
 
   // Đổi phần thì section hiện tại có thể không còn thuộc phần đó nữa.
   const section = part.sections.find((s) => s.code === sectionCode) ?? part.sections[0];
@@ -37,6 +37,7 @@ export function PracticeBrowser({ parts, setsBySection }: PracticeBrowserProps) 
         aria-label="Ba phần của đề BJT"
         value={part.code}
         onChange={selectPart}
+        className="px-6"
         items={parts.map((p) => ({
           id: p.code,
           label: <span className="jp">{p.nameJa}</span>,
@@ -45,7 +46,7 @@ export function PracticeBrowser({ parts, setsBySection }: PracticeBrowserProps) 
       />
 
       <TabPanel id={part.code}>
-        <div className="flex flex-wrap gap-2 pt-4">
+        <div className="flex flex-wrap gap-2 px-6 pt-4">
           {part.sections.map((s) => (
             <Chip
               key={s.code}
@@ -57,7 +58,7 @@ export function PracticeBrowser({ parts, setsBySection }: PracticeBrowserProps) 
           ))}
         </div>
 
-        <section className="pb-7 pt-5">
+        <section className="px-6 pb-7 pt-5">
           <SectionHeading
             title={`Section ${section.order} — ${section.nameVi.toLowerCase()}`}
             meta={`${sets.length} bộ · ${sets.reduce((n, s) => n + s.questionCount, 0)} câu`}
@@ -72,36 +73,36 @@ export function PracticeBrowser({ parts, setsBySection }: PracticeBrowserProps) 
           )}
 
           {sets.length === 0 ? (
-            <p className="border-y border-ln py-10 text-center text-sm text-fg3">
-              Chưa có bộ luyện tập nào cho section này.
-            </p>
+            <p className="py-8 text-sm text-fg3">Chưa có bộ luyện tập nào cho section này.</p>
           ) : (
-            sets.map((s) => (
-              <ListRow
-                key={s.id}
-                questionSetId={s.id}
-                index={s.indexNo}
-                title={s.titleVi}
-                subtitle={s.descVi}
-                trailing={
-                  <span className="flex items-center gap-2.5">
-                    <span className="rounded-sm border border-transparent bg-(image:--g-soft) px-1.5 py-0.5 text-xs font-semibold text-acc-hi">
-                      {s.level.replace('_PLUS', '+')}
+            <div className="flex flex-col gap-0.5">
+              {sets.map((s) => (
+                <ListRow
+                  key={s.id}
+                  questionSetId={s.id}
+                  index={s.indexNo}
+                  title={s.titleVi}
+                  subtitle={s.descVi}
+                  trailing={
+                    <span className="flex items-center gap-2.5">
+                      <span className="rounded-sm border border-transparent bg-(image:--g-soft) px-1.5 py-0.5 text-xs font-semibold text-acc-hi">
+                        {s.level.replace('_PLUS', '+')}
+                      </span>
+                      <span
+                        className={cn(
+                          'w-11 text-right text-xs font-semibold tabular-nums',
+                          !s.lastResult && 'text-fg3',
+                          s.lastResult && s.lastResult.correct / s.lastResult.total >= 0.7 && 'text-ok',
+                          s.lastResult && s.lastResult.correct / s.lastResult.total < 0.7 && 'text-ng',
+                        )}
+                      >
+                        {s.lastResult ? `${s.lastResult.correct}/${s.lastResult.total}` : '—'}
+                      </span>
                     </span>
-                    <span
-                      className={cn(
-                        'w-11 text-right text-xs font-semibold tabular-nums',
-                        !s.lastResult && 'text-fg3',
-                        s.lastResult && s.lastResult.correct / s.lastResult.total >= 0.7 && 'text-ok',
-                        s.lastResult && s.lastResult.correct / s.lastResult.total < 0.7 && 'text-ng',
-                      )}
-                    >
-                      {s.lastResult ? `${s.lastResult.correct}/${s.lastResult.total}` : '—'}
-                    </span>
-                  </span>
-                }
-              />
-            ))
+                  }
+                />
+              ))}
+            </div>
           )}
         </section>
       </TabPanel>

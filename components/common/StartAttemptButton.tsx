@@ -71,7 +71,7 @@ export function StartAttemptButton({
       onClick={start}
       disabled={loading}
       aria-busy={loading || undefined}
-      className={cn('disabled:opacity-60', className)}
+      className={cn('cursor-pointer disabled:cursor-not-allowed disabled:opacity-60', className)}
     >
       {loading && loadingLabel ? loadingLabel : children}
     </button>

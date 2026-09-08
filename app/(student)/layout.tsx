@@ -31,7 +31,10 @@ export default async function StudentLayout({ children }: LayoutProps<'/'>) {
         level={estimate?.level ?? null}
         dueVocabCount={dueVocabCount}
       />
-      <main className="min-h-dvh pt-14">{children}</main>
+      {/* overflow-x-clip: giữ -mx-6 của ListRow/Section trong khung, không kéo viewport. */}
+      <main className="mx-auto min-h-dvh w-full max-w-content overflow-x-clip pt-14">
+        {children}
+      </main>
       {/* Một dialog duy nhất cho cả app, mở từ bất kỳ đâu qua useAuthDialog(). */}
       <LoginDialog googleConfigured={isGoogleConfigured} />
     </ToastProvider>

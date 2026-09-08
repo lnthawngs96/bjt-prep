@@ -21,7 +21,14 @@ export default async function PracticePage() {
   const setsBySection: Record<string, QuestionSetSummary[]> = Object.fromEntries(entries);
 
   return (
-    <div className="mx-auto max-w-content px-6 pt-8">
+    <div className="pt-10">
+      <div className="mb-8 px-6">
+        <h1 className="mb-2 text-3xl font-bold tracking-tight">Luyện thi</h1>
+        <p className="max-w-prose text-sm text-fg2">
+          Luyện từng section theo đúng cấu trúc đề BJT. Chọn phần, chọn dạng câu, rồi làm từng bộ —
+          không cần ngồi cả đề 105 phút.
+        </p>
+      </div>
       <PracticeBrowser parts={parts} setsBySection={setsBySection} />
       <div className="h-40" />
     </div>
