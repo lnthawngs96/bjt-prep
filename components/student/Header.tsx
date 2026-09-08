@@ -41,6 +41,10 @@ export function Header({ score, level, dueVocabCount, isAdmin }: HeaderProps) {
 
   // Ẩn khi cuộn xuống quá 90px, hiện lại khi cuộn lên. Ngưỡng 4px để
   // không giật khi cuộn bằng trackpad.
+  //
+  // Nghe trên `document` chứ không phải `window`: scroll của viewport được
+  // phát với target là document, và có môi trường nó không tới được window.
+  // Nghe đúng chỗ event sinh ra thì không phụ thuộc vào chuyện đó.
   useEffect(() => {
     function onScroll() {
       const y = Math.max(0, window.scrollY);
@@ -48,8 +52,8 @@ export function Header({ score, level, dueVocabCount, isAdmin }: HeaderProps) {
       else if (y < lastY.current - 4 || y < 90) setHidden(false);
       lastY.current = y;
     }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    document.addEventListener('scroll', onScroll, { passive: true });
+    return () => document.removeEventListener('scroll', onScroll);
   }, []);
 
   // Đóng menu di động khi đổi trang. Điều chỉnh state ngay trong lúc render

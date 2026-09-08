@@ -1,7 +1,5 @@
 /** Phase 4: đổi './sources/mock/attempts' thành './sources/db/attempts'. */
 export {
-  navigationModeFor,
-  audioPlayOnce,
   getSetsBySection,
   getMockTests,
   getAttempt,
@@ -12,4 +10,6 @@ export {
   getCurrentEstimate,
   getSet,
   getFirstGroupOfSet,
+  getMockTest,
+  getFirstGroupOfMockTest,
 } from './sources/mock/attempts';

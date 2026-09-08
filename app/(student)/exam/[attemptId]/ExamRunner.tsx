@@ -10,6 +10,7 @@ import type { GroupForExam, NavigationMode, QuestionForExam } from '@/lib/data/t
 
 export interface ExamRunnerProps {
   attemptId: string;
+  title: string;
   partNameJa: string;
   sectionLabel: string;
   timeLimitSec: number;
@@ -24,6 +25,7 @@ type Slot = { group: GroupForExam; question: QuestionForExam };
 
 export function ExamRunner({
   attemptId,
+  title,
   partNameJa,
   sectionLabel,
   timeLimitSec,
@@ -87,6 +89,7 @@ export function ExamRunner({
         <span aria-hidden className="absolute inset-x-0 -bottom-px h-px bg-(image:--g-line) opacity-45" />
         <span className="jp gt flex-none text-[13px] font-bold">{partNameJa}</span>
         <span className="flex-none text-[11.5px] text-fg3">{sectionLabel}</span>
+        <span className="hidden flex-none text-[11.5px] text-fg3 xl:block">{title}</span>
 
         <div className="mx-auto flex flex-wrap gap-1" role="group" aria-label="Danh sách câu hỏi">
           {slots.map((s, i) => {

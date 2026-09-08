@@ -24,31 +24,10 @@ import {
 import type {
   AttemptResult,
   MockTestSummary,
-  NavigationMode,
   QuestionSetSummary,
   ResultItem,
 } from '@/lib/data/types';
 import type { Attempt, AttemptMode, SectionCode } from '@/lib/prisma-types';
-
-/* ============================================================
-   ĐIỀU HƯỚNG — bám theo CBT thật, xem CLAUDE.md
-   ============================================================ */
-
-const LISTENING_SECTIONS = new Set<string>(['L1', 'L2', 'L3', 'LR1', 'LR2', 'LR3']);
-
-/**
- * BJT thật là CBT tuyến tính: audio phát một lần, phần 聴解/聴読解 không lùi được.
- * Chỉ chế độ MOCK mô phỏng điều đó; luyện tập thì tự do để còn học được.
- */
-export function navigationModeFor(mode: AttemptMode, sectionCode: SectionCode): NavigationMode {
-  if (mode !== 'MOCK') return 'free';
-  return LISTENING_SECTIONS.has(sectionCode) ? 'linear' : 'free';
-}
-
-/** Audio chỉ phát một lần ở chế độ thi thử. */
-export function audioPlayOnce(mode: AttemptMode): boolean {
-  return mode === 'MOCK';
-}
 
 /* ============================================================
    DANH SÁCH BỘ VÀ ĐỀ
@@ -264,6 +243,19 @@ export async function getAttemptResult(attemptId: string): Promise<AttemptResult
 export async function getCurrentEstimate() {
   // TODO(db): db.attempt.findFirst({ where: { userId, mode: 'MOCK', finishedAt: { not: null } }, orderBy: { finishedAt: 'desc' } })
   return { score: MOCK_ESTIMATED_SCORE, level: MOCK_ESTIMATED_LEVEL };
+}
+
+export async function getMockTest(mockTestId: string) {
+  // TODO(db): db.mockTest.findUnique({ where: { id: mockTestId } })
+  return MOCK_TESTS.find((t) => t.id === mockTestId) ?? null;
+}
+
+/** Section của group đầu tiên trong đề — dùng suy ra navigationMode. */
+export async function getFirstGroupOfMockTest(mockTestId: string) {
+  const first = MOCK_TEST_ITEMS.filter((i) => i.mockTestId === mockTestId).sort(
+    (a, b) => a.order - b.order,
+  )[0];
+  return first ? (MOCK_GROUP_BY_ID.get(first.groupId) ?? null) : null;
 }
 
 export async function getSet(setId: string) {
