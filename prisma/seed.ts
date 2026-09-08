@@ -6,7 +6,7 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 import 'dotenv/config';
 
 const url = process.env.DATABASE_URL;
-if (!url) throw new Error('Thiếu DATABASE_URL — xem docs/db-setup.md');
+if (!url) throw new Error('Thiếu DATABASE_URL — xem docs/setup.md');
 
 // Prisma 7 bắt buộc driver adapter.
 const db = new PrismaClient({ adapter: new PrismaNeon({ connectionString: url }) });

@@ -29,7 +29,7 @@ import { MOCK_SETS, MOCK_SET_ITEMS } from '@/mock/sets';
 import { MOCK_TESTS, MOCK_TEST_ITEMS } from '@/mock/mockTests';
 
 const url = process.env.DATABASE_URL;
-if (!url) throw new Error('Thiếu DATABASE_URL — xem docs/db-setup.md');
+if (!url) throw new Error('Thiếu DATABASE_URL — xem docs/setup.md');
 const db = new PrismaClient({ adapter: new PrismaNeon({ connectionString: url }) });
 
 /** Prisma không nhận `null` cho cột Json — phải là DbNull. */

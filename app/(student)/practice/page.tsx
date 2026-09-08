@@ -3,7 +3,7 @@ import { getPartsWithSections } from '@/lib/data/sections';
 import { getSetsBySection } from '@/lib/data/attempts';
 import { getSession } from '@/lib/auth-server';
 import type { QuestionSetSummary } from '@/lib/data/types';
-import { PracticeBrowser } from './PracticeBrowser';
+import { PracticeBrowser } from '@/components/practice/PracticeBrowser';
 
 export const metadata: Metadata = { title: 'Luyện thi' };
 
@@ -21,7 +21,7 @@ export default async function PracticePage() {
   const setsBySection: Record<string, QuestionSetSummary[]> = Object.fromEntries(entries);
 
   return (
-    <div className="mx-auto max-w-[1000px] px-6 pt-8">
+    <div className="mx-auto max-w-content px-6 pt-8">
       <PracticeBrowser parts={parts} setsBySection={setsBySection} />
       <div className="h-40" />
     </div>

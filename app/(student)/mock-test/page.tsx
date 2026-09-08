@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
-import { ListRow } from '@/components/student/ListRow';
-import { Section, SectionHeading } from '@/components/student/SectionHeading';
+import { ListRow } from '@/components/common/ListRow';
+import { Section, SectionHeading } from '@/components/common/SectionHeading';
 import { getAttemptHistory, getMockTests } from '@/lib/data/attempts';
 import { getPartsWithSections } from '@/lib/data/sections';
 import { getSession } from '@/lib/auth-server';
@@ -21,10 +21,10 @@ export default async function MockTestPage() {
   const mockHistory = history.filter((a) => a.mode === 'MOCK' && a.finishedAt);
 
   return (
-    <div className="mx-auto max-w-[1000px] px-6 pt-10">
+    <div className="mx-auto max-w-content px-6 pt-10">
       <div className="mb-8">
-        <h1 className="mb-2 text-[32px] font-bold tracking-[-.03em]">Thi thử</h1>
-        <p className="max-w-[64ch] text-[13.5px] text-fg2">
+        <h1 className="mb-2 text-3xl font-bold tracking-tight">Thi thử</h1>
+        <p className="max-w-prose text-sm text-fg2">
           Đề mô phỏng đúng cấu trúc kỳ thi thật: {MOCK_TEST_QUESTION_COUNT} câu, ba phần, khoảng 105
           phút. Phần nghe phát audio một lần và không quay lại câu trước được.
         </p>
@@ -35,15 +35,15 @@ export default async function MockTestPage() {
         <SectionHeading title="Cấu trúc đề" meta={`${MOCK_TEST_QUESTION_COUNT} câu`} />
         <div className="flex flex-wrap gap-x-10 gap-y-5">
           {parts.map((p) => (
-            <div key={p.code} className="min-w-[240px] flex-1">
+            <div key={p.code} className="min-w-60 flex-1">
               <div className="mb-2 flex items-baseline gap-2.5">
-                <span className="jp text-[19px] font-bold">{p.nameJa}</span>
-                <span className="text-[12px] text-fg2">{p.nameVi}</span>
-                <span className="ml-auto text-[11.5px] tabular-nums text-fg3">
+                <span className="jp text-xl font-bold">{p.nameJa}</span>
+                <span className="text-xs text-fg2">{p.nameVi}</span>
+                <span className="ml-auto text-xs tabular-nums text-fg3">
                   {p.questionCount} câu · {Math.round(p.timeLimitSec / 60)} phút
                 </span>
               </div>
-              <ul className="text-[12.5px] text-fg2">
+              <ul className="text-xs text-fg2">
                 {p.sections.map((s) => (
                   <li key={s.code} className="flex justify-between border-b border-ln py-1.5">
                     <span className="jp">{s.nameJa}</span>
@@ -80,10 +80,10 @@ export default async function MockTestPage() {
                 key={t.id}
                 className="flex w-full items-center gap-3.5 border-b border-ln px-3 py-3.5 opacity-55 first-of-type:border-t"
               >
-                <span className="w-3.5 flex-none text-[11.5px] tabular-nums text-fg3">{i + 1}</span>
+                <span className="w-3.5 flex-none text-xs tabular-nums text-fg3">{i + 1}</span>
                 <span className="min-w-0 flex-1">
-                  <b className="block text-[14.5px] font-medium">{t.titleVi}</b>
-                  <span className="block text-[12.5px] text-fg2">{t.descVi}</span>
+                  <b className="block text-sm font-medium">{t.titleVi}</b>
+                  <span className="block text-xs text-fg2">{t.descVi}</span>
                 </span>
                 {trailing}
               </div>
@@ -110,7 +110,7 @@ export default async function MockTestPage() {
       <Section>
         <SectionHeading title="Lịch sử làm bài" meta={`${mockHistory.length} lượt`} />
         {mockHistory.length === 0 ? (
-          <p className="border-y border-ln py-10 text-center text-[13.5px] text-fg3">
+          <p className="border-y border-ln py-10 text-center text-sm text-fg3">
             Bạn chưa làm đề thi thử nào.
           </p>
         ) : (
@@ -128,27 +128,27 @@ export default async function MockTestPage() {
 
       <Section>
         <SectionHeading title="Cách tính điểm" />
-        <p className="mb-5 max-w-[75ch] text-[13.5px] leading-relaxed text-fg2">
+        <p className="mb-5 max-w-prose text-sm leading-relaxed text-fg2">
           Mỗi câu 10 điểm, {MOCK_TEST_QUESTION_COUNT} câu là 800 điểm. Đây là{' '}
           <b className="font-semibold text-fg">điểm tham khảo</b>, không phải công thức chính thức:
           BJT thật chấm bằng IRT (có tính đến độ khó từng câu) và tổ chức không công bố 配点. Con số ở
           đây dùng để bạn theo dõi tiến bộ của chính mình qua các lần làm, không so được trực tiếp với
           điểm thi thật.
         </p>
-        <ul className="max-w-[520px]">
+        <ul className="max-w-130">
           {[...SCORING_BANDS].reverse().map((b) => (
             <li key={b.level} className="flex items-baseline gap-4 border-b border-ln py-2.5 first:border-t">
               <span className="w-12 flex-none font-semibold tabular-nums">
                 {b.level.replace('_PLUS', '+')}
               </span>
-              <span className="w-24 flex-none text-[12.5px] tabular-nums text-fg3">
+              <span className="w-24 flex-none text-xs tabular-nums text-fg3">
                 {b.min}–{b.max}
               </span>
-              <span className="text-[12.5px] text-fg2">{b.labelVi}</span>
+              <span className="text-xs text-fg2">{b.labelVi}</span>
             </li>
           ))}
         </ul>
-        <p className="mt-5 text-[12.5px] text-fg3">
+        <p className="mt-5 text-xs text-fg3">
           Muốn luyện từng phần thay vì cả đề?{' '}
           <Link href="/practice" className="gt font-semibold">
             Vào phần luyện thi

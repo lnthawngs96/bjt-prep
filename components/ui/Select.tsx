@@ -20,7 +20,7 @@ export function Select({ label, error, className, children, ...props }: SelectPr
   const id = props.id ?? auto;
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <label htmlFor={id} className="text-[11px] font-bold text-fg2">
+      <label htmlFor={id} className="text-xs font-bold text-fg2">
         {label}
       </label>
       <div className="relative">
@@ -29,8 +29,8 @@ export function Select({ label, error, className, children, ...props }: SelectPr
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
           className={cn(
-            'w-full appearance-none rounded-[7px] border border-ln bg-bg py-2.5 pl-3 pr-9',
-            'text-[13.5px] text-fg transition-colors duration-200',
+            'w-full appearance-none rounded-md border border-ln bg-bg py-2.5 pl-3 pr-9',
+            'text-sm text-fg transition-colors duration-200',
             'focus:border-acc focus:outline-none disabled:opacity-55',
             error && 'border-ng',
           )}
@@ -44,7 +44,7 @@ export function Select({ label, error, className, children, ...props }: SelectPr
         />
       </div>
       {error && (
-        <p id={`${id}-error`} role="alert" className="text-[11.5px] text-ng">
+        <p id={`${id}-error`} role="alert" className="text-xs text-ng">
           {error}
         </p>
       )}

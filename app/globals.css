@@ -73,6 +73,9 @@
    gạch chân tab, badge, viền active. KHÔNG BAO GIỜ cho chữ nội dung. */
 :root {
   --g: linear-gradient(116deg, #1b4fd8 0%, #2e8fe0 46%, #23c9c2 100%);
+  /* Thang điểm yếu — đỏ sang cam. KHÔNG phải gradient thương hiệu, đừng
+     dùng cho nút hay tiêu đề. */
+  --g-ng: linear-gradient(90deg, #c7365a, #e0754b);
   --g-soft: linear-gradient(116deg, rgba(27, 79, 216, 0.13), rgba(35, 201, 194, 0.15));
   --g-line: linear-gradient(90deg, #1b4fd8, #2e8fe0, #23c9c2);
 }
@@ -106,6 +109,29 @@
   --shadow-soft: var(--sh);
   --shadow-dlg: var(--sh-lg);
   --shadow-hd: var(--hd);
+
+  /* Quầng sáng quanh nút gradient — bốn nấc theo cỡ nút.
+     Tailwind không có shadow màu thương hiệu nên phải khai ở đây. */
+  --shadow-btn-xs: 0 3px 10px rgba(35, 150, 232, 0.38);
+  --shadow-btn-sm: 0 4px 16px rgba(35, 150, 232, 0.3);
+  --shadow-btn: 0 5px 20px rgba(35, 150, 232, 0.32);
+  --shadow-btn-lg: 0 8px 24px rgba(35, 150, 232, 0.36);
+  /* Gạch chân câu đã đánh dấu trong dãy số màn làm bài. */
+  --shadow-flag: inset 0 -2px 0 var(--wr);
+
+  /* Bề rộng khung nội dung học viên — CLAUDE.md quy định 1000px. */
+  --container-content: 1000px;
+  /* Dưới mốc này header thu thành hamburger — CLAUDE.md quy định 860px. */
+  --breakpoint-nav: 860px;
+
+  /* Hai đường cong Tailwind không có sẵn. */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.5, 0.5, 1);
+
+  /* Animation — khai ở đây để dùng bằng class animate-*, không viết
+     arbitrary value rải trong component. */
+  --animate-dialog-rise: dialog-rise 0.24s ease;
+  --animate-drawer-in: drawer-in 0.34s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================================

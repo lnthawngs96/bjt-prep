@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { FaCheck, FaXmark } from 'react-icons/fa6';
-import { AudioPlayer } from '@/components/shared/AudioPlayer';
-import { ScoreRuler } from '@/components/shared/ScoreRuler';
+import { AudioPlayer } from '@/components/common/AudioPlayer';
+import { ScoreRuler } from '@/components/common/ScoreRuler';
 import { Badge } from '@/components/ui/Badge';
-import { Section, SectionHeading } from '@/components/student/SectionHeading';
+import { Section, SectionHeading } from '@/components/common/SectionHeading';
 import { getAttemptResult } from '@/lib/data/attempts';
 import { getPlaybackUrl } from '@/lib/data/media';
 import { getSession } from '@/lib/auth-server';
@@ -41,19 +41,19 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
   );
 
   return (
-    <div className="mx-auto max-w-[1000px] px-6">
+    <div className="mx-auto max-w-content px-6">
       {/* ---------- Điểm ---------- */}
       <section className="relative py-12">
         <span
           aria-hidden
-          className="pointer-events-none absolute -inset-x-[200px] -top-[58px] bottom-0 bg-(image:--glow)"
+          className="pointer-events-none absolute -inset-x-50 -top-14 bottom-0 bg-(image:--glow)"
         />
-        <div className="gt relative mb-3.5 text-[11.5px] font-bold">Kết quả</div>
+        <div className="gt relative mb-3.5 text-xs font-bold">Kết quả</div>
         <div className="relative flex flex-wrap items-end gap-5">
-          <span className="gt text-[58px] font-bold leading-[.98] tabular-nums">
+          <span className="gt text-6xl font-bold leading-none tabular-nums">
             {attempt.rawCorrect}/{attempt.totalQuestions}
           </span>
-          <span className="pb-3 text-[15px] text-fg2">
+          <span className="pb-3 text-base text-fg2">
             {Math.round(accuracy * 100)}% đúng
             {wrong.length > 0 && ` · ${wrong.length} câu cần xem lại`}
           </span>
@@ -62,14 +62,14 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
         {estimatedScore != null ? (
           <div className="relative mt-8">
             <ScoreRuler score={estimatedScore} />
-            <p className="mt-4 text-[12.5px] text-fg3">
+            <p className="mt-4 text-xs text-fg3">
               <b className="font-semibold text-fg2">Điểm tham khảo</b> {estimatedScore}/800, bậc{' '}
               {estimatedLevel?.replace('_PLUS', '+')}. Tính 10 điểm mỗi câu — BJT thật chấm bằng IRT
               và không công bố 配点.
             </p>
           </div>
         ) : (
-          <p className="relative mt-6 max-w-[70ch] text-[12.5px] text-fg3">
+          <p className="relative mt-6 max-w-prose text-xs text-fg3">
             Bộ luyện tập không quy ra thang 800. Ngoại suy từ {attempt.totalQuestions} câu sẽ làm điểm
             dao động hàng trăm đơn vị chỉ vì đoán trúng một câu. Chỉ đề thi thử đủ 80 câu mới có điểm
             tham khảo.
@@ -93,7 +93,7 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
 
             const head = (
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-[11.5px] tabular-nums text-fg3">Câu {idx + 1}</span>
+                <span className="text-xs tabular-nums text-fg3">Câu {idx + 1}</span>
                 {item.isCorrect ? (
                   <Badge tone="ok">
                     <FaCheck className="mr-1.5 size-2.5" /> Đúng
@@ -105,7 +105,7 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
                   </Badge>
                 )}
                 {item.tags.map((t) => (
-                  <span key={t.id} className="text-[11.5px] text-fg3">
+                  <span key={t.id} className="text-xs text-fg3">
                     {t.nameVi}
                   </span>
                 ))}
@@ -114,13 +114,13 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
 
             const body = (
               <>
-                <h3 className="jp mb-1 text-[16px] leading-[1.7]">{question.stemJa}</h3>
-                {question.stemVi && <p className="mb-4 text-[13px] text-fg2">{question.stemVi}</p>}
+                <h3 className="jp mb-1 text-base leading-relaxed">{question.stemJa}</h3>
+                {question.stemVi && <p className="mb-4 text-sm text-fg2">{question.stemVi}</p>}
 
                 {/* Phát lại ĐÚNG đoạn audio của câu này */}
                 {audio?.mediaId && audioUrls[audio.mediaId] && (
                   <div className="mb-4">
-                    <p className="mb-2 text-[11.5px] text-fg3">
+                    <p className="mb-2 text-xs text-fg3">
                       Nghe lại đoạn liên quan
                       {question.audioStartMs != null &&
                         ` (${fmt(question.audioStartMs)} → ${fmt(question.audioEndMs ?? 0)})`}
@@ -151,7 +151,7 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
                       >
                         <span
                           className={cn(
-                            'mt-px grid size-[23px] flex-none place-items-center rounded-md border text-[11px] tabular-nums',
+                            'mt-px grid size-6 flex-none place-items-center rounded-md border text-xs tabular-nums',
                             o.isCorrect && 'border-transparent bg-ok font-bold text-white',
                             isChosen && !o.isCorrect && 'border-transparent bg-ng font-bold text-white',
                             !o.isCorrect && !isChosen && 'border-ln text-fg3',
@@ -160,14 +160,14 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
                           {o.order}
                         </span>
                         <div className="min-w-0">
-                          <p className={cn('text-[14px]', o.textJa ? 'jp' : 'text-fg3')}>
+                          <p className={cn('text-sm', o.textJa ? 'jp' : 'text-fg3')}>
                             {o.textJa ?? 'Phương án được đọc trong audio'}
                             {isChosen && (
-                              <span className="jp-none ml-2 text-[11.5px] text-fg3">— bạn chọn</span>
+                              <span className="jp-none ml-2 text-xs text-fg3">— bạn chọn</span>
                             )}
                           </p>
                           {o.distractorNote && (
-                            <p className="mt-1 text-[12.5px] leading-relaxed text-fg2">
+                            <p className="mt-1 text-xs leading-relaxed text-fg2">
                               {o.distractorNote}
                             </p>
                           )}
@@ -188,12 +188,12 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
 
                 {(item.vocabToReview.length > 0 || item.grammarToReview.length > 0) && (
                   <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-ln pt-4">
-                    <span className="text-[11px] font-bold text-fg2">Cần ôn</span>
+                    <span className="text-xs font-bold text-fg2">Cần ôn</span>
                     {item.vocabToReview.map((v) => (
                       <Link
                         key={v.id}
                         href="/vocabulary"
-                        className="jp rounded-[5px] bg-(image:--g-soft) px-2 py-0.5 text-[11.5px] text-acc-hi"
+                        className="jp rounded-sm bg-(image:--g-soft) px-2 py-0.5 text-xs text-acc-hi"
                       >
                         {v.headword}
                       </Link>
@@ -202,7 +202,7 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
                       <Link
                         key={g.id}
                         href={`/grammar/${g.slug}`}
-                        className="jp rounded-[5px] bg-(image:--g-soft) px-2 py-0.5 text-[11.5px] text-acc-hi"
+                        className="jp rounded-sm bg-(image:--g-soft) px-2 py-0.5 text-xs text-acc-hi"
                       >
                         {g.pattern}
                       </Link>
@@ -211,7 +211,7 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
                 )}
 
                 {correctOption && !item.isCorrect && !question.explanationVi && (
-                  <p className="text-[12.5px] text-fg3">
+                  <p className="text-xs text-fg3">
                     Đáp án đúng là phương án {correctOption.order}.
                   </p>
                 )}
@@ -229,13 +229,13 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
                 >
                   <summary className="flex cursor-pointer list-none items-center gap-3 [&::-webkit-details-marker]:hidden">
                     {head}
-                    <span className="jp min-w-0 flex-1 truncate text-[14px] text-fg2">
+                    <span className="jp min-w-0 flex-1 truncate text-sm text-fg2">
                       {question.stemJa}
                     </span>
-                    <span className="flex-none text-[11.5px] text-acc-hi group-open:hidden">
+                    <span className="flex-none text-xs text-acc-hi group-open:hidden">
                       Xem lại
                     </span>
-                    <span className="hidden flex-none text-[11.5px] text-fg3 group-open:block">
+                    <span className="hidden flex-none text-xs text-fg3 group-open:block">
                       Thu gọn
                     </span>
                   </summary>
@@ -258,13 +258,13 @@ export default async function ResultPage({ params }: PageProps<'/result/[attempt
         <div className="flex flex-wrap gap-3">
           <Link
             href="/practice"
-            className="rounded-[9px] bg-(image:--g) px-7 py-3.5 text-[14.5px] font-semibold text-on-g shadow-[0_5px_20px_rgba(35,150,232,.32)] transition-[filter] duration-200 hover:brightness-110"
+            className="rounded-lg bg-(image:--g) px-7 py-3.5 text-sm font-semibold text-on-g shadow-btn transition duration-200 hover:brightness-110"
           >
             Làm bộ tiếp theo
           </Link>
           <Link
             href="/vocabulary/review"
-            className="rounded-[9px] border border-ln px-7 py-3.5 text-[14.5px] transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
+            className="rounded-lg border border-ln px-7 py-3.5 text-sm transition-colors duration-200 hover:border-acc-dim hover:bg-ln2"
           >
             Ôn từ vừa gặp
           </Link>
@@ -287,8 +287,8 @@ function Note({
 }) {
   return (
     <div className={cn('mt-3 border-l-2 pl-4', accent ? 'border-l-acc' : 'border-l-ln')}>
-      <p className="mb-1 text-[11px] font-bold text-fg2">{label}</p>
-      <p className="text-[13.5px] leading-relaxed text-fg2">{children}</p>
+      <p className="mb-1 text-xs font-bold text-fg2">{label}</p>
+      <p className="text-sm leading-relaxed text-fg2">{children}</p>
     </div>
   );
 }

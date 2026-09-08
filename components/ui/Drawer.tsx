@@ -44,23 +44,23 @@ export function Drawer({ open, onClose, title, subtitle, children, footer, class
       }}
       className={cn(
         // ml-auto + h-full: dính mép phải, cao hết màn hình
-        'ml-auto mr-0 my-0 h-dvh max-h-none w-full max-w-[520px] bg-transparent p-0',
-        'backdrop:bg-(--ov) backdrop:backdrop-blur-[3px]',
-        'motion-safe:[&[open]]:animate-[drawer-in_.34s_cubic-bezier(.4,0,.2,1)]',
+        'ml-auto mr-0 my-0 h-dvh max-h-none w-full max-w-130 bg-transparent p-0',
+        'backdrop:bg-(--ov) backdrop:backdrop-blur-xs',
+        'motion-safe:[&[open]]:animate-drawer-in',
         className,
       )}
     >
       <div className="flex h-full flex-col border-l border-ln bg-bg shadow-dlg">
-        <header className="flex h-[52px] flex-none items-center gap-2.5 border-b border-ln px-5">
-          <b id="drawer-title" className="text-[13.5px] font-semibold">
+        <header className="flex h-13 flex-none items-center gap-2.5 border-b border-ln px-5">
+          <b id="drawer-title" className="text-sm font-semibold">
             {title}
           </b>
-          {subtitle && <span className="text-[11.5px] text-fg3">{subtitle}</span>}
+          {subtitle && <span className="text-xs text-fg3">{subtitle}</span>}
           <button
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="ml-auto grid size-7 place-items-center rounded-[7px] text-fg3 transition-colors duration-200 hover:bg-(image:--g-soft) hover:text-acc-hi"
+            className="ml-auto grid size-7 place-items-center rounded-md text-fg3 transition-colors duration-200 hover:bg-(image:--g-soft) hover:text-acc-hi"
           >
             <FaXmark className="size-3" />
           </button>

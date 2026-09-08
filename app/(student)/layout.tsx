@@ -1,5 +1,5 @@
-import { Header } from '@/components/student/Header';
-import { LoginDialog } from '@/components/shared/LoginDialog';
+import { Header } from '@/components/layout/Header';
+import { LoginDialog } from '@/components/login/LoginDialog';
 import { ToastProvider } from '@/components/ui/Toast';
 import { getSession } from '@/lib/auth-server';
 import { isGoogleConfigured } from '@/lib/auth';
@@ -31,7 +31,7 @@ export default async function StudentLayout({ children }: LayoutProps<'/'>) {
         level={estimate?.level ?? null}
         dueVocabCount={dueVocabCount}
       />
-      <main className="min-h-dvh pt-[58px]">{children}</main>
+      <main className="min-h-dvh pt-14">{children}</main>
       {/* Một dialog duy nhất cho cả app, mở từ bất kỳ đâu qua useAuthDialog(). */}
       <LoginDialog googleConfigured={isGoogleConfigured} />
     </ToastProvider>

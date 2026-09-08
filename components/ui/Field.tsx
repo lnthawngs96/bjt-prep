@@ -4,9 +4,9 @@ import { useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttri
 import { cn } from '@/lib/utils';
 
 const CONTROL =
-  'w-full rounded-[7px] border border-ln bg-bg px-3 py-2.5 text-[13.5px] text-fg ' +
+  'w-full rounded-md border border-ln bg-bg px-3 py-2.5 text-sm text-fg ' +
   'placeholder:text-fg3 transition-colors duration-200 focus:border-acc focus:outline-none ' +
-  'disabled:opacity-55 aria-[invalid=true]:border-ng';
+  'disabled:opacity-55 aria-invalid:border-ng';
 
 interface Base {
   label: string;
@@ -27,18 +27,18 @@ function Shell({
 }: Base & { id: string; children: ReactNode }) {
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <label htmlFor={id} className="text-[11px] font-bold text-fg2">
+      <label htmlFor={id} className="text-xs font-bold text-fg2">
         {label}
       </label>
       {hint && (
-        <p id={`${id}-hint`} className="text-[11.5px] text-fg3">
+        <p id={`${id}-hint`} className="text-xs text-fg3">
           {hint}
         </p>
       )}
       {children}
       {error && (
         // role="alert" để screen reader đọc ngay khi lỗi xuất hiện.
-        <p id={`${id}-error`} role="alert" className="text-[11.5px] text-ng">
+        <p id={`${id}-error`} role="alert" className="text-xs text-ng">
           {error}
         </p>
       )}

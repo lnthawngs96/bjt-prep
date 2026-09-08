@@ -5,7 +5,7 @@ import { getPartsWithSections } from '@/lib/data/sections';
 import { getPlaybackUrl } from '@/lib/data/media';
 import { getSession } from '@/lib/auth-server';
 import { audioPlayOnce, buildExamParts, practiceTimeLimitSec } from '@/lib/exam-rules';
-import { ExamRunner } from './ExamRunner';
+import { ExamRunner } from '@/components/exam/ExamRunner';
 
 /** Màn làm bài không có header — nó nằm ngoài layout học viên về mặt thị giác. */
 export default async function ExamPage({ params }: PageProps<'/exam/[attemptId]'>) {

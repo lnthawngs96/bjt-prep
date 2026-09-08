@@ -21,7 +21,7 @@ function createClient(): PrismaClient {
     throw new Error(
       'Thiếu DATABASE_URL. Nếu bạn thấy lỗi này nghĩa là có code đang gọi Prisma ' +
         'trong khi chưa bật database. Tầng dữ liệu phải đi qua lib/data/, nguồn ' +
-        'được chọn theo DATABASE_URL. Bật DB thật theo docs/db-setup.md.',
+        'được chọn theo DATABASE_URL. Bật DB thật theo docs/setup.md.',
     );
   }
   return new PrismaClient({ adapter: new PrismaNeon({ connectionString: url }) });

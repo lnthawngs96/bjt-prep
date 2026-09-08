@@ -5,8 +5,8 @@ Web luyện thi **BJT — ビジネス日本語能力テスト** (Kỳ thi năng
 ## Trạng thái
 
 **Stage A xong** — trang học viên, đăng nhập Google, màn thi nhiều phần, chấm điểm ở server có test.
-**Stage B (nối Neon + Better Auth thật) đã viết code**, chờ có `DATABASE_URL` để migrate và kiểm thật — xem `docs/db-setup.md`.
-Tiếp theo: Stage C — admin CRUD trên DB, Stage D — deploy Vercel (`docs/deploy-vercel.md`).
+**Stage B (nối Neon + Better Auth thật) đã viết code**, chờ có `DATABASE_URL` để migrate và kiểm thật.
+Tiếp theo: Stage C — admin CRUD trên DB, Stage D — deploy Vercel. Cả ba việc cài đặt nằm ở `docs/setup.md`.
 
 Không có `DATABASE_URL` thì app chạy trên `mock/`: đủ để dev giao diện và chạy test, nhưng đăng nhập không bền và không lưu bài làm.
 
@@ -40,11 +40,8 @@ Mở http://localhost:3000. Giai đoạn này **không cần database** — dữ
 | File | Nội dung |
 |---|---|
 | `CLAUDE.md` | Quy ước dự án — **đọc trước khi viết dòng code đầu tiên** |
-| `docs/build-plan.md` | Kế hoạch 4 phase và tiêu chí nghiệm thu |
-| `docs/versions.md` | Phiên bản thật, các quyết định, sai lệch so với build-plan |
-| `docs/schema-plan.md` | Lý do đằng sau từng bảng trong schema |
-| `docs/db-setup.md` | Bật Neon khi sẵn sàng |
-| `docs/google-oauth.md` | Bật đăng nhập Google |
+| `docs/setup.md` | Bật Neon · bật đăng nhập Google · deploy Vercel |
+| `docs/versions.md` | Phiên bản thật và các quyết định kỹ thuật |
 | `docs/prototype.html` | Giao diện đã duyệt — mở ra xem khi phân vân layout |
 | `docs/login-dialog.html` | Dialog đăng nhập đã duyệt |
 

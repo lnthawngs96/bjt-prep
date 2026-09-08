@@ -53,7 +53,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed bottom-4 left-1/2 z-[100] flex -translate-x-1/2 flex-col gap-2"
+        className="pointer-events-none fixed bottom-4 left-1/2 z-100 flex -translate-x-1/2 flex-col gap-2"
       >
         {items.map((t) => {
           const Icon = ICONS[t.tone];
@@ -61,9 +61,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={t.id}
               className={cn(
-                'pointer-events-auto flex items-center gap-2.5 rounded-[9px] border border-ln',
-                'bg-bg px-3.5 py-2.5 text-[12.5px] text-fg shadow-soft',
-                'motion-safe:animate-[dialog-rise_.24s_ease]',
+                'pointer-events-auto flex items-center gap-2.5 rounded-lg border border-ln',
+                'bg-bg px-3.5 py-2.5 text-xs text-fg shadow-soft',
+                'motion-safe:animate-dialog-rise',
               )}
             >
               <Icon aria-hidden className={cn('size-3.5 flex-none', TONES[t.tone])} />

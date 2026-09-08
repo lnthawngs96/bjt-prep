@@ -54,8 +54,8 @@ export function Modal({
         if (e.target === ref.current) onClose();
       }}
       className={cn(
-        'm-auto w-full max-w-[396px] overflow-visible bg-transparent p-5 text-fg',
-        'backdrop:bg-(--ov) backdrop:backdrop-blur-[5px]',
+        'm-auto w-full max-w-99 overflow-visible bg-transparent p-5 text-fg',
+        'backdrop:bg-(--ov) backdrop:backdrop-blur-xs',
       )}
     >
       <div
@@ -65,7 +65,7 @@ export function Modal({
         )}
       >
         {/* Vạch gradient trên đỉnh dialog — theo docs/login-dialog.html */}
-        <span aria-hidden className="absolute inset-x-0 top-0 h-[3px] bg-(image:--g-line)" />
+        <span aria-hidden className="absolute inset-x-0 top-0 h-0.75 bg-(image:--g-line)" />
 
         <h2 id="modal-title" className={hideTitle ? 'sr-only' : 'sr-only'}>
           {title}
@@ -76,7 +76,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="absolute right-3.5 top-3.5 z-10 grid size-[30px] place-items-center rounded-lg text-fg3 transition-colors duration-200 hover:bg-ln2 hover:text-fg"
+            className="absolute right-3.5 top-3.5 z-10 grid size-8 place-items-center rounded-lg text-fg3 transition-colors duration-200 hover:bg-ln2 hover:text-fg"
           >
             <FaXmark className="size-3" />
           </button>

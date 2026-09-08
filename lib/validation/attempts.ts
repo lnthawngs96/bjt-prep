@@ -10,6 +10,8 @@ export const startAttemptBodySchema = z
     message: 'Cần questionSetId hoặc mockTestId',
   });
 
+export type StartAttemptBody = z.infer<typeof startAttemptBodySchema>;
+
 /** Body của POST /api/attempts/[attemptId]/submit — chỉ gửi lựa chọn thô. */
 export const submitBodySchema = z.object({
   answers: z

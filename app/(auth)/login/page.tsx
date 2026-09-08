@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth-server';
 import { isGoogleConfigured } from '@/lib/auth';
-import { LoginFallback } from './LoginFallback';
+import { LoginFallback } from '@/components/login/LoginFallback';
 
 export const metadata: Metadata = { title: 'Đăng nhập' };
 
