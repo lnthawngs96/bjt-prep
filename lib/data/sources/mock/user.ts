@@ -9,7 +9,7 @@ import {
 } from '@/mock/user';
 import { TODAY } from '@/mock/_shared';
 import { MOCK_TAGS } from '@/mock/tags';
-import { MOCK_SECTIONS } from '@/mock/sections';
+import { MOCK_PARTS, MOCK_SECTIONS } from '@/mock/sections';
 import type { StudentDashboard, WeakSkill } from '@/lib/data/types';
 import type { User, UserProfile } from '@/lib/prisma-types';
 
@@ -64,8 +64,11 @@ export async function getStudentDashboard(): Promise<StudentDashboard> {
     (a, b) => a.accuracy - b.accuracy,
   )[0];
   const section = MOCK_SECTIONS.find((s) => s.code === weakSection?.key);
+  const part = MOCK_PARTS.find((p) => p.code === section?.part);
   const weakSkills = await getWeakSkills('tag', 4);
   const maxWeek = Math.max(...MOCK_WEEKLY_ACTIVITY.map((d) => d.questions), 1);
+  // Mảng xếp thứ Hai → Chủ nhật, còn getDay() trả 0 cho Chủ nhật.
+  const todayIndex = (TODAY.getDay() + 6) % 7;
 
   return {
     displayName: MOCK_USER.name,
@@ -75,7 +78,9 @@ export async function getStudentDashboard(): Promise<StudentDashboard> {
     continueHere: section
       ? {
           sectionCode: section.code,
+          partNameJa: part?.nameJa ?? section.nameJa,
           sectionNameJa: section.nameJa,
+          sectionOrder: section.order,
           setId: 'set-lr2-007',
           setTitleVi: 'Doanh số theo khu vực',
           indexNo: 7,
@@ -114,10 +119,12 @@ export async function getStudentDashboard(): Promise<StudentDashboard> {
     weakSkills,
     weeklyActivity: MOCK_WEEKLY_ACTIVITY.map((d, i) => ({
       label: d.label,
-      // Chuẩn hoá về phần trăm của ngày cao nhất để vẽ cột.
-      questions: Math.round((d.questions / maxWeek) * 100),
-      isToday: i === MOCK_WEEKLY_ACTIVITY.length - 2,
+      questions: d.questions,
+      // Chuẩn hoá theo ngày cao nhất trong tuần để vẽ cột.
+      heightPct: Math.round((d.questions / maxWeek) * 100),
+      isToday: i === todayIndex,
     })),
+    weeklyTotal: MOCK_WEEKLY_ACTIVITY.reduce((n, d) => n + d.questions, 0),
   };
 }
 

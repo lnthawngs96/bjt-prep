@@ -77,12 +77,14 @@ export const MOCK_MEDIA_BY_ID = new Map(MOCK_MEDIA.map((m) => [m.id, m]));
  * Giai đoạn tĩnh: đường dẫn cục bộ trong public/.
  * TODO(r2): Phase 4 thay bằng presigned URL hết hạn 10 phút, gắn với attempt đang mở.
  */
+// File mẫu là WAV im lặng tự sinh, chỉ để AudioPlayer có src thật mà chạy.
+// r2Key phía trên vẫn ghi .mp3 vì đó là định dạng của file thật trên R2.
 export const MOCK_MEDIA_URL: Record<string, string> = {
-  'med-lr2-007': '/mock-audio/lr2-007.mp3',
-  'med-l2-014': '/mock-audio/l2-014.mp3',
+  'med-lr2-007': '/mock-audio/lr2-007.wav',
+  'med-l2-014': '/mock-audio/l2-014.wav',
   'med-img-l2-014': '/mock-image/l2-014.svg',
-  'med-lr2-008': '/mock-audio/lr2-008.mp3',
-  'med-lr2-009': '/mock-audio/lr2-009.mp3',
+  'med-lr2-008': '/mock-audio/lr2-008.wav',
+  'med-lr2-009': '/mock-audio/lr2-009.wav',
 };
 
 /* ============================================================

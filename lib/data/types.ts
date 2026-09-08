@@ -154,7 +154,12 @@ export type StudentDashboard = {
   /** Khối "Tiếp tục ở đây". */
   continueHere: {
     sectionCode: SectionDef['code'];
+    /** Tên PHẦN (聴読解) — chữ gradient cỡ lớn ở hero. */
+    partNameJa: string;
+    /** Tên section (資料聴読解問題) — dùng ở dòng phụ và trang luyện tập. */
     sectionNameJa: string;
+    /** Thứ tự section trong phần: 1, 2 hoặc 3. */
+    sectionOrder: number;
     setId: string;
     setTitleVi: string;
     indexNo: number;
@@ -168,5 +173,14 @@ export type StudentDashboard = {
   todayTasks: { id: string; titleVi: string; subtitleVi: string; meta: string; href: string }[];
   weakSkills: WeakSkill[];
   /** 7 phần tử, thứ Hai → Chủ nhật. */
-  weeklyActivity: { label: string; questions: number; isToday: boolean }[];
+  weeklyActivity: {
+    label: string;
+    /** Số câu thật trong ngày. */
+    questions: number;
+    /** Chiều cao cột tính theo % của ngày cao nhất trong tuần. */
+    heightPct: number;
+    isToday: boolean;
+  }[];
+  /** Tổng số câu trong tuần — cộng từ weeklyActivity. */
+  weeklyTotal: number;
 };

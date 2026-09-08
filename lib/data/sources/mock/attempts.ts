@@ -78,7 +78,7 @@ export async function getSetsBySection(sectionCode: SectionCode): Promise<Questi
 
 export async function getMockTests(): Promise<MockTestSummary[]> {
   // TODO(db): db.mockTest.findMany({ include: { items: true, attempts: { where: { userId } } } })
-  return MOCK_TESTS.map((t) => {
+  const rows = MOCK_TESTS.map((t) => {
     const items = MOCK_TEST_ITEMS.filter((i) => i.mockTestId === t.id);
     const perSection: Partial<Record<SectionCode, number>> = {};
     let questionCount = 0;
@@ -102,6 +102,17 @@ export async function getMockTests(): Promise<MockTestSummary[]> {
             }
           : null,
     };
+  });
+
+  // Đề chưa làm lên trước — đó là việc học viên cần làm tiếp.
+  // Đề đã làm xếp theo lần làm gần nhất.
+  return rows.sort((a, b) => {
+    if (!a.lastAttempt && b.lastAttempt) return -1;
+    if (a.lastAttempt && !b.lastAttempt) return 1;
+    if (a.lastAttempt && b.lastAttempt) {
+      return b.lastAttempt.takenAt.getTime() - a.lastAttempt.takenAt.getTime();
+    }
+    return a.code.localeCompare(b.code);
   });
 }
 
