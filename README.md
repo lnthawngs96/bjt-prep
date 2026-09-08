@@ -42,8 +42,6 @@ Mở http://localhost:3000. Giai đoạn này **không cần database** — dữ
 | `CLAUDE.md` | Quy ước dự án — **đọc trước khi viết dòng code đầu tiên** |
 | `docs/setup.md` | Bật Neon · bật đăng nhập Google · deploy Vercel |
 | `docs/versions.md` | Phiên bản thật và các quyết định kỹ thuật |
-| `docs/prototype.html` | Giao diện đã duyệt — mở ra xem khi phân vân layout |
-| `docs/login-dialog.html` | Dialog đăng nhập đã duyệt |
 
 ## Kiến trúc — điều quan trọng nhất
 

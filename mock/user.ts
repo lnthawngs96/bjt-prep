@@ -3,7 +3,7 @@ import { AttemptMode, Level, UserRole } from '@/lib/prisma-types';
 import { T0, T1, TODAY } from './_shared';
 
 /**
- * Học viên mẫu. Số liệu ở đây khớp với docs/prototype.html để đối chiếu thị giác:
+ * Học viên mẫu:
  * 412 điểm · bậc J3 · 47 ngày đến kỳ thi · tỉ lệ đúng 聴読解 52%.
  */
 

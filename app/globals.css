@@ -6,7 +6,7 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ============================================================
-   BIẾN MÀU — copy nguyên từ docs/prototype.html
+   BIẾN MÀU
    Dark mode là swap biến, không phải bộ class riêng.
    next-themes ghi data-theme lên <html>.
    ============================================================ */

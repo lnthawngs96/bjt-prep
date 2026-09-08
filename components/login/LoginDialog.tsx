@@ -9,7 +9,7 @@ import { useAuthDialog } from '@/stores/common/authDialogStore';
 import { LOGIN_PERKS } from '@/constants/login/loginPerks';
 import { cn } from '@/lib/utils';
 
-/** Dựng lại đúng docs/login-dialog.html bằng <Modal> tự viết. */
+/** Dialog đăng nhập Google — dựng bằng <Modal> tự viết. */
 export function LoginDialog({ googleConfigured = true }: { googleConfigured?: boolean }) {
   const { open, callbackURL, reason, hide } = useAuthDialog();
   const pathname = usePathname();

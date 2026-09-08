@@ -64,7 +64,7 @@ export function Modal({
           className,
         )}
       >
-        {/* Vạch gradient trên đỉnh dialog — theo docs/login-dialog.html */}
+        {/* Vạch gradient trên đỉnh dialog */}
         <span aria-hidden className="absolute inset-x-0 top-0 h-0.75 bg-(image:--g-line)" />
 
         <h2 id="modal-title" className={hideTitle ? 'sr-only' : 'sr-only'}>

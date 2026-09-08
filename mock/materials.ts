@@ -185,7 +185,7 @@ export const MOCK_MATERIALS: Material[] = [
     ...stamps,
   },
 
-  // ---- TABLE cho group LR2 — khớp đúng docs/prototype.html ----
+  // ---- TABLE cho group LR2 ----
   {
     id: 'mat-lr2-007-table',
     kind: MaterialKind.TABLE,

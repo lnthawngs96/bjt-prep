@@ -282,10 +282,6 @@ Các primitive còn lại:
 Chỉ CSS transition, bọc trong `prefers-reduced-motion`.
 Màn hình làm bài không có hiệu ứng vào trang — người dùng bấm "Câu tiếp theo" 80 lần trong hai tiếng.
 
-`docs/prototype.html` — giao diện đã duyệt.
-`docs/login-dialog.html` — dialog đăng nhập đã duyệt.
-Phân vân về layout thì mở hai file đó ra xem.
-
 ---
 
 ## Chấm điểm
