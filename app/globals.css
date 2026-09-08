@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Biến thể `dark:` bám theo data-theme của next-themes, KHÔNG theo
+   prefers-color-scheme mặc định của Tailwind — nếu không thì nút chuyển
+   theme bấm xong giao diện đổi mà `dark:` vẫn nghe hệ điều hành. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ============================================================
+   BIẾN MÀU — copy nguyên từ docs/prototype.html
+   Dark mode là swap biến, không phải bộ class riêng.
+   next-themes ghi data-theme lên <html>.
+   ============================================================ */
+
+:root,
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #0a1828;
+  --fg2: #54657a;
+  --fg3: #8796a8;
+  --ln: #e3eaf3;
+  --ln2: #f1f5fb;
+  --acc: #1c6fd4;
+  --acc-hi: #144e9e;
+  --acc-soft: #ebf3fd;
+  --acc-dim: #b8d2f2;
+  --ok: #0f8a62;
+  --ok-soft: #e3f5ee;
+  --ng: #c7365a;
+  --ng-soft: #fbe9ee;
+  --wr: #a87510;
+  --wr-soft: #f8f1df;
+
+  --sh: 0 8px 34px rgba(10, 24, 40, 0.13);
+  --sh-lg: 0 24px 70px rgba(10, 24, 40, 0.22);
+  --hd: 0 1px 0 rgba(10, 24, 40, 0.06);
+  --ov: rgba(10, 24, 40, 0.42);
+  --on-g: #ffffff;
+  --hdbg: rgba(255, 255, 255, 0.86);
+  --glow: radial-gradient(700px 220px at 10% -20%, rgba(35, 150, 232, 0.13), transparent 70%);
+  --glow-dlg: radial-gradient(420px 200px at 50% -30%, rgba(35, 150, 232, 0.15), transparent 70%);
 }
+
+:root[data-theme="dark"] {
+  --bg: #07121e;
+  --fg: #deeaf6;
+  --fg2: #8da2b9;
+  --fg3: #5e7288;
+  --ln: #1b2d42;
+  --ln2: #0f2032;
+  --acc: #4c9cec;
+  --acc-hi: #83bef7;
+  --acc-soft: #0e2740;
+  --acc-dim: #28496e;
+  --ok: #3bc48f;
+  --ok-soft: #0b2820;
+  --ng: #ef6f90;
+  --ng-soft: #2a1219;
+  --wr: #d8a63f;
+  --wr-soft: #2a2011;
+
+  --sh: 0 8px 34px rgba(0, 0, 0, 0.55);
+  --sh-lg: 0 24px 70px rgba(0, 0, 0, 0.7);
+  --hd: 0 1px 0 rgba(255, 255, 255, 0.05);
+  --ov: rgba(2, 8, 14, 0.66);
+  --on-g: #04101b;
+  --hdbg: rgba(7, 18, 30, 0.84);
+  --glow: radial-gradient(700px 220px at 10% -20%, rgba(43, 140, 224, 0.2), transparent 70%);
+  --glow-dlg: radial-gradient(420px 200px at 50% -30%, rgba(43, 140, 224, 0.24), transparent 70%);
+}
+
+/* Gradient dùng chung cho cả hai theme.
+   CHỈ dùng cho: logo, nút chính, số điểm lớn, tên phần cỡ lớn, chip đang chọn,
+   gạch chân tab, badge, viền active. KHÔNG BAO GIỜ cho chữ nội dung. */
+:root {
+  --g: linear-gradient(116deg, #1b4fd8 0%, #2e8fe0 46%, #23c9c2 100%);
+  --g-soft: linear-gradient(116deg, rgba(27, 79, 216, 0.13), rgba(35, 201, 194, 0.15));
+  --g-line: linear-gradient(90deg, #1b4fd8, #2e8fe0, #23c9c2);
+}
+
+/* ============================================================
+   TOKEN TAILWIND — Tailwind v4 là CSS-first, KHÔNG có tailwind.config.ts
+   ============================================================ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-fg2: var(--fg2);
+  --color-fg3: var(--fg3);
+  --color-ln: var(--ln);
+  --color-ln2: var(--ln2);
+  --color-acc: var(--acc);
+  --color-acc-hi: var(--acc-hi);
+  --color-acc-soft: var(--acc-soft);
+  --color-acc-dim: var(--acc-dim);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-ng: var(--ng);
+  --color-ng-soft: var(--ng-soft);
+  --color-wr: var(--wr);
+  --color-wr-soft: var(--wr-soft);
+  --color-on-g: var(--on-g);
+
+  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
+  --font-jp: var(--font-biz-udpgothic), serif;
+
+  --shadow-soft: var(--sh);
+  --shadow-dlg: var(--sh-lg);
+  --shadow-hd: var(--hd);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   NỀN TẢNG
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-be-vietnam-pro), system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+/* Màn hình làm bài ngồi hai tiếng — tôn trọng thiết lập của người dùng. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+
+@utility gt {
+  background: var(--g);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility jp {
+  font-family: var(--font-biz-udpgothic), serif;
+  letter-spacing: 0.01em;
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   ANIMATION — chỉ CSS transition, không thư viện.
+   Đã bọc prefers-reduced-motion ở khối nền tảng phía trên.
+   ============================================================ */
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes dialog-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
 }
