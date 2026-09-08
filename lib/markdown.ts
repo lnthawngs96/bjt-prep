@@ -5,7 +5,7 @@
  * danh sách gạch đầu dòng và đánh số. Mọi thứ khác là chữ thường — kể cả
  * thẻ HTML, nên không có đường nào cho script lọt vào trang.
  *
- * Trả về cây block thuần dữ liệu; components/shared/Markdown.tsx đổi thành
+ * Trả về cây block thuần dữ liệu; components/common/Markdown.tsx đổi thành
  * React element. Tách như vậy để test được mà không cần DOM.
  */
 

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Be_Vietnam_Pro, BIZ_UDPGothic } from 'next/font/google';
-import { ThemeProvider } from '@/components/shared/ThemeProvider';
+import { ThemeProvider } from '@/components/common/ThemeProvider';
 import './globals.css';
 
 const beVietnamPro = Be_Vietnam_Pro({

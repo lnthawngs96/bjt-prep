@@ -66,13 +66,13 @@ Kiểm lại khi nâng Prisma.
 
 ---
 
-## Hai sai lệch so với `docs/build-plan.md` bản gốc
+## Hai chỗ khác với kế hoạch dựng ban đầu
 
-Build-plan viết trước khi biết phiên bản thật. Hai chỗ dưới đây **build-plan sai, file này đúng**.
+Kế hoạch dựng viết trước khi biết phiên bản thật. Hai chỗ dưới đây **kế hoạch sai, file này đúng**.
 
-### 1. Không có `tailwind.config.ts` (build-plan §1.2)
+### 1. Không có `tailwind.config.ts`
 
-Build-plan bảo tạo `tailwind.config.ts` và map biến thành token. Tailwind v4 là **CSS-first** — `create-next-app` không sinh file config nữa, và file đó cũng không được đọc.
+Kế hoạch bảo tạo `tailwind.config.ts` và map biến thành token. Tailwind v4 là **CSS-first** — `create-next-app` không sinh file config nữa, và file đó cũng không được đọc.
 
 → Toàn bộ token khai báo bằng `@theme inline` trong `app/globals.css`.
 
@@ -85,7 +85,7 @@ v4:  bg-(--ov)     ← đúng
 
 `CLAUDE.md` dòng snippet Modal đã sửa theo v4.
 
-### 2. `prisma-client-js` và `previewFeatures` không còn (build-plan §1.1)
+### 2. `prisma-client-js` và `previewFeatures` không còn
 
 Prisma 7 bỏ generator `prisma-client-js`, và `driverAdapters` đã GA nên không còn là preview feature. Ngoài ra `url` không được phép nằm trong `datasource` của schema nữa.
 

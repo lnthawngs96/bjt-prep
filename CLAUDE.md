@@ -5,7 +5,7 @@ Sản phẩm luyện thi **BJT (ビジネス日本語能力テスト)** cho ngư
 **Giai đoạn hiện tại: nối database thật (Stage B), tiếp theo là admin (Stage C) và deploy Vercel (Stage D).**
 Tầng dữ liệu có hai nguồn cùng chữ ký: có `DATABASE_URL` thì đọc Prisma + Neon, không có thì đọc `mock/`. Đọc kỹ mục "Tầng dữ liệu". Chưa có R2, chưa có SRS.
 
-Đọc `docs/build-plan.md` (bốn phase gốc) và `docs/db-setup.md` trước khi bắt đầu.
+Ba việc cài đặt còn lại (Neon · Google OAuth · Vercel) nằm ở `docs/setup.md`.
 
 ---
 
@@ -129,19 +129,31 @@ app/
     questions/  vocabulary/  grammar/  media/  mock-tests/  users/  stats/
   api/auth/[...all]/          Better Auth — toNextJsHandler, KHÔNG phải NextAuth
   generated/prisma/           Prisma Client sinh ra, .gitignore
-components/
+
+components/                   CHIA THEO TRANG
   ui/                         primitive TỰ VIẾT: Button, Modal, Drawer, Tabs,
                               Chip, Field, Select, Tooltip, Toast, Badge
-  student/  admin/  shared/
-lib/
+  common/                     dùng ở ≥2 trang: ListRow · SectionHeading ·
+                              MaterialView · AudioPlayer · Markdown · ScoreRuler ·
+                              StartAttemptButton · Theme*
+  layout/                     khung học viên: Header · UserMenu
+  home/ vocabulary/ grammar/ practice/ mock-test/ exam/ result/ login/ admin/
+constants/    common/ + <trang>/
+types/        common/ + <trang>/
+stores/       common/authDialogStore · exam/examSessionStore
+services/api/ common/ + <trang>/   — hàm gọi API đặt tên theo endpoint
+
+lib/                          HẠ TẦNG DÙNG CHUNG, không thuộc trang nào
   data/                       TẦNG TRUY XUẤT — đọc mục trên
     types.ts                        QuestionForExam · QuestionWithAnswer · ExamPart
     source.ts                       USE_DB = Boolean(DATABASE_URL)
     sources/mock/                   đọc mock/
     sources/db/                     gọi Prisma, cùng chữ ký
-  validation/                 zod schema cho body request
+  validation/                 zod schema cho body request — dùng CHUNG cho
+                              server kiểm và client gửi
   prisma-types.ts             chỗ DUY NHẤT chạm đường dẫn client generated
-  auth.ts  auth-server.ts  db.ts  exam-rules.ts  grading.ts  scoring.ts  markdown.ts  utils.ts
+  hooks/  auth.ts  auth-server.ts  db.ts  exam-rules.ts  grading.ts
+  scoring.ts  markdown.ts  utils.ts
 mock/                         fixture nội dung
 prisma/schema.prisma  seed.ts (cấu trúc)  seed-content.ts (nội dung từ mock/)
 prisma.config.ts              Prisma 7 — thay cho key "prisma" trong package.json
@@ -154,6 +166,27 @@ docs/
 
 Hai route group `(student)` và `(admin)` có layout hoàn toàn khác nhau. Đừng gộp.
 
+### Quy ước đặt tên — theo trang, có tiền tố
+
+`app/` chỉ chứa `page.tsx`, `layout.tsx`, `route.ts`. **Không để component cạnh
+`page.tsx`** — nó thuộc `components/<trang>/`.
+
+| Loại | Nơi đặt | Tên |
+|---|---|---|
+| Component riêng một trang | `components/<trang>/` | PascalCase **có tiền tố tên trang**: `ExamRunner`, `VocabularyFlashcards`, `GrammarBrowser` |
+| Component dùng ≥2 trang | `components/common/` | tên trần — đường dẫn đã nói lên nó dùng chung |
+| Primitive | `components/ui/` | tên trần: `Button`, `Modal` |
+| Hằng số | `constants/<trang>/` hoặc `constants/common/` | file camelCase, biến `SCREAMING_SNAKE` có tiền tố: `GRAMMAR_LEVELS`, `LOGIN_PERKS` |
+| Type | `types/<trang>/` hoặc `types/common/` | có tiền tố: `MaterialTableBody`. **`Props` của một component thì để nguyên trong file component** |
+| Store Zustand | `stores/<trang>/` hoặc `stores/common/` | `<tên>Store.ts` |
+| Gọi API từ client | `services/api/<trang>/` | **tên hàm theo endpoint**: `POST /api/attempts` → `handlePostAttempts`; `POST /api/attempts/[id]/submit` → `handlePostAttemptSubmit` |
+
+Thư mục dùng kebab-case trùng tên route segment (`mock-test`).
+
+Component **không tự gọi `fetch`**. Mọi lời gọi đi qua `services/api/`, trả
+`ApiResult<T>` đã phân loại mã lỗi (`services/api/common/apiResult.ts`) — chỗ gọi
+`switch` trên `code` chứ không đọc `res.status`.
+
 ---
 
 ## Quy tắc giao diện
@@ -164,9 +197,23 @@ Hai route group `(student)` và `(admin)` có layout hoàn toàn khác nhau. Đ�
 - Nội dung học viên: một khung, `max-width: 1000px`, căn giữa.
 - Điểm nhấn tạo bằng cỡ chữ và khoảng trắng, không bằng khối màu.
 
+### Dùng class có sẵn, đừng viết arbitrary value
+
+**Ưu tiên class chuẩn của Tailwind.** `text-sm` chứ không `text-[13.5px]`,
+`rounded-lg` chứ không `rounded-[9px]`, `max-w-prose` chứ không `max-w-[62ch]`.
+
+Thứ Tailwind **thật sự không có** — gradient thương hiệu, shadow màu, đường cong
+easing riêng, animation, bề rộng khung 1000px, mốc 860px — thì khai thành **token
+trong `@theme inline`** của `app/globals.css` rồi dùng bằng tên: `shadow-btn`,
+`ease-smooth`, `animate-dialog-rise`, `max-w-content`, `max-nav:`, `nav:`.
+
+Chỉ để lại arbitrary value khi giá trị là hình học của một hiệu ứng cụ thể và đặt
+tên cho nó chỉ làm rối. Trước khi thêm một cái mới, hỏi: cái này có nên là token không?
+
 ### Màu
 ```css
 --g: linear-gradient(116deg,#1B4FD8 0%,#2E8FE0 46%,#23C9C2 100%);
+--g-ng: linear-gradient(90deg,#C7365A,#E0754B);   /* chỉ cho thanh điểm yếu */
 ```
 Gradient chỉ cho: logo, nút chính, số điểm lớn, tên phần cỡ lớn, chip đang chọn, gạch chân tab, badge, viền active.
 **Không bao giờ** cho chữ nội dung — mất contrast, app này ngồi hai tiếng.
@@ -307,14 +354,14 @@ Thiết kế sai từ bây giờ thì sau này phải viết lại.
 - **Đề thi thử chia PHẦN, mỗi phần một đồng hồ.** `buildExamParts` trong `lib/exam-rules.ts` gom group theo Part; hết giờ hoặc bấm "Kết thúc phần" thì sang phần kế và phần cũ khoá. Luyện tập là một phần.
 - **Mọi quy tắc chấm nằm trong `lib/grading.ts`**, dùng chung cho nguồn mock và DB: không nộp lại, chỉ chấm câu thuộc đề, từ chối nộp trễ quá `SUBMIT_GRACE_SEC`. Sửa quy tắc thì sửa ở đó và thêm test.
 - **Hàm tầng dữ liệu theo người dùng nhận `userId`** (`getAttempt(id, userId)`, `getMockTests(userId | null)`…). Lượt làm bài của người khác trả `null`, trang trả 404.
-- **DOCUMENT chỉ là markdown**, render qua `components/shared/Markdown.tsx`. Không `dangerouslySetInnerHTML` ở bất cứ đâu.
+- **DOCUMENT chỉ là markdown**, render qua `components/common/Markdown.tsx`. Không `dangerouslySetInnerHTML` ở bất cứ đâu.
 - **Next 16 dùng `proxy.ts`** thay cho `middleware.ts`, cùng vai trò.
 
 ## Thói quen
 
-- Trước khi code một phase, đọc phần tương ứng trong `docs/build-plan.md` và làm đúng tiêu chí nghiệm thu ở đó.
+- Đặt file mới theo bảng "Quy ước đặt tên" ở mục Cấu trúc thư mục. Không để component cạnh `page.tsx`.
 - Chạy `npm run typecheck`, `npm run lint` và `npm test` trước khi commit. Test bằng Vitest, nằm trong `tests/`, chỉ cho logic thuần và nguồn mock.
-- Không tự thêm tính năng ngoài phase đang làm.
+- Không tự thêm tính năng ngoài việc đang làm.
 - Không sửa `prisma/schema.prisma` mà không hỏi — nó là nguồn sự thật của cả dự án.
 
 <!-- BEGIN:nextjs-agent-rules -->

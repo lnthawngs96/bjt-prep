@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FaCheck, FaXmark } from 'react-icons/fa6';
 import { Badge } from '@/components/ui/Badge';
-import { Section, SectionHeading } from '@/components/student/SectionHeading';
+import { Section, SectionHeading } from '@/components/common/SectionHeading';
 import { getGrammarBySlug } from '@/lib/data/grammar';
 
 const REGISTER_LABEL: Record<string, string> = {
@@ -31,17 +31,17 @@ export default async function GrammarDetailPage({ params }: PageProps<'/grammar/
   const bad = g.examples.filter((e) => e.isNegative);
 
   return (
-    <div className="mx-auto max-w-[1000px] px-6">
+    <div className="mx-auto max-w-content px-6">
       <section className="relative py-12">
         <span
           aria-hidden
-          className="pointer-events-none absolute -inset-x-[200px] -top-[58px] bottom-0 bg-(image:--glow)"
+          className="pointer-events-none absolute -inset-x-50 -top-14 bottom-0 bg-(image:--glow)"
         />
-        <Link href="/grammar" className="relative mb-5 block text-[12.5px] text-fg3 hover:text-fg">
+        <Link href="/grammar" className="relative mb-5 block text-xs text-fg3 hover:text-fg">
           ← Ngữ pháp
         </Link>
-        <h1 className="jp gt relative mb-4 text-[44px] font-bold leading-tight">{g.pattern}</h1>
-        <p className="relative mb-4 text-[17px]">{g.meaningVi}</p>
+        <h1 className="jp gt relative mb-4 text-5xl font-bold leading-tight">{g.pattern}</h1>
+        <p className="relative mb-4 text-lg">{g.meaningVi}</p>
         <div className="relative flex flex-wrap gap-2">
           <Badge tone="gradient">{g.level.replace('_PLUS', '+')}</Badge>
           <Badge tone="neutral">
@@ -53,20 +53,20 @@ export default async function GrammarDetailPage({ params }: PageProps<'/grammar/
 
       <Section>
         <SectionHeading title="Cách cấu tạo" />
-        <p className="jp text-[17px]">{g.formation}</p>
+        <p className="jp text-lg">{g.formation}</p>
       </Section>
 
       {g.usageNoteVi && (
         <Section>
           <SectionHeading title="Dùng khi nào" />
-          <p className="max-w-[75ch] text-[14px] leading-relaxed text-fg2">{g.usageNoteVi}</p>
+          <p className="max-w-prose text-sm leading-relaxed text-fg2">{g.usageNoteVi}</p>
         </Section>
       )}
 
       {g.commonMistakeVi && (
         <Section>
           <SectionHeading title="Lỗi người Việt hay mắc" />
-          <p className="max-w-[75ch] border-l-2 border-l-ng pl-4 text-[14px] leading-relaxed text-fg2">
+          <p className="max-w-prose border-l-2 border-l-ng pl-4 text-sm leading-relaxed text-fg2">
             {g.commonMistakeVi}
           </p>
         </Section>
@@ -76,32 +76,32 @@ export default async function GrammarDetailPage({ params }: PageProps<'/grammar/
       <Section>
         <SectionHeading title="Ví dụ" meta={`${good.length} đúng · ${bad.length} sai`} />
         <div className="flex flex-wrap gap-x-12 gap-y-8">
-          <div className="min-w-[280px] flex-1">
-            <p className="mb-3 flex items-center gap-2 text-[11px] font-bold text-ok">
+          <div className="min-w-70 flex-1">
+            <p className="mb-3 flex items-center gap-2 text-xs font-bold text-ok">
               <FaCheck className="size-3" /> DÙNG ĐÚNG
             </p>
             {good.map((e) => (
               <div key={e.id} className="border-b border-ln py-4 first:border-t">
-                <p className="jp text-[14.5px] leading-[1.9]">{e.sentenceJa}</p>
-                <p className="mt-1 text-[12.5px] text-fg2">{e.meaningVi}</p>
-                {e.noteVi && <p className="mt-2 text-[12px] text-fg3">{e.noteVi}</p>}
+                <p className="jp text-sm leading-loose">{e.sentenceJa}</p>
+                <p className="mt-1 text-xs text-fg2">{e.meaningVi}</p>
+                {e.noteVi && <p className="mt-2 text-xs text-fg3">{e.noteVi}</p>}
               </div>
             ))}
           </div>
 
           {bad.length > 0 && (
-            <div className="min-w-[280px] flex-1">
-              <p className="mb-3 flex items-center gap-2 text-[11px] font-bold text-ng">
+            <div className="min-w-70 flex-1">
+              <p className="mb-3 flex items-center gap-2 text-xs font-bold text-ng">
                 <FaXmark className="size-3" /> DÙNG SAI
               </p>
               {bad.map((e) => (
                 <div key={e.id} className="border-b border-ln py-4 first:border-t">
-                  <p className="jp text-[14.5px] leading-[1.9] line-through decoration-ng/50">
+                  <p className="jp text-sm leading-loose line-through decoration-ng/50">
                     {e.sentenceJa}
                   </p>
-                  <p className="mt-1 text-[12.5px] text-fg2">{e.meaningVi}</p>
+                  <p className="mt-1 text-xs text-fg2">{e.meaningVi}</p>
                   {e.noteVi && (
-                    <p className="mt-2 border-l-2 border-l-ng pl-3 text-[12px] text-fg2">{e.noteVi}</p>
+                    <p className="mt-2 border-l-2 border-l-ng pl-3 text-xs text-fg2">{e.noteVi}</p>
                   )}
                 </div>
               ))}
