@@ -2,7 +2,7 @@
 
 Sản phẩm luyện thi **BJT (ビジネス日本語能力テスト)** cho người Việt. Nội dung do chủ dự án tự viết, nạp qua trang admin.
 
-**Giai đoạn hiện tại: nối database thật (Stage B), tiếp theo là admin (Stage C) và deploy Vercel (Stage D).**
+**Giai đoạn hiện tại: Stage A–C xong (học viên, DB thật, admin). Còn Stage D: deploy Vercel.**
 Tầng dữ liệu có hai nguồn cùng chữ ký: có `DATABASE_URL` thì đọc Prisma + Neon, không có thì đọc `mock/`. Đọc kỹ mục "Tầng dữ liệu". Chưa có R2, chưa có SRS.
 
 Ba việc cài đặt còn lại (Neon · Google OAuth · Vercel) nằm ở `docs/setup.md`.
@@ -68,15 +68,21 @@ npx prisma generate
 Prisma 7 sinh client vào `app/generated/prisma` (không còn `node_modules`). Để chỉ có **một** chỗ phải sửa nếu output đổi, mọi type đi qua `lib/prisma-types.ts`:
 
 ```ts
-// lib/prisma-types.ts — chỗ DUY NHẤT chạm vào đường dẫn generated
+// lib/prisma-types.ts — an toàn cho client: chỉ type và enum
 export type * from '@/app/generated/prisma/client';
-export { Prisma } from '@/app/generated/prisma/client'; // namespace giá trị: DbNull, TransactionClient, lỗi P2002
 export * from '@/app/generated/prisma/enums';
+
+// lib/prisma-server.ts — CHỈ server: namespace giá trị (DbNull, lỗi P2002)
+export { Prisma } from '@/app/generated/prisma/client';
 ```
+
+Hai file đó là hai chỗ duy nhất chạm đường dẫn generated. **Không export `Prisma` từ `prisma-types.ts`**: client component import enum từ đó sẽ kéo cả runtime Prisma vào bundle trình duyệt và Turbopack gãy (`node:module`).
 
 ```ts
 // mọi nơi khác
 import type { Question, QuestionGroup, VocabEntry, Level, SectionCode } from '@/lib/prisma-types';
+import type { Prisma } from '@/lib/prisma-types';   // Prisma.TransactionClient — type, dùng được ở đâu cũng được
+import { Prisma } from '@/lib/prisma-server';       // Prisma.DbNull — server
 ```
 
 **Đừng viết tay type song song.** Làm vậy sẽ lệch với schema và sau này phải sửa hai nơi.
@@ -352,6 +358,10 @@ Thiết kế sai từ bây giờ thì sau này phải viết lại.
 - **Hàm tầng dữ liệu theo người dùng nhận `userId`** (`getAttempt(id, userId)`, `getMockTests(userId | null)`…). Lượt làm bài của người khác trả `null`, trang trả 404.
 - **DOCUMENT chỉ là markdown**, render qua `components/common/Markdown.tsx`. Không `dangerouslySetInnerHTML` ở bất cứ đâu.
 - **Next 16 dùng `proxy.ts`** thay cho `middleware.ts`, cùng vai trò.
+
+## Trang quản trị — cách thêm một thao tác ghi
+
+Mọi mutation admin đi một đường: `lib/validation/admin/<entity>.ts` (zod) → `app/api/admin/<entity>/route.ts` dùng `adminRoute(schema, handler)` từ `lib/admin/route.ts` (kiểm ADMIN, parse, map lỗi Prisma) → hàm ghi trong `lib/data/sources/db/admin/<entity>.ts` chạy trong `db.$transaction` và gọi `logAudit` → client gọi qua `services/api/admin/<entity>Api.ts` với hook `useAdminMutation` (toast, lỗi theo ô, `router.refresh()`). Ném `AdminError` (`lib/admin/errors.ts`) để trả mã lỗi có chủ đích. Không có nguồn mock cho admin.
 
 ## Thói quen
 

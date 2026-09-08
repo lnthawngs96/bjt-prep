@@ -4,9 +4,9 @@ Web luyện thi **BJT — ビジネス日本語能力テスト** (Kỳ thi năng
 
 ## Trạng thái
 
-**Stage A xong** — trang học viên, đăng nhập Google, màn thi nhiều phần, chấm điểm ở server có test.
-**Stage B (nối Neon + Better Auth thật) đã viết code**, chờ có `DATABASE_URL` để migrate và kiểm thật.
-Tiếp theo: Stage C — admin CRUD trên DB, Stage D — deploy Vercel. Cả ba việc cài đặt nằm ở `docs/setup.md`.
+**Stage A, B, C xong** — trang học viên, đăng nhập Google, màn thi nhiều phần, chấm điểm ở server có test,
+Neon + Better Auth thật, trang quản trị CRUD đủ mọi thực thể (`/admin`) có audit log.
+Tiếp theo: Stage D — deploy Vercel theo mục 3 của `docs/setup.md`.
 
 Không có `DATABASE_URL` thì app chạy trên `mock/`: đủ để dev giao diện và chạy test, nhưng đăng nhập không bền và không lưu bài làm.
 

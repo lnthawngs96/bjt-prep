@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { Prisma } from '@/lib/prisma-types';
+import { Prisma } from '@/lib/prisma-server';
 import { gradeSubmission } from '@/lib/grading';
 import { mockTimeLimitSec, practiceTimeLimitSec } from '@/lib/exam-rules';
 import { getGroupsWithAnswersByMockTest, getGroupsWithAnswersBySet } from './questions';

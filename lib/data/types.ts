@@ -1,6 +1,7 @@
 import type {
   Attempt,
   AttemptAnswer,
+  ContentStatus,
   GrammarExample,
   GrammarPoint,
   Level,
@@ -10,11 +11,14 @@ import type {
   Question,
   QuestionGroup,
   QuestionOption,
+  QuestionReport,
   QuestionSet,
   MockTest,
+  SectionCode,
   SectionDef,
   PartDef,
   Tag,
+  User,
   VocabEntry,
   VocabExample,
   VocabTopic,
@@ -87,7 +91,7 @@ export type QuestionSetSummary = QuestionSet & {
 export type MockTestSummary = MockTest & {
   questionCount: number;
   /** Số câu theo từng section — dùng để cảnh báo đề chưa đủ 80 câu. */
-  perSection: Partial<Record<SectionDef['code'], number>>;
+  perSection: Partial<Record<SectionCode, number>>;
   lastAttempt: { attemptId: string; score: number; correct: number; takenAt: Date } | null;
 };
 
@@ -155,6 +159,106 @@ export type VocabWithExamples = VocabEntry & {
 export type VocabTopicWithCount = VocabTopic & { entryCount: number };
 
 export type GrammarWithExamples = GrammarPoint & { examples: GrammarExample[] };
+
+/* ============================================================
+   QUẢN TRỊ — hình dạng dữ liệu cho các trang /admin
+   ============================================================ */
+
+export type AdminOverview = {
+  questionsByStatus: Partial<Record<ContentStatus, number>>;
+  counts: {
+    groups: number;
+    materials: number;
+    media: number;
+    vocab: number;
+    grammar: number;
+    sets: number;
+    mockTests: number;
+    users: number;
+    attempts: number;
+    openReports: number;
+  };
+};
+
+/** Danh sách câu hỏi — nhẹ, đủ để lọc và tìm; sửa thì tải bản đầy đủ. */
+export type AdminQuestionRow = Pick<
+  Question,
+  'id' | 'stemJa' | 'sectionCode' | 'level' | 'status' | 'groupId' | 'order' | 'updatedAt'
+> & {
+  groupTitle: string;
+  optionCount: number;
+  spokenOptions: boolean;
+};
+
+export type AdminQuestionEditor = Question & {
+  options: QuestionOption[];
+  tagIds: string[];
+  vocabLinks: { vocabId: string; relevance: string }[];
+  grammarLinks: { grammarId: string; relevance: string }[];
+};
+
+export type AdminGroupRow = QuestionGroup & {
+  materials: { materialId: string; order: number; titleAdmin: string; kind: Material['kind'] }[];
+  questionCount: number;
+};
+
+export type AdminMaterialRow = Material & { media: MediaAsset | null; groupCount: number };
+
+export type AdminMediaRow = MediaAsset & { usageCount: number };
+
+export type AdminVocabRow = VocabEntry & {
+  examples: VocabExample[];
+  relations: { relatedId: string; relation: string; headword: string }[];
+};
+
+export type AdminGrammarRow = GrammarPoint & { examples: GrammarExample[] };
+
+export type AdminSetRow = QuestionSet & {
+  items: { groupId: string; order: number }[];
+  questionCount: number;
+};
+
+export type AdminMockTestRow = MockTest & {
+  items: { groupId: string; sectionCode: SectionCode; order: number }[];
+  perSection: Partial<Record<SectionCode, number>>;
+  questionCount: number;
+};
+
+export type AdminUserRow = Pick<User, 'id' | 'name' | 'email' | 'role' | 'banned' | 'createdAt'> & {
+  attemptCount: number;
+};
+
+export type AdminQuestionStat = {
+  questionId: string;
+  stemJa: string;
+  sectionCode: SectionCode;
+  attempts: number;
+  correct: number;
+  rate: number;
+  /** Tỉ lệ đúng < 10% hoặc > 95% với đủ lượt làm — nhiều khả năng đáp án nhập sai hoặc câu quá dễ. */
+  suspicious: boolean;
+};
+
+export type AdminReportRow = QuestionReport & {
+  question: Pick<Question, 'id' | 'stemJa' | 'sectionCode'>;
+  user: Pick<User, 'email' | 'name'> | null;
+};
+
+/** Danh sách chọn cho các form — tải một lần ở server component. */
+export type AdminLookups = {
+  parts: PartDef[];
+  sections: SectionDef[];
+  groups: (Pick<QuestionGroup, 'id' | 'titleAdmin' | 'sectionCode' | 'level' | 'status'> & {
+    /** Số câu PUBLISHED — để form đề thi thử đếm 80 câu ngay khi lắp. */
+    questionCount: number;
+  })[];
+  materials: Pick<Material, 'id' | 'titleAdmin' | 'kind'>[];
+  media: Pick<MediaAsset, 'id' | 'r2Key' | 'mime'>[];
+  tags: Tag[];
+  vocab: Pick<VocabEntry, 'id' | 'headword' | 'readingKana'>[];
+  grammar: Pick<GrammarPoint, 'id' | 'pattern' | 'slug'>[];
+  topics: VocabTopic[];
+};
 
 /* ============================================================
    HỌC VIÊN

@@ -7,22 +7,23 @@ export async function getSession() {
 }
 
 /**
- * Chặn Route Handler và Server Action của admin.
+ * Chặn Route Handler của admin.
  *
- * Middleware MỘT MÌNH KHÔNG ĐỦ: nó chỉ chắn điều hướng trang, còn ai gọi
- * thẳng vào API vẫn lọt. Mọi endpoint admin phải gọi hàm này.
+ * proxy.ts MỘT MÌNH KHÔNG ĐỦ: nó chỉ chắn điều hướng trang, còn ai gọi
+ * thẳng vào API vẫn lọt. Mọi endpoint admin phải đi qua hàm này (qua
+ * `adminRoute` trong lib/admin/route.ts).
  *
- * Trả về `null` khi hợp lệ, hoặc một Response để handler trả thẳng ra.
+ * Trả về `{ userId }` khi hợp lệ, hoặc một Response để handler trả thẳng ra.
  */
-export async function requireAdmin(): Promise<Response | null> {
+export async function requireAdmin(): Promise<{ userId: string } | Response> {
   const session = await getSession();
   if (!session) {
-    return Response.json({ error: 'Chưa đăng nhập' }, { status: 401 });
+    return Response.json({ error: 'Chưa đăng nhập', code: 'UNAUTHENTICATED' }, { status: 401 });
   }
   if (session.user.role !== 'ADMIN') {
-    return Response.json({ error: 'Không có quyền truy cập' }, { status: 403 });
+    return Response.json({ error: 'Không có quyền truy cập', code: 'FORBIDDEN' }, { status: 403 });
   }
-  return null;
+  return { userId: session.user.id };
 }
 
 export async function isAdmin(): Promise<boolean> {
