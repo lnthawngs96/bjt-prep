@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { levelSchema, optionalText, registerSchema, requiredText, slugSchema, statusSchema } from './common';
+import { levelSchema, optionalText, registerSchema, requiredText, slugSchema, sourceFields, statusSchema } from './common';
 
 export const grammarExampleInputSchema = z.object({
   sentenceJa: requiredText,
@@ -21,6 +21,7 @@ export const grammarInputSchema = z.object({
   usageNoteVi: optionalText,
   commonMistakeVi: optionalText,
   jlptLevel: optionalText,
+  ...sourceFields,
   status: statusSchema,
   examples: z.array(grammarExampleInputSchema).default([]),
 });

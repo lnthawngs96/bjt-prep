@@ -1,3 +1,4 @@
+import type { ContentSourceKey } from '@/constants/common/contentSources';
 import type { GrammarExample, GrammarPoint } from '@/lib/prisma-types';
 import { ContentStatus, Level, Register } from '@/lib/prisma-types';
 import { stamps } from './_shared';
@@ -5,6 +6,8 @@ import { stamps } from './_shared';
 type G = [
   id: string, slug: string, pattern: string, formation: string, meaningVi: string,
   register: Register, level: Level, usageNoteVi: string, commonMistakeVi: string | null, jlpt: string | null,
+  // Nguồn tham khảo — xem chú thích cùng tên trong mock/vocab.ts.
+  sourceKey?: ContentSourceKey | null,
 ];
 
 const R = Register;
@@ -15,7 +18,7 @@ const raw: G[] = [
     'Xin phép được làm việc gì đó', R.KENJOUGO, L.J2,
     'Dùng khi xin phép làm một việc với người trên. Hai điều kiện phải cùng đúng: việc đó cần sự cho phép của đối phương, VÀ mình được lợi từ việc đó.',
     'Người Việt hay dùng お〜になる cho hành động của chính mình. お提出になる là tự tôn kính bản thân — lỗi kính ngữ nặng nhất và phổ biến nhất.',
-    'N3'],
+    'N3', 'keigo-shishin-2007'],
   ['g-temorau', 'temorau-shiji', '〜てもらいましょう / 〜てもらう', 'Vて + もらう',
     'Nhờ/để người khác làm cho mình', R.TEINEIGO, L.J3,
     'Khi CẤP TRÊN dùng dạng này với cấp dưới thì đó là CHỈ THỊ, không phải đề nghị — dù hình thức nghe mềm.',
@@ -25,17 +28,17 @@ const raw: G[] = [
     'Là (thể lịch sự cao nhất của です)', R.TEINEIGO, L.J3,
     'Dùng khi tự giới thiệu công ty mình hoặc trình bày với khách. Trang trọng hơn です一 bậc.',
     'Dùng でございます cho hành động của khách. Nó là thể lịch sự về BẢN THÂN/sự vật, không phải tôn kính đối phương.',
-    'N3'],
+    'N3', 'keigo-shishin-2007'],
   ['g-oh-suru', 'o-suru', 'お〜する / ご〜する', 'お + V連用形 + する',
     'Khiêm nhường hoá hành động của mình hướng tới người trên', R.KENJOUGO, L.J3,
     'Chỉ dùng khi hành động của mình CÓ tác động tới người nghe: お待ちする, お送りする, ご連絡する.',
     'Dùng cho hành động không liên quan đến đối phương, ví dụ お帰りする để nói mình về — sai, vì việc mình về không tác động tới ai.',
-    'N4'],
+    'N4', 'keigo-shishin-2007'],
   ['g-oh-ni-naru', 'o-ni-naru', 'お〜になる / ご〜になる', 'お + V連用形 + になる',
     'Tôn kính hoá hành động của người trên', R.SONKEIGO, L.J3,
     'Chỉ dùng cho hành động của NGƯỜI KHÁC ở vị trí trên mình.',
     'Ghép nhầm với hành động của chính mình. Đây là cặp đối xứng với お〜する — nhớ theo cặp thì khó lẫn hơn nhớ rời.',
-    'N4'],
+    'N4', 'keigo-shishin-2007'],
   ['g-teoku', 'teoku', '〜ておく', 'Vて + おく',
     'Làm trước để chuẩn bị cho việc sau', R.PLAIN, L.J4,
     '〜ておいてください là chỉ thị chuẩn bị. Hình thức nghe nhẹ nhưng vẫn là mệnh lệnh có hạn chót.',
@@ -62,7 +65,7 @@ const raw: G[] = [
 ];
 
 export const MOCK_GRAMMAR: GrammarPoint[] = raw.map(
-  ([id, slug, pattern, formation, meaningVi, register, level, usageNoteVi, commonMistakeVi, jlptLevel]) => ({
+  ([id, slug, pattern, formation, meaningVi, register, level, usageNoteVi, commonMistakeVi, jlptLevel, sourceKey]) => ({
     id,
     slug,
     pattern,
@@ -73,6 +76,8 @@ export const MOCK_GRAMMAR: GrammarPoint[] = raw.map(
     usageNoteVi,
     commonMistakeVi,
     jlptLevel,
+    sourceKey: sourceKey ?? null,
+    sourceLocator: null,
     status: ContentStatus.PUBLISHED,
     ...stamps,
   }),

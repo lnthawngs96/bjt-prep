@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Chip } from '@/components/ui/Chip';
 import { Badge } from '@/components/ui/Badge';
 import { SectionHeading } from '@/components/common/SectionHeading';
+import { SourceRef } from '@/components/common/SourceRef';
 import type { VocabTopicWithCount } from '@/lib/data/types';
 import type { VocabEntry } from '@/lib/prisma-types';
 
@@ -63,6 +64,7 @@ export function VocabularyBrowser({
               </span>
             </div>
             {v.noteVi && <p className="mt-2 max-w-prose text-xs text-fg2">{v.noteVi}</p>}
+            <SourceRef className="mt-2" sourceKey={v.sourceKey} sourceLocator={v.sourceLocator} />
           </li>
         ))}
       </ul>

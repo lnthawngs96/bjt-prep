@@ -59,8 +59,13 @@ export type QuestionWithAnswer = Question & {
 
 export type MaterialWithMedia = Material & { media: MediaAsset | null };
 
-/** Group cho màn thi: tài liệu đầy đủ, câu hỏi đã lọc sạch đáp án. */
-export type GroupForExam = QuestionGroup & {
+/**
+ * Group cho màn thi: tài liệu đầy đủ, câu hỏi đã lọc sạch đáp án.
+ *
+ * Nguồn tham khảo (sourceKey/sourceLocator) là thông tin soạn bài nội bộ —
+ * không có lý do gì để nó xuống máy học viên, nên cắt ngay ở kiểu.
+ */
+export type GroupForExam = Omit<QuestionGroup, 'sourceKey' | 'sourceLocator'> & {
   materials: MaterialWithMedia[];
   questions: QuestionForExam[];
 };
