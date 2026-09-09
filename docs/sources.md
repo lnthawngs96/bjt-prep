@@ -121,17 +121,26 @@ Bản 第2版 đã cập nhật theo đề CBT. Hai thứ đáng lấy:
 Cặp đôi của 3.1 cho phần 読解. Bao trùm đúng ba section R1 語彙・文法 · R2 表現読解 ·
 R3 総合読解 — tức **nguồn ngữ pháp sát đề nhất** trong toàn bộ danh sách này.
 
-### 3.3 BJTビジネス日本語能力テスト 模試と対策
+### 3.3 ［音声DL版］BJTビジネス日本語能力テスト 模試と対策
 
 | | |
 |---|---|
 | Tác giả | 株式会社パソナHRソリューション |
 | NXB | アスク出版 |
-| Bản CD | 181 trang · B5 · ISBN 978-4-87217-610-0 |
-| Bản 音声DL | ISBN 978-4-86639-918-8 |
+| Phát hành | 02/2026 · 184 trang · B5 · âm thanh tải trên web |
+| ISBN | 978-4-86639-918-8 |
+
+Bản mới nhất của một cuốn có tuổi đời dài: bản đầu do JALアカデミー soạn, phát hành
+07/2006, ISBN 978-4-87217-610-0 — **bản 2006 đã lỗi thời**, chỉ dùng bản 音声DL版.
 
 Giải thích từng dạng câu hỏi và cách xử lý, kèm 1 đề mô phỏng. Hữu ích cho việc viết
 `explanationVi` — cách người Nhật giải thích "vì sao phương án này sai".
+
+### 3.4 ［音声DL版］BJTビジネス日本語能力テスト わかるビジネス日本語 *(chưa xác minh năm)*
+
+加藤清方 · 島田めぐみ · 澁川晶 · 小川茂夫 · アスク出版 · ISBN 978-4-86639-907-2.
+Cùng nhóm tác giả với sách 公式 đời đầu. Chưa xác minh được năm phát hành nên chưa
+đưa vào `constants/common/contentSources.ts`.
 
 ---
 
@@ -220,27 +229,51 @@ Quy tắc làm việc cho dự án: **sách dùng để quyết định *dạy c
 
 ---
 
-## 6. Cách gắn nguồn vào dữ liệu — thiết kế đề xuất
+## 6. Cách gắn nguồn vào dữ liệu — đã làm
 
-Hai phần, phần một không đụng schema, phần hai thì có.
+Hai phần rời nhau, đổi cái này không đụng cái kia.
 
-**Phần 1 — sổ đăng ký sách** (`constants/common/contentSources.ts`, chưa làm):
-mỗi cuốn một khoá ngắn (`bjt-official-mock-2017`, `kaisha-no-nihongo`, `keigo-shishin`…)
-kèm tên tiếng Nhật, tác giả, NXB, năm, ISBN, và cờ `isOfficial`. Giao diện đọc từ đây,
-dữ liệu chỉ giữ khoá — đổi cách hiển thị chỉ sửa một chỗ.
+**Sổ đăng ký sách** — `constants/common/contentSources.ts`, kiểu ở
+`types/common/contentSource.ts`. Mỗi cuốn một khoá ngắn (`bjt-official-mock-2017`,
+`kaisha-no-nihongo-2023`, `keigo-shishin-2007`…) kèm tên tiếng Nhật, tác giả, NXB, năm,
+ISBN, link và cờ `isOfficial` / `isFree`. Thêm sách mới chỉ sửa file này, **không cần
+migration**.
 
-**Phần 2 — trường ghi nguồn trong schema** (cần duyệt trước khi sửa
-`prisma/schema.prisma`): thêm vào `VocabEntry`, `GrammarPoint` và `QuestionGroup`
+**Trường trong schema** — `VocabEntry`, `GrammarPoint` và `QuestionGroup` mỗi bảng thêm:
 
 ```prisma
 sourceKey     String?   // khoá trỏ tới contentSources.ts
 sourceLocator String?   // "tr. 42" · "第2部 練習3" · "別冊 p.12"
 ```
 
-Chọn cách này thay vì thêm model `ContentSource` + bảng nối vì giai đoạn hiện tại một mục
-chỉ cần **một** nguồn tham chiếu, và mọi mục đều do chủ dự án tự viết. Nếu sau này cần
-nhiều nguồn cho một mục thì nâng lên bảng nối, lúc đó dữ liệu đã có sẵn khoá để chuyển.
+`sourceKey` để kiểu `String?` chứ không phải enum: sách chưa đăng ký vẫn lưu được, và
+đổi tên khoá không làm hỏng dữ liệu cũ — chỗ hiển thị tự lùi về in nguyên khoá.
 
-Hiển thị: một dòng nhỏ cỡ `text-sm` màu `--fg3` cuối thẻ từ vựng / mục ngữ pháp,
-dạng 「Tham khảo: カイシャの日本語 (難易度別語彙表)」. Không phải card, không viền —
-đúng quy tắc giao diện.
+Chọn hai cột thay vì thêm model `ContentSource` + bảng nối vì mỗi mục hiện chỉ cần MỘT
+nguồn tham chiếu. Nếu sau này cần nhiều nguồn cho một mục thì nâng lên bảng nối, lúc đó
+dữ liệu đã có sẵn khoá để chuyển.
+
+**Hiển thị** — `components/common/SourceRef.tsx`: một dòng `text-xs` màu `--fg3`,
+dạng 「Tham khảo: カイシャの日本語 · tr. 42」, có link tới trang nhà xuất bản nếu sổ đăng ký
+có. Không card, không viền. Hiện ở trang từ vựng và trang chi tiết ngữ pháp.
+
+**Nhập nguồn** — `components/admin/form/AdminSourceFields.tsx`, dùng chung cho ba form
+từ vựng · ngữ pháp · nhóm câu hỏi. Select chọn sách + ô ghi vị trí trong sách.
+
+**Nguồn của `QuestionGroup` KHÔNG xuống màn thi.** `GroupForExam` là
+`Omit<QuestionGroup, 'sourceKey' | 'sourceLocator'>`, và cả hai nguồn dữ liệu đều cắt hai
+trường này trước khi trả — cùng cách làm với `isCorrect`. Có `@ts-expect-error` trong
+`lib/data/security.assert.ts` giữ ràng buộc, và một test trong `tests/submit-flow.test.ts`
+kiểm ở runtime. Nguồn của đề là thông tin soát bản quyền nội bộ, học viên không cần thấy.
+
+---
+
+## 7. Việc còn lại cho phần nội dung
+
+Hiện chỉ những mục thật sự soạn theo một tài liệu cụ thể mới có `sourceKey` — nhóm động
+từ kính ngữ và bốn mẫu ngữ pháp kính ngữ, đều trỏ về **敬語の指針** (miễn phí, kiểm chứng
+được). Phần còn lại để `null`: gán bừa một cuốn sách vào một mục không soạn từ nó thì
+trích dẫn thành sai sự thật, tệ hơn là không ghi gì.
+
+`sourceLocator` trong mock đều `null` vì số trang phải mở đúng bản sách thật mới biết —
+đây là việc điền dần qua trang admin khi soạn nội dung.

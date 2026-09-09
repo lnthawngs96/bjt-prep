@@ -31,6 +31,8 @@ function scalarData(input: GroupInput) {
     titleAdmin: input.titleAdmin,
     instructionJa: input.instructionJa,
     instructionVi: input.instructionVi,
+    sourceKey: input.sourceKey,
+    sourceLocator: input.sourceLocator,
     status: input.status,
   };
 }

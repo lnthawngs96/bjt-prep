@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { idSchema, levelSchema, optionalInt, optionalText, posSchema, registerSchema, requiredText, statusSchema } from './common';
+import { idSchema, levelSchema, optionalInt, optionalText, posSchema, registerSchema, requiredText, sourceFields, statusSchema } from './common';
 
 export const VOCAB_RELATIONS = ['synonym', 'antonym', 'sonkeigo', 'kenjougo', 'teineigo'] as const;
 
@@ -23,6 +23,7 @@ export const vocabInputSchema = z.object({
   register: registerSchema.nullable().optional().transform((v) => v ?? null),
   audioId: optionalText,
   noteVi: optionalText,
+  ...sourceFields,
   status: statusSchema,
   examples: z.array(vocabExampleInputSchema).default([]),
   /** 言う → おっしゃる (sonkeigo) / 申す (kenjougo). */

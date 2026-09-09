@@ -10,6 +10,7 @@ import { AdminFilterBar } from './AdminFilterBar';
 import { AdminEmpty, AdminListRow } from './AdminListRow';
 import { AdminStatusBadge } from './AdminStatusBadge';
 import { AdminEnumSelect } from './form/AdminEnumSelect';
+import { AdminSourceFields } from './form/AdminSourceFields';
 import { AdminFormRow, AdminFormSection } from './form/AdminFormSection';
 import {
   ADMIN_LEVELS,
@@ -30,14 +31,15 @@ const LEVEL_LABELS = Object.fromEntries(ADMIN_LEVELS.map((l) => [l, levelLabel(l
 function empty(): VocabInput {
   return {
     headword: '', readingKana: '', accent: null, pos: 'NOUN', meaningVi: '', meaningEn: null, level: 'J3',
-    topicId: null, register: null, audioId: null, noteVi: null, status: 'DRAFT', examples: [], relations: [],
+    topicId: null, register: null, audioId: null, noteVi: null, sourceKey: null, sourceLocator: null,
+    status: 'DRAFT', examples: [], relations: [],
   };
 }
 function toInput(v: AdminVocabRow): VocabInput {
   return {
     headword: v.headword, readingKana: v.readingKana, accent: v.accent, pos: v.pos, meaningVi: v.meaningVi,
     meaningEn: v.meaningEn, level: v.level, topicId: v.topicId, register: v.register, audioId: v.audioId,
-    noteVi: v.noteVi, status: v.status,
+    noteVi: v.noteVi, sourceKey: v.sourceKey, sourceLocator: v.sourceLocator, status: v.status,
     examples: v.examples.map((e) => ({ sentenceJa: e.sentenceJa, sentenceKana: e.sentenceKana, meaningVi: e.meaningVi, contextTag: e.contextTag, audioId: e.audioId })),
     relations: v.relations.map((r) => ({ relatedId: r.relatedId, relation: r.relation as VocabInput['relations'][number]['relation'] })),
   };
@@ -136,6 +138,12 @@ export function AdminVocabularyList({ rows, lookups }: { rows: AdminVocabRow[]; 
                 ))}
               </Select>
               <TextareaField label="Ghi chú dùng khi nào, tránh nhầm với từ nào" rows={3} value={v.noteVi ?? ''} onChange={(e) => set('noteVi', e.target.value || null)} />
+              <AdminSourceFields
+                sourceKey={v.sourceKey}
+                sourceLocator={v.sourceLocator}
+                onSourceKey={(x) => set('sourceKey', x)}
+                onSourceLocator={(x) => set('sourceLocator', x)}
+              />
             </AdminFormSection>
 
             <AdminFormSection title="Ví dụ">

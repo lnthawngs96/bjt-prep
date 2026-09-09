@@ -31,6 +31,8 @@ function scalarData(input: VocabInput) {
     register: input.register,
     audioId: input.audioId,
     noteVi: input.noteVi,
+    sourceKey: input.sourceKey,
+    sourceLocator: input.sourceLocator,
     status: input.status,
   };
 }

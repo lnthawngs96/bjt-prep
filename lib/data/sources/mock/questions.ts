@@ -20,7 +20,7 @@ import type {
   QuestionForExam,
   QuestionWithAnswer,
 } from '@/lib/data/types';
-import type { GrammarPoint, Question, QuestionOption, Tag, VocabEntry } from '@/lib/prisma-types';
+import type { GrammarPoint, Question, QuestionGroup, QuestionOption, Tag, VocabEntry } from '@/lib/prisma-types';
 
 /* ============================================================
    HÀM NỘI BỘ
@@ -72,6 +72,12 @@ function questionsOfGroup(groupId: string): Question[] {
    ============================================================ */
 
 /** Group cho màn thi. Trả về KHÔNG có isCorrect, explanationVi, distractorNote. */
+/** Cắt nguồn tham khảo khỏi group trước khi trả cho màn thi — xem GroupForExam. */
+function toExamGroup(g: QuestionGroup): Omit<QuestionGroup, 'sourceKey' | 'sourceLocator'> {
+  const { sourceKey: _k, sourceLocator: _l, ...rest } = g;
+  return rest;
+}
+
 export async function getGroupsForExamBySet(setId: string): Promise<GroupForExam[]> {
   // TODO(db): const items = await db.questionSetItem.findMany({
   //   where: { setId }, orderBy: { order: 'asc' },
@@ -86,7 +92,7 @@ export async function getGroupsForExamBySet(setId: string): Promise<GroupForExam
     .flatMap((i) => {
       const g = MOCK_GROUP_BY_ID.get(i.groupId);
       if (!g) return [];
-      return [{ ...g, materials: materialsOf(g.id), questions: questionsOfGroup(g.id).map(toExam) }];
+      return [{ ...toExamGroup(g), materials: materialsOf(g.id), questions: questionsOfGroup(g.id).map(toExam) }];
     });
 }
 
@@ -97,7 +103,7 @@ export async function getGroupsForExamByMockTest(mockTestId: string): Promise<Gr
     .flatMap((i) => {
       const g = MOCK_GROUP_BY_ID.get(i.groupId);
       if (!g) return [];
-      return [{ ...g, materials: materialsOf(g.id), questions: questionsOfGroup(g.id).map(toExam) }];
+      return [{ ...toExamGroup(g), materials: materialsOf(g.id), questions: questionsOfGroup(g.id).map(toExam) }];
     });
 }
 

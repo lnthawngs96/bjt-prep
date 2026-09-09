@@ -358,6 +358,13 @@ Thiết kế sai từ bây giờ thì sau này phải viết lại.
 - **Hàm tầng dữ liệu theo người dùng nhận `userId`** (`getAttempt(id, userId)`, `getMockTests(userId | null)`…). Lượt làm bài của người khác trả `null`, trang trả 404.
 - **DOCUMENT chỉ là markdown**, render qua `components/common/Markdown.tsx`. Không `dangerouslySetInnerHTML` ở bất cứ đâu.
 - **Next 16 dùng `proxy.ts`** thay cho `middleware.ts`, cùng vai trò.
+- **Nguồn tham khảo ghi bằng `sourceKey` + `sourceLocator`** trên `VocabEntry`,
+  `GrammarPoint` và `QuestionGroup`. `sourceKey` là khoá trỏ vào sổ sách
+  `constants/common/contentSources.ts` (thêm sách không cần migration); hiển thị qua
+  `components/common/SourceRef.tsx`. Ghi nguồn nghĩa là "soạn theo tham khảo", không
+  phải "trích nguyên văn" — danh mục sách và ranh giới bản quyền ở `docs/sources.md`.
+  Nguồn của `QuestionGroup` là thông tin nội bộ, **không xuống màn thi**: `GroupForExam`
+  đã cắt hai trường này.
 
 ## Trang quản trị — cách thêm một thao tác ghi
 

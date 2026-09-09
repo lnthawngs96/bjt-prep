@@ -34,6 +34,11 @@ describe('luồng mở và nộp bài (nguồn mock)', () => {
     for (const g of groups) for (const q of g.questions) for (const o of q.options) {
       expect(o).not.toHaveProperty('isCorrect');
     }
+    // Nguồn tham khảo là thông tin soạn bài nội bộ, cũng không xuống màn thi.
+    for (const g of groups) {
+      expect(g).not.toHaveProperty('sourceKey');
+      expect(g).not.toHaveProperty('sourceLocator');
+    }
 
     const answers = correctAnswersFor(ids);
     answers[0].selectedOptionId = `${ids[0]}-o1`; // cố tình sai một câu — o1 không phải đáp án

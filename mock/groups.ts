@@ -7,6 +7,9 @@ import { stamps } from './_shared';
  * Một audio hoặc một bảng số liệu phục vụ nhiều câu.
  * Mọi câu đều thuộc một group, kể cả câu 語彙・文法 đứng một mình —
  * group đó có 1 câu và 0 tài liệu. Một đường đi duy nhất, query đơn giản hơn.
+ *
+ * sourceKey/sourceLocator của group là thông tin NỘI BỘ để soát bản quyền, không
+ * hiện cho học viên. Đề mẫu ở đây do dự án tự viết nên đều null — xem docs/sources.md.
  */
 
 export const MOCK_GROUPS: QuestionGroup[] = [
@@ -19,6 +22,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Vừa nghe hội thoại vừa xem bảng số liệu, rồi trả lời câu hỏi.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -30,6 +35,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Xem ảnh, nghe phát ngôn rồi chọn cách đáp lại phù hợp nhất.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -41,6 +48,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Chọn phương án phù hợp nhất điền vào chỗ trống.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -52,6 +61,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Đọc email sau rồi trả lời câu hỏi.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -63,6 +74,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Vừa nghe hội thoại vừa xem biểu đồ, rồi trả lời câu hỏi.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -74,6 +87,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Vừa nghe hội thoại vừa xem bảng lịch, rồi trả lời câu hỏi.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
 
@@ -87,6 +102,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Nhìn ảnh. Câu hỏi và bốn phương án được đọc trong audio, chọn số của phương án phù hợp nhất.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -98,6 +115,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Vừa nhìn ảnh vừa nghe hội thoại. Câu hỏi và phương án được đọc trong audio.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -109,6 +128,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Xem tranh minh hoạ, nghe hội thoại rồi trả lời các câu hỏi.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -120,6 +141,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Vừa xem bảng và email vừa nghe hội thoại, rồi trả lời câu hỏi.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
   {
@@ -131,6 +154,8 @@ export const MOCK_GROUPS: QuestionGroup[] = [
     instructionVi: 'Đọc 稟議書 (đơn xin phê duyệt) sau rồi trả lời câu hỏi.',
     status: ContentStatus.PUBLISHED,
     createdById: null,
+    sourceKey: null,
+    sourceLocator: null,
     ...stamps,
   },
 ];

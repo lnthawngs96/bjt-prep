@@ -40,3 +40,13 @@ export const slugSchema = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Chỉ chữ thường, số và dấu gạch ngang');
 
 export const orderedItemSchema = z.object({ id: idSchema, order: z.number().int().min(0) });
+
+/**
+ * Nguồn tham khảo. `sourceKey` để tự do là chuỗi chứ không z.enum theo
+ * CONTENT_SOURCES: sách mới thêm vào constants là dùng được ngay, và dữ liệu cũ
+ * không gãy nếu một khoá bị đổi tên. Chỗ hiển thị tự lùi về in nguyên khoá.
+ */
+export const sourceFields = {
+  sourceKey: optionalText,
+  sourceLocator: optionalText,
+};

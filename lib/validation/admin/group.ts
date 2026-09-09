@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { idSchema, levelSchema, optionalText, requiredText, sectionCodeSchema, statusSchema } from './common';
+import { idSchema, levelSchema, optionalText, requiredText, sectionCodeSchema, sourceFields, statusSchema } from './common';
 
 export const groupInputSchema = z.object({
   sectionCode: sectionCodeSchema,
@@ -7,6 +7,8 @@ export const groupInputSchema = z.object({
   titleAdmin: requiredText,
   instructionJa: optionalText,
   instructionVi: optionalText,
+  /** Nguồn chỉ để soát bản quyền — không xuống màn thi, xem GroupForExam. */
+  ...sourceFields,
   status: statusSchema,
   /** Tài liệu gắn vào group, theo thứ tự hiển thị. */
   materials: z.array(z.object({ materialId: idSchema, order: z.number().int().min(1) })).default([]),

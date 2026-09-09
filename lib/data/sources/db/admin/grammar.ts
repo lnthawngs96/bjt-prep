@@ -22,6 +22,8 @@ function scalarData(input: GrammarInput) {
     usageNoteVi: input.usageNoteVi,
     commonMistakeVi: input.commonMistakeVi,
     jlptLevel: input.jlptLevel,
+    sourceKey: input.sourceKey,
+    sourceLocator: input.sourceLocator,
     status: input.status,
   };
 }

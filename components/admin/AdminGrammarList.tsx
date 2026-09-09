@@ -10,6 +10,7 @@ import { AdminEmpty, AdminListRow } from './AdminListRow';
 import { AdminStatusBadge } from './AdminStatusBadge';
 import { AdminCheckbox } from './form/AdminCheckbox';
 import { AdminEnumSelect } from './form/AdminEnumSelect';
+import { AdminSourceFields } from './form/AdminSourceFields';
 import { AdminFormRow, AdminFormSection } from './form/AdminFormSection';
 import { ADMIN_LEVELS, ADMIN_REGISTER_LABELS, ADMIN_STATUS_LABELS, levelLabel } from '@/constants/admin/adminLabels';
 import { useAdminMutation } from '@/lib/hooks/useAdminMutation';
@@ -21,12 +22,13 @@ import type { Level, Register } from '@/lib/prisma-types';
 const LEVEL_LABELS = Object.fromEntries(ADMIN_LEVELS.map((l) => [l, levelLabel(l)])) as Record<Level, string>;
 
 function empty(): GrammarInput {
-  return { slug: '', pattern: '', formation: '', meaningVi: '', register: 'TEINEIGO', level: 'J3', usageNoteVi: null, commonMistakeVi: null, jlptLevel: null, status: 'DRAFT', examples: [] };
+  return { slug: '', pattern: '', formation: '', meaningVi: '', register: 'TEINEIGO', level: 'J3', usageNoteVi: null, commonMistakeVi: null, jlptLevel: null, sourceKey: null, sourceLocator: null, status: 'DRAFT', examples: [] };
 }
 function toInput(g: AdminGrammarRow): GrammarInput {
   return {
     slug: g.slug, pattern: g.pattern, formation: g.formation, meaningVi: g.meaningVi, register: g.register, level: g.level,
-    usageNoteVi: g.usageNoteVi, commonMistakeVi: g.commonMistakeVi, jlptLevel: g.jlptLevel, status: g.status,
+    usageNoteVi: g.usageNoteVi, commonMistakeVi: g.commonMistakeVi, jlptLevel: g.jlptLevel,
+    sourceKey: g.sourceKey, sourceLocator: g.sourceLocator, status: g.status,
     examples: g.examples.map((e) => ({ sentenceJa: e.sentenceJa, meaningVi: e.meaningVi, contextTag: e.contextTag, isNegative: e.isNegative, noteVi: e.noteVi, audioId: e.audioId })),
   };
 }
@@ -108,6 +110,12 @@ export function AdminGrammarList({ rows }: { rows: AdminGrammarRow[] }) {
               </AdminFormRow>
               <TextareaField label="Dùng khi nào" rows={3} value={v.usageNoteVi ?? ''} onChange={(e) => set('usageNoteVi', e.target.value || null)} />
               <TextareaField label="Lỗi người Việt hay mắc" rows={3} value={v.commonMistakeVi ?? ''} onChange={(e) => set('commonMistakeVi', e.target.value || null)} />
+              <AdminSourceFields
+                sourceKey={v.sourceKey}
+                sourceLocator={v.sourceLocator}
+                onSourceKey={(x) => set('sourceKey', x)}
+                onSourceLocator={(x) => set('sourceLocator', x)}
+              />
             </AdminFormSection>
 
             <AdminFormSection title="Ví dụ" hint="Đánh dấu ví dụ SAI để hiện cạnh ví dụ đúng — học kính ngữ mà không thấy ví dụ sai thì khó nhớ.">

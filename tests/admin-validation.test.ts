@@ -84,6 +84,22 @@ describe('grammar và mock test', () => {
     expect(grammarInputSchema.safeParse({ ...base, slug: 'sasete-itadaku' }).success).toBe(true);
     expect(grammarInputSchema.safeParse({ ...base, slug: 'Sasete Itadaku' }).success).toBe(false);
   });
+  it('nguồn tham khảo: ô trống thành null, khoá lạ vẫn nhận', () => {
+    const base = { pattern: 'x', formation: 'x', meaningVi: 'x', register: 'PLAIN', level: 'J3', status: 'DRAFT', slug: 'x' };
+
+    const trong = grammarInputSchema.parse(base);
+    expect(trong.sourceKey).toBeNull();
+    expect(trong.sourceLocator).toBeNull();
+
+    const rong = grammarInputSchema.parse({ ...base, sourceKey: '  ', sourceLocator: '' });
+    expect(rong.sourceKey).toBeNull();
+
+    // Sách chưa đăng ký trong contentSources.ts vẫn lưu được — chỗ hiển thị tự
+    // lùi về in nguyên khoá, còn hơn từ chối và mất nguồn.
+    const la = grammarInputSchema.parse({ ...base, sourceKey: 'sach-cua-rieng-toi', sourceLocator: 'tr. 42' });
+    expect(la.sourceKey).toBe('sach-cua-rieng-toi');
+    expect(la.sourceLocator).toBe('tr. 42');
+  });
   it('mã đề in hoa', () => {
     expect(mockTestInputSchema.safeParse({ code: 'MT-04', titleVi: 'x' }).success).toBe(true);
     expect(mockTestInputSchema.safeParse({ code: 'mt-04', titleVi: 'x' }).success).toBe(false);

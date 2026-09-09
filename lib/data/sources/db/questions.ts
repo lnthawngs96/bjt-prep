@@ -99,7 +99,9 @@ async function groupsForExam(ids: string[]): Promise<GroupForExam[]> {
     where: { id: { in: ids } },
     include: { ...MATERIALS, ...QUESTIONS_FOR_EXAM },
   });
-  return sortByIds(rows, ids).map(({ materials, questions, ...g }) => ({
+  // sourceKey/sourceLocator bị bỏ ở đây, giống cách options phải dùng `select`:
+  // cắt tại nguồn thì không phụ thuộc vào kỷ luật của chỗ gọi.
+  return sortByIds(rows, ids).map(({ materials, questions, sourceKey: _k, sourceLocator: _l, ...g }) => ({
     ...g,
     materials: flattenMaterials(materials),
     questions: questions.map(toExam),

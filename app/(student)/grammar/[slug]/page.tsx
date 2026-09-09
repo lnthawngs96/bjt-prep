@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { FaCheck, FaXmark } from 'react-icons/fa6';
 import { Badge } from '@/components/ui/Badge';
 import { Section, SectionHeading } from '@/components/common/SectionHeading';
+import { SourceRef } from '@/components/common/SourceRef';
 import { getGrammarBySlug } from '@/lib/data/grammar';
 
 const REGISTER_LABEL: Record<string, string> = {
@@ -113,6 +114,12 @@ export default async function GrammarDetailPage({ params }: PageProps<'/grammar/
           )}
         </div>
       </Section>
+
+      {g.sourceKey && (
+        <Section>
+          <SourceRef sourceKey={g.sourceKey} sourceLocator={g.sourceLocator} />
+        </Section>
+      )}
 
       <div className="h-40" />
     </>

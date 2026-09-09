@@ -11,10 +11,12 @@
  * Đừng xoá file này. Nó là thứ duy nhất biến quy tắc trong CLAUDE.md thành
  * ràng buộc mà máy kiểm được.
  */
-import type { QuestionForExam, QuestionWithAnswer } from './types';
+import type { GroupForExam, GroupWithAnswers, QuestionForExam, QuestionWithAnswer } from './types';
 
 declare const examQuestion: QuestionForExam;
 declare const reviewQuestion: QuestionWithAnswer;
+declare const examGroup: GroupForExam;
+declare const reviewGroup: GroupWithAnswers;
 
 // --- Màn thi KHÔNG được đọc các trường này ---
 
@@ -39,6 +41,12 @@ examQuestion.options[0].isCorrect;
 // @ts-expect-error Vì sao phương án kia sai cũng là nội dung sau khi nộp.
 examQuestion.options[0].distractorNote;
 
+// @ts-expect-error Nguồn tham khảo là thông tin soạn bài, không phải của học viên.
+examGroup.sourceKey;
+
+// @ts-expect-error Vị trí trong sách lại càng không.
+examGroup.sourceLocator;
+
 // --- Màn xem lại thì đọc được hết, không có lỗi nào ở dưới ---
 
 reviewQuestion.explanationVi;
@@ -46,5 +54,7 @@ reviewQuestion.businessNoteVi;
 reviewQuestion.stemVi;
 reviewQuestion.options[0].isCorrect;
 reviewQuestion.options[0].distractorNote;
+reviewGroup.sourceKey;
+reviewGroup.sourceLocator;
 
 export {};

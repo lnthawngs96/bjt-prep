@@ -1,3 +1,4 @@
+import type { ContentSourceKey } from '@/constants/common/contentSources';
 import type { VocabEntry, VocabExample, VocabRelation, VocabTopic } from '@/lib/prisma-types';
 import { ContentStatus, Level, PartOfSpeech, Register } from '@/lib/prisma-types';
 import { stamps } from './_shared';
@@ -15,6 +16,9 @@ export const MOCK_VOCAB_TOPICS: VocabTopic[] = [
 type V = [
   id: string, headword: string, kana: string, pos: PartOfSpeech, meaningVi: string,
   level: Level, topicId: string, register: Register | null, noteVi: string | null,
+  // Nguồn tham khảo — chỉ ghi ở mục thật sự soạn theo một tài liệu cụ thể.
+  // Phần còn lại để null cho tới khi chủ dự án đối chiếu sách của mình.
+  sourceKey?: ContentSourceKey | null,
 ];
 
 const P = PartOfSpeech;
@@ -41,15 +45,27 @@ const raw: V[] = [
 
   // ---- 電話・来客対応 ----
   ['v-mairu', '参る', 'まいる', P.VERB_U, 'Đi/đến (khiêm nhường)', L.J3, 'vt-denwa-taiou', R.KENJOUGO,
-    'Khiêm nhường của 行く và 来る. Nói về người TRONG công ty mình với người ngoài thì dùng từ này.'],
+    'Khiêm nhường của 行く và 来る. Nói về người TRONG công ty mình với người ngoài thì dùng từ này. '
+    + 'Theo 敬語の指針 đây là 謙譲語Ⅱ (丁重語): nó hạ mình trước NGƯỜI NGHE, không cần có cấp trên nào '
+    + 'trong câu — khác 伺う/拝見する (謙譲語Ⅰ) vốn bắt buộc phải có đối tượng được kính. Vì vậy '
+    + '「電車が参ります」 nói được, còn 「電車を伺います」 thì không.',
+    'keigo-shishin-2007'],
   ['v-irassharu', 'いらっしゃる', 'いらっしゃる', P.VERB_U, 'Đi/đến/có mặt (tôn kính)', L.J3, 'vt-denwa-taiou', R.SONKEIGO,
-    'Tôn kính của 行く・来る・いる. Chỉ dùng cho người ngoài hoặc cấp trên — dùng cho đồng nghiệp mình trước mặt khách là sai.'],
+    'Tôn kính của 行く・来る・いる. Chỉ dùng cho người ngoài hoặc cấp trên — dùng cho đồng nghiệp mình trước mặt khách là sai.',
+    'keigo-shishin-2007'],
   ['v-haiken', '拝見する', 'はいけんする', P.VERB_IRR, 'Xem (khiêm nhường)', L.J3, 'vt-denwa-taiou', R.KENJOUGO,
-    'Khiêm nhường của 見る. Cặp đối là ご覧になる (tôn kính).'],
-  ['v-goran', 'ご覧になる', 'ごらんになる', P.VERB_U, 'Xem (tôn kính)', L.J3, 'vt-denwa-taiou', R.SONKEIGO, null],
-  ['v-ossharu', 'おっしゃる', 'おっしゃる', P.VERB_U, 'Nói (tôn kính)', L.J3, 'vt-denwa-taiou', R.SONKEIGO, null],
+    'Khiêm nhường của 見る. Cặp đối là ご覧になる (tôn kính). Đây là 謙譲語Ⅰ theo 敬語の指針: '
+    + 'bắt buộc có người được kính làm chủ của vật được xem.',
+    'keigo-shishin-2007'],
+  ['v-goran', 'ご覧になる', 'ごらんになる', P.VERB_U, 'Xem (tôn kính)', L.J3, 'vt-denwa-taiou', R.SONKEIGO, null,
+    'keigo-shishin-2007'],
+  ['v-ossharu', 'おっしゃる', 'おっしゃる', P.VERB_U, 'Nói (tôn kính)', L.J3, 'vt-denwa-taiou', R.SONKEIGO, null,
+    'keigo-shishin-2007'],
   ['v-mousu', '申す', 'もうす', P.VERB_U, 'Nói (khiêm nhường)', L.J3, 'vt-denwa-taiou', R.KENJOUGO,
-    'Tự giới thiệu tên luôn dùng 〜と申します, không dùng 〜と言います trong công việc.'],
+    'Tự giới thiệu tên luôn dùng 〜と申します, không dùng 〜と言います trong công việc. Cùng nhóm '
+    + '謙譲語Ⅱ với 参る theo 敬語の指針 — hạ mình trước người nghe chứ không hạ trước đối tượng của '
+    + 'hành động, nên 「雨が降ると申しております」 nói về thời tiết vẫn đúng.',
+    'keigo-shishin-2007'],
   ['v-raikyaku', '来客', 'らいきゃく', P.NOUN, 'Khách đến thăm', L.J4, 'vt-denwa-taiou', null, null],
   ['v-meishi', '名刺', 'めいし', P.NOUN, 'Danh thiếp', L.J5, 'vt-denwa-taiou', null,
     'Nhận bằng hai tay, đọc ngay, đặt lên bàn theo thứ tự chỗ ngồi. Nhét túi quần là thất lễ.'],
@@ -89,7 +105,7 @@ const raw: V[] = [
 ];
 
 export const MOCK_VOCAB: VocabEntry[] = raw.map(
-  ([id, headword, readingKana, pos, meaningVi, level, topicId, register, noteVi]) => ({
+  ([id, headword, readingKana, pos, meaningVi, level, topicId, register, noteVi, sourceKey]) => ({
     id,
     headword,
     readingKana,
@@ -102,6 +118,9 @@ export const MOCK_VOCAB: VocabEntry[] = raw.map(
     register,
     audioId: null,
     noteVi,
+    sourceKey: sourceKey ?? null,
+    // Vị trí trong sách do admin nhập khi soạn nội dung từ bản sách thật.
+    sourceLocator: null,
     status: ContentStatus.PUBLISHED,
     ...stamps,
   }),

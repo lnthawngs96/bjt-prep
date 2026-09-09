@@ -9,6 +9,7 @@ import { AdminFilterBar } from './AdminFilterBar';
 import { AdminEmpty, AdminListRow } from './AdminListRow';
 import { AdminStatusBadge } from './AdminStatusBadge';
 import { AdminEnumSelect } from './form/AdminEnumSelect';
+import { AdminSourceFields } from './form/AdminSourceFields';
 import { AdminFormRow, AdminFormSection } from './form/AdminFormSection';
 import { AdminOrderedPicker } from './form/AdminOrderedPicker';
 import {
@@ -27,7 +28,7 @@ import type { Level, SectionCode } from '@/lib/prisma-types';
 const LEVEL_LABELS = Object.fromEntries(ADMIN_LEVELS.map((l) => [l, levelLabel(l)])) as Record<Level, string>;
 
 function empty(): GroupInput {
-  return { sectionCode: 'LR2', level: 'J3', titleAdmin: '', instructionJa: null, instructionVi: null, status: 'DRAFT', materials: [] };
+  return { sectionCode: 'LR2', level: 'J3', titleAdmin: '', instructionJa: null, instructionVi: null, sourceKey: null, sourceLocator: null, status: 'DRAFT', materials: [] };
 }
 function toInput(g: AdminGroupRow): GroupInput {
   return {
@@ -36,6 +37,8 @@ function toInput(g: AdminGroupRow): GroupInput {
     titleAdmin: g.titleAdmin,
     instructionJa: g.instructionJa,
     instructionVi: g.instructionVi,
+    sourceKey: g.sourceKey,
+    sourceLocator: g.sourceLocator,
     status: g.status,
     materials: g.materials.map((m) => ({ materialId: m.materialId, order: m.order })),
   };
@@ -117,6 +120,12 @@ export function AdminGroupList({ rows, lookups }: { rows: AdminGroupRow[]; looku
               </AdminFormRow>
               <TextareaField label="Hướng dẫn (tiếng Nhật)" rows={2} className="[&_textarea]:jp" value={v.instructionJa ?? ''} onChange={(e) => set('instructionJa', e.target.value || null)} />
               <TextareaField label="Hướng dẫn (tiếng Việt)" rows={2} value={v.instructionVi ?? ''} onChange={(e) => set('instructionVi', e.target.value || null)} />
+              <AdminSourceFields
+                sourceKey={v.sourceKey}
+                sourceLocator={v.sourceLocator}
+                onSourceKey={(x) => set('sourceKey', x)}
+                onSourceLocator={(x) => set('sourceLocator', x)}
+              />
             </AdminFormSection>
             <AdminFormSection title="Tài liệu" hint="Theo thứ tự hiển thị: thường audio trước, bảng hoặc ảnh sau.">
               <AdminOrderedPicker
